@@ -6,7 +6,7 @@ import { flushSync } from "react-dom"
 import { createRoot, type Root } from "react-dom/client"
 
 //* Styles imports
-import "../../app/globals.css"
+import "../../src/app/globals.css"
 
 type StoryModule = Record<string, ComponentType<Record<string, unknown>>>
 
@@ -23,8 +23,8 @@ declare global {
 }
 
 const stories = import.meta.glob<StoryModule>([
-  "../../components/**/*.story.tsx",
-  "../../app/**/*.story.tsx",
+  "../../src/components/**/*.story.tsx",
+  "../../src/app/**/*.story.tsx",
 ])
 
 function storyPath(file: string) {
