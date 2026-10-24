@@ -22,10 +22,10 @@ type SignUpInput = {
 }
 
 async function fillSignUpForm(page: Page, input: SignUpInput) {
-  await page.getByLabel("Name").fill(input.name)
-  await page.getByLabel("Email").fill(input.email)
-  await page.getByLabel("Password", { exact: true }).fill(input.password)
-  await page.getByLabel("Confirm password").fill(input.confirmPassword)
+  await page.getByLabel("Nome").fill(input.name)
+  await page.getByLabel("E-mail").fill(input.email)
+  await page.getByLabel("Senha", { exact: true }).fill(input.password)
+  await page.getByLabel("Confirmar senha").fill(input.confirmPassword)
 }
 
 async function mockSignUp(
@@ -47,14 +47,14 @@ describe("sign-up page", () => {
     await page.goto("/sign-up")
 
     await expect(
-      page.getByRole("heading", { name: "Create an account" })
+      page.getByRole("heading", { name: "Criar uma conta" })
     ).toBeVisible()
-    await expect(page.getByLabel("Name")).toBeVisible()
-    await expect(page.getByLabel("Email")).toBeVisible()
-    await expect(page.getByLabel("Password", { exact: true })).toBeVisible()
-    await expect(page.getByLabel("Confirm password")).toBeVisible()
+    await expect(page.getByLabel("Nome")).toBeVisible()
+    await expect(page.getByLabel("E-mail")).toBeVisible()
+    await expect(page.getByLabel("Senha", { exact: true })).toBeVisible()
+    await expect(page.getByLabel("Confirmar senha")).toBeVisible()
     await expect(
-      page.getByRole("button", { name: "Create account" })
+      page.getByRole("button", { name: "Criar conta" })
     ).toBeVisible()
   })
 
@@ -75,11 +75,13 @@ describe("sign-up page", () => {
       password: "short",
       confirmPassword: "short",
     })
-    await page.getByRole("button", { name: "Create account" }).click()
+    await page.getByRole("button", { name: "Criar conta" }).click()
 
-    await expect(page.getByText("Enter a valid email address")).toBeVisible()
     await expect(
-      page.getByText("Password must be at least 8 characters")
+      page.getByText("Digite um endereço de e-mail válido")
+    ).toBeVisible()
+    await expect(
+      page.getByText("A senha deve ter pelo menos 8 caracteres")
     ).toBeVisible()
     expect(requestCount).toBe(0)
     await expect(page).toHaveURL(/\/sign-up$/)
@@ -107,10 +109,10 @@ describe("sign-up page", () => {
       password: "correct-horse-1",
       confirmPassword: "correct-horse-1",
     })
-    await page.getByRole("button", { name: "Create account" }).click()
+    await page.getByRole("button", { name: "Criar conta" }).click()
 
     await expect(
-      page.getByText("User already exists. Use another email.")
+      page.getByText("O usuário já existe. Use outro e-mail.")
     ).toBeVisible()
     await expect(page).toHaveURL(/\/sign-up$/)
   })
@@ -146,10 +148,10 @@ describe("sign-up page", () => {
       password: "correct-horse-1",
       confirmPassword: "correct-horse-1",
     })
-    await page.getByRole("button", { name: "Create account" }).click()
+    await page.getByRole("button", { name: "Criar conta" }).click()
 
     await expect(
-      page.getByRole("heading", { name: "Project ready!" })
+      page.getByRole("heading", { name: "Projeto pronto!" })
     ).toBeVisible()
     await expect(page).toHaveURL("/")
   })
