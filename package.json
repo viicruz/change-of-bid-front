@@ -13,6 +13,8 @@
     "test:e2e": "playwright test --project=e2e",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit",
+    "check-messages": "node scripts/check-messages-parity.ts",
+    "test:unit": "node --test tests/unit/scripts/check-messages-parity.test.ts",
     "fallow": "npx fallow",
     "react-doctor": "npx react-doctor@latest"
   },
@@ -26,6 +28,7 @@
     "cn": "^0.5.0",
     "lucide-react": "^1.61.0",
     "next": "16.4.2",
+    "next-intl": "^4.14.9",
     "next-themes": "^0.4.6",
     "react": "19.3.0",
     "react-dom": "19.3.0",
