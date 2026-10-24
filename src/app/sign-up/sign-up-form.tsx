@@ -2,6 +2,7 @@
 
 //* Libraries imports
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useTranslations } from "next-intl"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm, type UseFormRegisterReturn } from "react-hook-form"
@@ -10,6 +11,9 @@ import { useForm, type UseFormRegisterReturn } from "react-hook-form"
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
+
+//* Hooks imports
+import { useErrorTranslations } from "@/src/hooks/commons/use-error-translations"
 
 //* Auth imports
 import { authClient } from "@/src/lib/auth-client"
@@ -25,8 +29,6 @@ const apiFieldByCode = {
 } as const
 
 type ApiFieldCode = keyof typeof apiFieldByCode
-
-const fallbackErrorMessage = "Unable to create the account."
 
 function isApiFieldCode(code: unknown): code is ApiFieldCode {
   return typeof code === "string" && code in apiFieldByCode
@@ -64,7 +66,9 @@ function SignUpField(props: {
 
 export function SignUpForm() {
   const router = useRouter()
-  const [formError, setFormError] = useState<string | null>(null)
+  const t = useTranslations("pages./sign-up")
+  const translateError = useErrorTranslations()
+  const [formErrorCode, setFormErrorCode] = useState<string | null>(null)
   const [isSigningUp, setIsSigningUp] = useState(false)
   const form = useForm<SignUpValues>({
     resolver: zodResolver(signUpSchema),
@@ -77,7 +81,7 @@ export function SignUpForm() {
   })
 
   async function onSubmit(values: SignUpValues) {
-    setFormError(null)
+    setFormErrorCode(null)
     setIsSigningUp(true)
     let signedUp = false
 
@@ -89,22 +93,21 @@ export function SignUpForm() {
       })
 
       if (result.error) {
-        const message = result.error.message || fallbackErrorMessage
         const code = result.error.code
 
         if (isApiFieldCode(code)) {
-          form.setError(apiFieldByCode[code], { message })
+          form.setError(apiFieldByCode[code], { message: code })
           return
         }
 
-        setFormError(message)
+        setFormErrorCode(typeof code === "string" ? code : "")
         return
       }
 
       signedUp = true
       router.push("/")
     } catch {
-      setFormError(fallbackErrorMessage)
+      setFormErrorCode("")
     } finally {
       if (!signedUp) {
         setIsSigningUp(false)
@@ -123,39 +126,53 @@ export function SignUpForm() {
     >
       <SignUpField
         id="sign-up-name"
-        label="Name"
+        label={t("name")}
         type="text"
         autoComplete="name"
-        error={errors.name?.message}
+        error={
+          errors.name?.message ? translateError(errors.name.message) : undefined
+        }
         registration={form.register("name")}
       />
       <SignUpField
         id="sign-up-email"
-        label="Email"
+        label={t("email")}
         type="email"
         autoComplete="email"
-        error={errors.email?.message}
+        error={
+          errors.email?.message
+            ? translateError(errors.email.message)
+            : undefined
+        }
         registration={form.register("email")}
       />
       <SignUpField
         id="sign-up-password"
-        label="Password"
+        label={t("password")}
         type="password"
         autoComplete="new-password"
-        error={errors.password?.message}
+        error={
+          errors.password?.message
+            ? translateError(errors.password.message)
+            : undefined
+        }
         registration={form.register("password")}
       />
       <SignUpField
         id="sign-up-confirm-password"
-        label="Confirm password"
+        label={t("confirmPassword")}
         type="password"
         autoComplete="new-password"
-        error={errors.confirmPassword?.message}
+        error={
+          errors.confirmPassword?.message
+            ? translateError(errors.confirmPassword.message)
+            : undefined
+        }
         registration={form.register("confirmPassword")}
       />
-      {formError ? (
+      {formErrorCode !== null ? (
         <p id="sign-up-error" role="alert" className="text-sm text-destructive">
-          {formError}
+          {translateError(formErrorCode)}
         </p>
       ) : null}
       <Button
@@ -164,7 +181,7 @@ export function SignUpForm() {
         className="w-full"
         disabled={isSigningUp}
       >
-        {isSigningUp ? "Creating account..." : "Create account"}
+        {isSigningUp ? t("submitting") : t("submit")}
       </Button>
     </form>
   )
