@@ -5,6 +5,12 @@ import { StrictMode, type ComponentType } from "react"
 import { flushSync } from "react-dom"
 import { createRoot, type Root } from "react-dom/client"
 
+//* Components imports
+import { ComponentProviders } from "../support/component-providers"
+
+//* Locale imports
+import { locales, type Locale } from "../../src/lib/locale"
+
 //* Styles imports
 import "../../src/app/globals.css"
 
@@ -13,6 +19,11 @@ type StoryModule = Record<string, ComponentType<Record<string, unknown>>>
 type MountParams = {
   story: string
   props?: Record<string, unknown>
+  locale?: Locale
+}
+
+function isLocale(value: unknown): value is Locale {
+  return typeof value === "string" && locales.some((locale) => locale === value)
 }
 
 declare global {
@@ -58,11 +69,15 @@ if (!rootElement) {
 
 let root: Root | undefined
 
-window.mount = async ({ story, props }) => {
+window.mount = async ({ story, props, locale }) => {
   const Story = await resolveStory(story)
 
   if (!Story) {
     throw new Error(`Unknown story: ${story}`)
+  }
+
+  if (locale !== undefined && !isLocale(locale)) {
+    throw new Error(`Unknown locale: ${String(locale)}`)
   }
 
   const activeRoot = (root ??= createRoot(rootElement))
@@ -70,7 +85,9 @@ window.mount = async ({ story, props }) => {
   flushSync(() => {
     activeRoot.render(
       <StrictMode>
-        <Story {...(props ?? {})} />
+        <ComponentProviders locale={locale}>
+          <Story {...(props ?? {})} />
+        </ComponentProviders>
       </StrictMode>
     )
   })
