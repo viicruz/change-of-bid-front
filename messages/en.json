@@ -1,0 +1,39 @@
+{
+  "pages": {
+    "/": {
+      "title": "Project ready!",
+      "description": "You may now add components and start building.",
+      "buttonAdded": "We've already added the button component for you.",
+      "button": "Button",
+      "darkModeHint": "(Press <kbd>d</kbd> to toggle dark mode)"
+    },
+    "/sign-up": {
+      "title": "Create an account",
+      "description": "Sign up with your email and password.",
+      "name": "Name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "submit": "Create account",
+      "submitting": "Creating account..."
+    }
+  },
+  "schemas": {
+    "NAME_REQUIRED": "Name is required",
+    "INVALID_EMAIL": "Enter a valid email address",
+    "PASSWORD_TOO_SHORT": "Password must be at least 8 characters",
+    "PASSWORD_TOO_LONG": "Password must be at most 128 characters",
+    "PASSWORDS_DO_NOT_MATCH": "Passwords do not match",
+    "00000_UNKNOWN_ERROR": "Unable to create the account."
+  },
+  "exceptions": {
+    "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": "User already exists. Use another email."
+  },
+  "localeSelect": {
+    "label": "Language",
+    "locales": {
+      "en": "English",
+      "pt-br": "Português (Brasil)"
+    }
+  }
+}

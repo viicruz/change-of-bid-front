@@ -1,0 +1,39 @@
+{
+  "pages": {
+    "/": {
+      "title": "Projeto pronto!",
+      "description": "Agora você pode adicionar componentes e começar a construir.",
+      "buttonAdded": "O componente de botão já foi adicionado para você.",
+      "button": "Botão",
+      "darkModeHint": "(Pressione <kbd>d</kbd> para alternar o modo escuro)"
+    },
+    "/sign-up": {
+      "title": "Criar uma conta",
+      "description": "Cadastre-se com seu e-mail e senha.",
+      "name": "Nome",
+      "email": "E-mail",
+      "password": "Senha",
+      "confirmPassword": "Confirmar senha",
+      "submit": "Criar conta",
+      "submitting": "Criando conta..."
+    }
+  },
+  "schemas": {
+    "NAME_REQUIRED": "O nome é obrigatório",
+    "INVALID_EMAIL": "Digite um endereço de e-mail válido",
+    "PASSWORD_TOO_SHORT": "A senha deve ter pelo menos 8 caracteres",
+    "PASSWORD_TOO_LONG": "A senha deve ter no máximo 128 caracteres",
+    "PASSWORDS_DO_NOT_MATCH": "As senhas não coincidem",
+    "00000_UNKNOWN_ERROR": "Não foi possível criar a conta."
+  },
+  "exceptions": {
+    "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": "O usuário já existe. Use outro e-mail."
+  },
+  "localeSelect": {
+    "label": "Idioma",
+    "locales": {
+      "en": "English",
+      "pt-br": "Português (Brasil)"
+    }
+  }
+}
