@@ -109,6 +109,37 @@
         "closed": "Encerrado"
       }
     },
+    "/auctioneer": {
+      "title": "Painel do leiloeiro",
+      "description": "Gerencie seus lotes e as cartas que estão neles.",
+      "createLot": "Criar lote",
+      "lotSearchLabel": "Buscar lotes",
+      "lotSearchPlaceholder": "Buscar pelo nome do lote",
+      "lotFiltersLabel": "Filtrar lotes",
+      "lotsLabel": "Lotes",
+      "cardsInLot": "Cartas já no lote",
+      "assistanceMenu": "Menu de auxílio",
+      "lotName": "Nome",
+      "lotDescription": "Descrição",
+      "minimalValue": "Lance inicial",
+      "minimumIncrement": "Incremento mínimo",
+      "startsAt": "Início do leilão",
+      "cardSearchTitle": "Pesquisa de cartas",
+      "cardSearchLabel": "Buscar cartas",
+      "cardSearchPlaceholder": "Buscar pelo nome da carta",
+      "cardFiltersLabel": "Filtrar por tipo",
+      "statuses": {
+        "live": "Ao vivo",
+        "scheduled": "Agendado",
+        "closed": "Encerrado"
+      },
+      "cardTypes": {
+        "monster": "Monstro",
+        "spell": "Magia",
+        "trap": "Armadilha",
+        "extra": "Extra Deck"
+      }
+    },
     "/sign-in": {
       "title": "Entrar",
       "description": "Entre com seu e-mail e senha.",
