@@ -1,11 +1,30 @@
 {
   "pages": {
     "/": {
-      "title": "Projeto pronto!",
-      "description": "Agora você pode adicionar componentes e começar a construir.",
-      "buttonAdded": "O componente de botão já foi adicionado para você.",
-      "button": "Botão",
-      "darkModeHint": "(Pressione <kbd>d</kbd> para alternar o modo escuro)"
+      "title": "Vitrine de lotes",
+      "ctaTitle": "Entre no leilão",
+      "ctaDescription": "Cadastre-se para dar lances em cartas de Yu-Gi-Oh.",
+      "ctaButton": "Começar a dar lances",
+      "searchLabel": "Buscar lotes",
+      "searchPlaceholder": "Buscar pelo nome do lote",
+      "filtersLabel": "Filtrar por tipo",
+      "cardTypes": {
+        "monster": "Monstro",
+        "spell": "Magia",
+        "trap": "Armadilha",
+        "extra": "Extra Deck"
+      },
+      "sections": {
+        "live": "Lotes ao vivo",
+        "scheduled": "Lotes agendados",
+        "closed": "Lotes encerrados"
+      },
+      "empty": "Nenhum lote encontrado.",
+      "currentBid": "Lance atual",
+      "finalBid": "Lance final",
+      "endsAt": "Termina em",
+      "startsAt": "Começa em",
+      "endedAt": "Encerrado em"
     },
     "/sign-up": {
       "title": "Criar uma conta",

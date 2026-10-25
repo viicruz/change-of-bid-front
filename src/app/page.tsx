@@ -2,28 +2,20 @@
 import { getTranslations } from "next-intl/server"
 
 //* Components imports
-import { Button } from "@/src/components/ui/button"
+import { LotShowcase } from "@/src/components/home/lot-showcase"
+import { ShowcaseCta } from "@/src/components/home/showcase-cta"
 
 export default async function Page() {
   const t = await getTranslations("pages./")
 
   return (
-    <div className="flex flex-1 p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-        <div>
-          <h1 className="font-medium">{t("title")}</h1>
-          <p>{t("description")}</p>
-          <p>{t("buttonAdded")}</p>
-          <Button id="home-ready-button" type="button" className="mt-2">
-            {t("button")}
-          </Button>
-        </div>
-        <div className="font-mono text-xs text-muted-foreground">
-          {t.rich("darkModeHint", {
-            kbd: (chunks) => <kbd>{chunks}</kbd>,
-          })}
-        </div>
+    <main className="flex flex-1 flex-col items-center gap-6 py-6">
+      <div className="w-full max-w-7xl">
+        <ShowcaseCta />
       </div>
-    </div>
+      <div className="flex w-full max-w-3xl flex-col px-6">
+        <LotShowcase />
+      </div>
+    </main>
   )
 }

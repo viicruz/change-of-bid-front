@@ -138,9 +138,6 @@ describe("sign-in page", () => {
     })
     await page.getByRole("button", { name: "Entrar" }).click()
 
-    await expect(
-      page.getByRole("heading", { name: "Projeto pronto!" })
-    ).toBeVisible()
     await expect(page).toHaveURL("/")
     await expect
       .poll(() => page.evaluate((key) => sessionStorage.getItem(key), tokenKey))
