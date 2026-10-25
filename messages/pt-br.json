@@ -15,7 +15,18 @@
       "password": "Senha",
       "confirmPassword": "Confirmar senha",
       "submit": "Criar conta",
-      "submitting": "Criando conta..."
+      "submitting": "Criando conta...",
+      "signInLink": "Já tenho uma conta"
+    },
+    "/sign-in": {
+      "title": "Entrar",
+      "description": "Entre com seu e-mail e senha.",
+      "email": "E-mail",
+      "password": "Senha",
+      "submit": "Entrar",
+      "submitting": "Entrando...",
+      "unknownError": "Não foi possível entrar.",
+      "signUpLink": "Criar uma conta"
     }
   },
   "schemas": {
@@ -27,7 +38,8 @@
     "00000_UNKNOWN_ERROR": "Não foi possível criar a conta."
   },
   "exceptions": {
-    "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": "O usuário já existe. Use outro e-mail."
+    "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": "O usuário já existe. Use outro e-mail.",
+    "INVALID_EMAIL_OR_PASSWORD": "E-mail ou senha inválidos."
   },
   "localeSelect": {
     "label": "Idioma",
