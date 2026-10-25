@@ -1,11 +1,30 @@
 {
   "pages": {
     "/": {
-      "title": "Project ready!",
-      "description": "You may now add components and start building.",
-      "buttonAdded": "We've already added the button component for you.",
-      "button": "Button",
-      "darkModeHint": "(Press <kbd>d</kbd> to toggle dark mode)"
+      "title": "Lot showcase",
+      "ctaTitle": "Join the auction",
+      "ctaDescription": "Create an account to bid on Yu-Gi-Oh cards.",
+      "ctaButton": "Start bidding",
+      "searchLabel": "Search lots",
+      "searchPlaceholder": "Search by lot name",
+      "filtersLabel": "Filter by type",
+      "cardTypes": {
+        "monster": "Monster",
+        "spell": "Spell",
+        "trap": "Trap",
+        "extra": "Extra Deck"
+      },
+      "sections": {
+        "live": "Live lots",
+        "scheduled": "Scheduled lots",
+        "closed": "Closed lots"
+      },
+      "empty": "No lots found.",
+      "currentBid": "Current bid",
+      "finalBid": "Final bid",
+      "endsAt": "Ends at",
+      "startsAt": "Starts at",
+      "endedAt": "Ended at"
     },
     "/sign-up": {
       "title": "Create an account",
