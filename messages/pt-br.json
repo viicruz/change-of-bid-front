@@ -37,6 +37,21 @@
       "submitting": "Criando conta...",
       "signInLink": "Já tenho uma conta"
     },
+    "/wallet": {
+      "title": "Carteira",
+      "description": "Veja o saldo e as últimas transações.",
+      "devNotice": "Modo de desenvolvimento. O saldo adicionado aqui é artificial e existe só nesta sessão.",
+      "devAmountLabel": "Valor a adicionar",
+      "devSubmit": "Adicionar saldo",
+      "totalBalance": "Saldo total",
+      "historyTitle": "Histórico de transações",
+      "transactions": {
+        "deposit": "Depósito inicial",
+        "bid": "Lance em Blue-Eyes White Dragon",
+        "refund": "Reembolso de lance",
+        "devTopUp": "Crédito artificial"
+      }
+    },
     "/sign-in": {
       "title": "Entrar",
       "description": "Entre com seu e-mail e senha.",

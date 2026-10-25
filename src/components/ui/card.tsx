@@ -100,3 +100,15 @@ export {
   CardDescription,
   CardContent,
 }
+
+const card = {
+  Root: Card,
+  Header: CardHeader,
+  Footer: CardFooter,
+  Title: CardTitle,
+  Action: CardAction,
+  Description: CardDescription,
+  Content: CardContent,
+}
+
+export default card;
