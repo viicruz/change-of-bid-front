@@ -11,7 +11,7 @@ export function ShowcaseCta() {
   const t = useTranslations("pages./")
 
   return (
-    <div className="min-h-96 w-full justify-center rounded-none bg-blue-600 px-4 flex flex-col gap-4 items-start">
+    <div className="min-h-96 w-full justify-center rounded-none px-4 flex flex-col gap-4 items-start">
       <div>
         <h1 className="font-heading text-xl font-medium">{t("ctaTitle")}</h1>
         <div>{t("ctaDescription")}</div>

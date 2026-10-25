@@ -33,7 +33,7 @@ export function WalletSummary() {
   return (
     <div className="flex w-full flex-col items-center gap-6">
       <BalanceCard balance={walletBalance(transactions)} />
-      <div className="w-full max-w-lg bg-red-500">
+      <div className="w-full max-w-lg">
         <DevBalanceNotice onAddBalance={onAddBalance} />
       </div>
       <section

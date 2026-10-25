@@ -39,7 +39,7 @@ export function DevBalanceNotice(props: DevBalanceNoticeProps) {
   }
 
   return (
-    <Card.Root className="w-full bg-blue-600 max-w-lg">
+    <Card.Root className="w-full max-w-lg">
       <Card.Content>
         <form
           id="dev-balance-form"
