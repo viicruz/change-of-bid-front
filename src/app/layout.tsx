@@ -5,6 +5,7 @@ import { Geist_Mono, Merriweather, Roboto } from "next/font/google"
 
 //* Components imports
 import { LanguageSelect } from "@/src/components/button/language-select"
+import { QueryProvider } from "@/src/components/query-provider"
 import { ThemeProvider } from "@/src/components/theme-provider"
 
 //* Lib imports
@@ -46,12 +47,14 @@ export default async function RootLayout({
     >
       <body className="flex min-h-svh flex-col">
         <NextIntlClientProvider locale={locale}>
-          <ThemeProvider>
-            <div className="flex justify-end px-6 pt-6">
-              <LanguageSelect />
-            </div>
-            {children}
-          </ThemeProvider>
+          <QueryProvider>
+            <ThemeProvider>
+              <div className="flex justify-end px-6 pt-6">
+                <LanguageSelect />
+              </div>
+              {children}
+            </ThemeProvider>
+          </QueryProvider>
         </NextIntlClientProvider>
       </body>
     </html>
