@@ -13,10 +13,8 @@ import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
 
 //* Hooks imports
+import { SignUpError, useSignUp } from "@/src/hooks/auth/use-sign-up"
 import { useErrorTranslations } from "@/src/hooks/commons/use-error-translations"
-
-//* Auth imports
-import { authClient } from "@/src/lib/auth-client"
 
 //* Schema imports
 import { signUpSchema, type SignUpValues } from "./sign-up-schema"
@@ -68,8 +66,8 @@ export function SignUpForm() {
   const router = useRouter()
   const t = useTranslations("pages./sign-up")
   const translateError = useErrorTranslations()
+  const signUp = useSignUp()
   const [formErrorCode, setFormErrorCode] = useState<string | null>(null)
-  const [isSigningUp, setIsSigningUp] = useState(false)
   const form = useForm<SignUpValues>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -80,39 +78,27 @@ export function SignUpForm() {
     },
   })
 
-  async function onSubmit(values: SignUpValues) {
+  function onSubmit(values: SignUpValues) {
     setFormErrorCode(null)
-    setIsSigningUp(true)
-    let signedUp = false
-
-    try {
-      const result = await authClient.signUp.email({
-        name: values.name,
-        email: values.email,
-        password: values.password,
-      })
-
-      if (result.error) {
-        const code = result.error.code
+    signUp.mutate({
+      name: values.name,
+      email: values.email,
+      password: values.password,
+    }, {
+      onSuccess: () => {
+        router.push("/")
+      },
+      onError: (error) => {
+        const code = error instanceof SignUpError ? error.code : ""
 
         if (isApiFieldCode(code)) {
           form.setError(apiFieldByCode[code], { message: code })
           return
         }
 
-        setFormErrorCode(typeof code === "string" ? code : "")
-        return
-      }
-
-      signedUp = true
-      router.push("/")
-    } catch {
-      setFormErrorCode("")
-    } finally {
-      if (!signedUp) {
-        setIsSigningUp(false)
-      }
-    }
+        setFormErrorCode(code)
+      },
+    })
   }
 
   const errors = form.formState.errors
@@ -179,9 +165,9 @@ export function SignUpForm() {
         id="sign-up-submit"
         type="submit"
         className="w-full"
-        disabled={isSigningUp}
+        disabled={signUp.isPending || signUp.isSuccess}
       >
-        {isSigningUp ? t("submitting") : t("submit")}
+        {signUp.isPending ? t("submitting") : t("submit")}
       </Button>
     </form>
   )

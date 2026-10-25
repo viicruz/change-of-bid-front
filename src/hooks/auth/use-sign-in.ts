@@ -6,6 +6,9 @@ import { useMutation } from "@tanstack/react-query"
 //* Auth imports
 import { authClient } from "@/src/lib/auth-client"
 
+//* Local imports
+import { queryClient } from "@/src/lib/query-client"
+
 export type SignInInput = {
   email: string
   password: string
@@ -40,5 +43,9 @@ export function useSignIn() {
   return useMutation({
     mutationFn: signIn,
     retry: false,
+    onSuccess: () => {
+      //clear the query client
+      queryClient.clear()
+    },
   })
 }
