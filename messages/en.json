@@ -37,6 +37,21 @@
       "submitting": "Creating account...",
       "signInLink": "I already have an account"
     },
+    "/wallet": {
+      "title": "Wallet",
+      "description": "See your balance and latest transactions.",
+      "devNotice": "Development mode. Balance added here is artificial and exists only in this session.",
+      "devAmountLabel": "Amount to add",
+      "devSubmit": "Add balance",
+      "totalBalance": "Total balance",
+      "historyTitle": "Transaction history",
+      "transactions": {
+        "deposit": "Initial deposit",
+        "bid": "Bid on Blue-Eyes White Dragon",
+        "refund": "Bid refund",
+        "devTopUp": "Artificial credit"
+      }
+    },
     "/sign-in": {
       "title": "Sign in",
       "description": "Sign in with your email and password.",
