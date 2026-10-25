@@ -52,6 +52,22 @@
         "devTopUp": "Crédito artificial"
       }
     },
+    "/my-bids": {
+      "title": "Meus arremates",
+      "description": "Veja seus últimos lances.",
+      "searchLabel": "Buscar lances",
+      "searchPlaceholder": "Buscar pelo nome do lote",
+      "filtersLabel": "Filtrar lances",
+      "historyTitle": "Histórico de bids",
+      "filters": {
+        "leading": "Na frente",
+        "outbid": "Superado",
+        "won": "Arrematado"
+      },
+      "bidAmount": "Valor do lance",
+      "bidTime": "Horário do lance",
+      "viewLot": "Ver lote"
+    },
     "/sign-in": {
       "title": "Entrar",
       "description": "Entre com seu e-mail e senha.",

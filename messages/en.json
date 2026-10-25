@@ -52,6 +52,22 @@
         "devTopUp": "Artificial credit"
       }
     },
+    "/my-bids": {
+      "title": "My bids",
+      "description": "See your latest bids.",
+      "searchLabel": "Search bids",
+      "searchPlaceholder": "Search by lot name",
+      "filtersLabel": "Filter bids",
+      "historyTitle": "Bid history",
+      "filters": {
+        "leading": "Leading",
+        "outbid": "Outbid",
+        "won": "Won"
+      },
+      "bidAmount": "Bid amount",
+      "bidTime": "Bid time",
+      "viewLot": "View lot"
+    },
     "/sign-in": {
       "title": "Sign in",
       "description": "Sign in with your email and password.",
