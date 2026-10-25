@@ -1,5 +1,6 @@
 //* Libraries imports
 import { getTranslations } from "next-intl/server"
+import Link from "next/link"
 
 //* Components imports
 import { SignUpForm } from "./sign-up-form"
@@ -15,6 +16,13 @@ export default async function Page() {
           <p className="text-sm text-muted-foreground">{t("description")}</p>
         </div>
         <SignUpForm />
+        <Link
+          id="sign-up-sign-in-link"
+          href="/sign-in"
+          className="text-sm text-muted-foreground underline underline-offset-4"
+        >
+          {t("signInLink")}
+        </Link>
       </div>
     </main>
   )
