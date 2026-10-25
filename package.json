@@ -14,7 +14,7 @@
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit",
     "check-messages": "node scripts/check-messages-parity.ts",
-    "test:unit": "node --test tests/unit/scripts/check-messages-parity.test.ts",
+    "test:unit": "node --test \"tests/unit/**/*.test.ts\"",
     "fallow": "fallow",
     "fallow:audit": "fallow audit",
     "react-doctor": "npx react-doctor@latest"

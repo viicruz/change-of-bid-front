@@ -68,6 +68,47 @@
       "bidTime": "Horário do lance",
       "viewLot": "Ver lote"
     },
+    "/auction/[id]/audit": {
+      "title": "Auditoria",
+      "description": "Registro público de um lote e dos seus lances.",
+      "lotInfo": "Informações do lote",
+      "bidHistory": "Histórico de bids",
+      "currentBid": "Lance atual",
+      "finalBid": "Lance final",
+      "startsAt": "Começa em",
+      "endsAt": "Termina em",
+      "endedAt": "Encerrado em",
+      "bidder": "Licitante",
+      "bidAmount": "Valor",
+      "bidTime": "Horário",
+      "cardType": "Tipo",
+      "rarity": "Raridade",
+      "condition": "Condição",
+      "setName": "Coleção",
+      "cardTypes": {
+        "monster": "Monstro",
+        "spell": "Magia",
+        "trap": "Armadilha",
+        "extra": "Extra Deck"
+      },
+      "rarities": {
+        "common": "Comum",
+        "rare": "Rara",
+        "superRare": "Super Rara",
+        "ultraRare": "Ultra Rara",
+        "secretRare": "Secreta"
+      },
+      "conditions": {
+        "mint": "Mint",
+        "nearMint": "Near Mint",
+        "played": "Usada"
+      },
+      "statuses": {
+        "live": "Ao vivo",
+        "scheduled": "Agendado",
+        "closed": "Encerrado"
+      }
+    },
     "/sign-in": {
       "title": "Entrar",
       "description": "Entre com seu e-mail e senha.",

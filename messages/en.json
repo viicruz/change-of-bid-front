@@ -68,6 +68,47 @@
       "bidTime": "Bid time",
       "viewLot": "View lot"
     },
+    "/auction/[id]/audit": {
+      "title": "Audit",
+      "description": "Public record of a lot and its bids.",
+      "lotInfo": "Lot information",
+      "bidHistory": "Bid history",
+      "currentBid": "Current bid",
+      "finalBid": "Final bid",
+      "startsAt": "Starts at",
+      "endsAt": "Ends at",
+      "endedAt": "Ended at",
+      "bidder": "Bidder",
+      "bidAmount": "Amount",
+      "bidTime": "Time",
+      "cardType": "Type",
+      "rarity": "Rarity",
+      "condition": "Condition",
+      "setName": "Set",
+      "cardTypes": {
+        "monster": "Monster",
+        "spell": "Spell",
+        "trap": "Trap",
+        "extra": "Extra Deck"
+      },
+      "rarities": {
+        "common": "Common",
+        "rare": "Rare",
+        "superRare": "Super Rare",
+        "ultraRare": "Ultra Rare",
+        "secretRare": "Secret Rare"
+      },
+      "conditions": {
+        "mint": "Mint",
+        "nearMint": "Near Mint",
+        "played": "Played"
+      },
+      "statuses": {
+        "live": "Live",
+        "scheduled": "Scheduled",
+        "closed": "Closed"
+      }
+    },
     "/sign-in": {
       "title": "Sign in",
       "description": "Sign in with your email and password.",
