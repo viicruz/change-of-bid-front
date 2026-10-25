@@ -1,0 +1,8 @@
+{
+  "$schema": "https://react.doctor/schema/config.json",
+  "ignore": {
+    "files": ["src/components/ui/**"]
+  },
+  "scope": "changed",
+  "base": "preview"
+}
