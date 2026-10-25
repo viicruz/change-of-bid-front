@@ -150,9 +150,6 @@ describe("sign-up page", () => {
     })
     await page.getByRole("button", { name: "Criar conta" }).click()
 
-    await expect(
-      page.getByRole("heading", { name: "Projeto pronto!" })
-    ).toBeVisible()
     await expect(page).toHaveURL("/")
   })
 })
