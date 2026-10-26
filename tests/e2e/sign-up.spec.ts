@@ -136,6 +136,7 @@ describe("sign-up page", () => {
             image: null,
             createdAt: "2026-10-24T18:00:00.000Z",
             updatedAt: "2026-10-24T18:00:00.000Z",
+            role: "BIDDER",
           },
         }),
       })
