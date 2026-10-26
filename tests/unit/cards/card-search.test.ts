@@ -8,8 +8,14 @@ import { apiResponseErrorSchema } from "@/src/schemas/common/api"
 //* Local imports
 import {
   buildCardSearchParams,
+  cardSearchQueryKey,
   isEmptyCardSearchError,
+  shouldKeepCardSearchPage,
 } from "@/src/hooks/cards/queries/use-index-cards"
+import {
+  getCardSearchPageCount,
+  getCardSearchPageItems,
+} from "@/src/lib/cards/card-search-pages"
 import { ApiError } from "@/src/lib/api"
 
 const blueEyesWhiteDragon = {
@@ -185,6 +191,90 @@ describe("buildCardSearchParams", () => {
         id: [46986414],
       })
     ).toThrow(/name and id cannot be used together/)
+  })
+
+  it("encodes num and offset, including a zero offset", () => {
+    expect(
+      buildCardSearchParams(
+        { fname: "Dragon" },
+        {
+          num: 4,
+          offset: 0,
+        }
+      )
+    ).toEqual({
+      fname: "Dragon",
+      num: "4",
+      offset: "0",
+    })
+  })
+
+  it("rejects a pagination count that is not a non-negative integer", () => {
+    expect(() =>
+      buildCardSearchParams({ fname: "Dragon" }, { num: 1.5, offset: 0 })
+    ).toThrow(/num must be a non-negative integer/)
+    expect(() =>
+      buildCardSearchParams({ fname: "Dragon" }, { num: 4, offset: -1 })
+    ).toThrow(/offset must be a non-negative integer/)
+  })
+})
+
+describe("card search pages", () => {
+  it("counts pages from the total number of cards", () => {
+    expect(getCardSearchPageCount(0, 4)).toBe(0)
+    expect(getCardSearchPageCount(4, 4)).toBe(1)
+    expect(getCardSearchPageCount(5, 4)).toBe(2)
+  })
+
+  it("lists every page when there are only a few", () => {
+    expect(getCardSearchPageItems(2, 5)).toEqual([1, 2, 3, 4, 5])
+  })
+
+  it("collapses distant pages into ellipses", () => {
+    expect(getCardSearchPageItems(1, 12)).toEqual([1, 2, "ellipsis", 12])
+    expect(getCardSearchPageItems(6, 12)).toEqual([
+      1,
+      "ellipsis",
+      6,
+      "ellipsis",
+      12,
+    ])
+    expect(getCardSearchPageItems(12, 12)).toEqual([1, "ellipsis", 11, 12])
+  })
+})
+
+describe("shouldKeepCardSearchPage", () => {
+  it("keeps the previous page while only the offset changes", () => {
+    const previousKey = cardSearchQueryKey(
+      { fname: "Dragon" },
+      { num: 4, offset: 0 }
+    )
+    const nextKey = cardSearchQueryKey(
+      { fname: "Dragon" },
+      { num: 4, offset: 4 }
+    )
+
+    expect(shouldKeepCardSearchPage(previousKey, nextKey)).toBe(true)
+  })
+
+  it("drops the previous page when the filters or page size change", () => {
+    const previousKey = cardSearchQueryKey(
+      { fname: "Dragon" },
+      { num: 4, offset: 0 }
+    )
+
+    expect(
+      shouldKeepCardSearchPage(
+        previousKey,
+        cardSearchQueryKey({ fname: "Magician" }, { num: 4, offset: 0 })
+      )
+    ).toBe(false)
+    expect(
+      shouldKeepCardSearchPage(
+        previousKey,
+        cardSearchQueryKey({ fname: "Dragon" }, { num: 8, offset: 0 })
+      )
+    ).toBe(false)
   })
 })
 
