@@ -29,7 +29,18 @@
     },
     "/sign-up": {
       "title": "Criar uma conta",
-      "description": "Cadastre-se com seu e-mail e senha.",
+      "description": "Escolha como participar e cadastre-se com e-mail e senha.",
+      "role": "Como você quer participar?",
+      "roles": {
+        "bidder": {
+          "title": "Arrematante",
+          "description": "Dê lances em lotes e acompanhe seus arremates."
+        },
+        "auctioneer": {
+          "title": "Leiloeiro",
+          "description": "Crie lotes e conduza os leilões."
+        }
+      },
       "name": "Nome",
       "email": "E-mail",
       "password": "Senha",
@@ -250,6 +261,7 @@
     "PASSWORD_TOO_SHORT": "A senha deve ter pelo menos 8 caracteres",
     "PASSWORD_TOO_LONG": "A senha deve ter no máximo 128 caracteres",
     "PASSWORDS_DO_NOT_MATCH": "As senhas não coincidem",
+    "ROLE_REQUIRED": "Escolha se você quer ser arrematante ou leiloeiro.",
     "TITLE_REQUIRED": "O título é obrigatório",
     "INVALID_MONEY": "Os valores em dinheiro devem ser maiores que zero e ter no máximo 2 casas decimais.",
     "INVALID_DATETIME": "Informe uma data e hora ISO com fuso horário.",
