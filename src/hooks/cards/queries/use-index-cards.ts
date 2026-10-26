@@ -283,7 +283,7 @@ export function isEmptyCardSearchError(error: unknown) {
   return (
     error instanceof ApiError &&
     error.status === 500 &&
-    error.message === EMPTY_CARD_SEARCH_MESSAGE
+    error.message.startsWith(EMPTY_CARD_SEARCH_MESSAGE)
   )
 }
 
