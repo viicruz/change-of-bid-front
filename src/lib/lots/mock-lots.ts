@@ -2,7 +2,7 @@ export const cardTypes = ["monster", "spell", "trap", "extra"] as const
 
 export type CardType = (typeof cardTypes)[number]
 
-export const lotStatuses = ["live", "scheduled", "closed"] as const
+export const lotStatuses = ["live", "scheduled", "canceled", "closed"] as const
 
 export type LotStatus = (typeof lotStatuses)[number]
 
@@ -97,6 +97,15 @@ export const mockLots: Lot[] = [
     currentBid: 2600,
     startsAt: "2026-11-04T15:00:00.000-03:00",
     endsAt: "2026-11-07T21:00:00.000-03:00",
+  },
+  {
+    id: "lot-monster-reborn",
+    name: "Monster Reborn",
+    cardType: "spell",
+    status: "canceled",
+    currentBid: 420,
+    startsAt: "2026-09-15T15:00:00.000-03:00",
+    endsAt: "2026-09-20T21:00:00.000-03:00",
   },
   {
     id: "lot-red-eyes-black-dragon",

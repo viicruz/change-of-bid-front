@@ -17,6 +17,7 @@
       "sections": {
         "live": "Lotes ao vivo",
         "scheduled": "Lotes agendados",
+        "canceled": "Lotes cancelados",
         "closed": "Lotes encerrados"
       },
       "empty": "Nenhum lote encontrado.",
@@ -106,7 +107,24 @@
       "statuses": {
         "live": "Ao vivo",
         "scheduled": "Agendado",
+        "canceled": "Cancelado",
         "closed": "Encerrado"
+      }
+    },
+    "/auction/[id]": {
+      "title": "Sala do lote",
+      "description": "Acompanhe um lote ao vivo, pendente, cancelado ou finalizado.",
+      "lotInfo": "Informações do lote",
+      "currentBid": "Valor atual",
+      "bidValue": "Valor do lance",
+      "placeBid": "Fazer lance",
+      "bidHistory": "Histórico de lances",
+      "emptyBids": "Nenhum lance ainda.",
+      "statuses": {
+        "live": "Ao vivo",
+        "scheduled": "Pendente",
+        "canceled": "Cancelado",
+        "closed": "Finalizado"
       }
     },
     "/auctioneer": {
@@ -133,6 +151,7 @@
       "statuses": {
         "live": "Ao vivo",
         "scheduled": "Agendado",
+        "canceled": "Cancelado",
         "closed": "Encerrado"
       },
       "cardTypes": {

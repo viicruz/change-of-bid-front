@@ -24,7 +24,7 @@ const dateFormat = {
 } as const
 
 function bidLabelKey(status: LotStatus) {
-  if (status === "closed") {
+  if (status === "closed" || status === "canceled") {
     return "finalBid" as const
   }
 
@@ -32,7 +32,7 @@ function bidLabelKey(status: LotStatus) {
 }
 
 function endLabelKey(status: LotStatus) {
-  if (status === "closed") {
+  if (status === "closed" || status === "canceled") {
     return "endedAt" as const
   }
 
