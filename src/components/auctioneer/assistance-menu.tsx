@@ -21,36 +21,44 @@ function onSubmit(event: SubmitEvent<HTMLFormElement>) {
 
 type AssistanceMenuProps = {
   lot: AuctioneerLot
+  idPrefix?: string
+  showTitle?: boolean
 }
 
 export function AssistanceMenu(props: AssistanceMenuProps) {
   const t = useTranslations("pages./auctioneer")
+  const idPrefix = props.idPrefix ?? ""
+  const showTitle = props.showTitle ?? true
 
   return (
     <form
-      id="assistance-menu"
+      id={`${idPrefix}assistance-menu`}
       className="flex w-full flex-col gap-4"
       onSubmit={onSubmit}
     >
-      <h2
-        id="assistance-menu-title"
-        className="text-center font-heading text-base font-medium"
-      >
-        {t("assistanceMenu")}
-      </h2>
+      {showTitle ? (
+        <h2
+          id={`${idPrefix}assistance-menu-title`}
+          className="text-center font-heading text-base font-medium"
+        >
+          {t("assistanceMenu")}
+        </h2>
+      ) : null}
       <div className="flex flex-col gap-2">
-        <Label htmlFor="lot-title">{t("lotName")}</Label>
+        <Label htmlFor={`${idPrefix}lot-title`}>{t("lotName")}</Label>
         <Input
-          id="lot-title"
+          id={`${idPrefix}lot-title`}
           name="title"
           type="text"
           defaultValue={props.lot.title}
         />
       </div>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="lot-description">{t("lotDescription")}</Label>
+        <Label htmlFor={`${idPrefix}lot-description`}>
+          {t("lotDescription")}
+        </Label>
         <textarea
-          id="lot-description"
+          id={`${idPrefix}lot-description`}
           name="description"
           rows={4}
           defaultValue={props.lot.description}
@@ -58,9 +66,11 @@ export function AssistanceMenu(props: AssistanceMenuProps) {
         />
       </div>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="lot-minimal-value">{t("minimalValue")}</Label>
+        <Label htmlFor={`${idPrefix}lot-minimal-value`}>
+          {t("minimalValue")}
+        </Label>
         <Input
-          id="lot-minimal-value"
+          id={`${idPrefix}lot-minimal-value`}
           name="minimalValue"
           type="number"
           min={0}
@@ -69,9 +79,11 @@ export function AssistanceMenu(props: AssistanceMenuProps) {
         />
       </div>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="lot-minimum-increment">{t("minimumIncrement")}</Label>
+        <Label htmlFor={`${idPrefix}lot-minimum-increment`}>
+          {t("minimumIncrement")}
+        </Label>
         <Input
-          id="lot-minimum-increment"
+          id={`${idPrefix}lot-minimum-increment`}
           name="minimumIncrement"
           type="number"
           min={0}
@@ -80,9 +92,9 @@ export function AssistanceMenu(props: AssistanceMenuProps) {
         />
       </div>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="lot-starts-at">{t("startsAt")}</Label>
+        <Label htmlFor={`${idPrefix}lot-starts-at`}>{t("startsAt")}</Label>
         <Input
-          id="lot-starts-at"
+          id={`${idPrefix}lot-starts-at`}
           name="startsAt"
           type="datetime-local"
           defaultValue={toDateTimeLocal(props.lot.startsAt)}

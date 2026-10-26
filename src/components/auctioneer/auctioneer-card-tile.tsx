@@ -6,11 +6,17 @@ import type { AuctioneerCard } from "@/src/lib/auctioneer/mock-auctioneer"
 
 type AuctioneerCardTileProps = {
   card: AuctioneerCard
+  idPrefix?: string
+  onSelect?: (card: AuctioneerCard) => void
 }
 
 export function AuctioneerCardTile(props: AuctioneerCardTileProps) {
-  return (
-    <Card.Root id={`auctioneer-card-${props.card.id}`}>
+  const idPrefix = props.idPrefix ?? ""
+  const cardId = `${idPrefix}auctioneer-card-${props.card.id}`
+  const onSelect = props.onSelect
+
+  const body = (
+    <Card.Root id={onSelect ? undefined : cardId}>
       <Card.Content className="flex flex-col gap-2">
         <div
           aria-hidden="true"
@@ -21,5 +27,22 @@ export function AuctioneerCardTile(props: AuctioneerCardTileProps) {
         </p>
       </Card.Content>
     </Card.Root>
+  )
+
+  if (!onSelect) {
+    return body
+  }
+
+  return (
+    <button
+      id={cardId}
+      type="button"
+      className="w-full cursor-pointer rounded-xl border-0 bg-transparent p-0 text-left"
+      onClick={() => {
+        onSelect(props.card)
+      }}
+    >
+      {body}
+    </button>
   )
 }
