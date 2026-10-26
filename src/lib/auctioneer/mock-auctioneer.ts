@@ -5,6 +5,7 @@ export type AuctioneerCard = {
   id: string
   name: string
   cardType: CardType
+  imageUrl?: string
 }
 
 export type AuctioneerLot = {

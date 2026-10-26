@@ -1,3 +1,6 @@
+//* Libraries imports
+import Image from "next/image"
+
 //* Components imports
 import Card from "@/src/components/ui/card"
 
@@ -18,10 +21,21 @@ export function AuctioneerCardTile(props: AuctioneerCardTileProps) {
   const body = (
     <Card.Root id={onSelect ? undefined : cardId}>
       <Card.Content className="flex flex-col gap-2">
-        <div
-          aria-hidden="true"
-          className="aspect-3/4 w-full rounded-md bg-muted"
-        />
+        {props.card.imageUrl ? (
+          <Image
+            src={props.card.imageUrl}
+            alt=""
+            width={421}
+            height={614}
+            sizes="(min-width: 1024px) 8rem, 40vw"
+            className="aspect-3/4 h-auto w-full rounded-md object-cover"
+          />
+        ) : (
+          <div
+            aria-hidden="true"
+            className="aspect-3/4 w-full rounded-md bg-muted"
+          />
+        )}
         <p className="line-clamp-2 font-heading text-sm font-medium">
           {props.card.name}
         </p>
