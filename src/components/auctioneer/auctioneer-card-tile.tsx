@@ -4,22 +4,22 @@ import Image from "next/image"
 //* Components imports
 import Card from "@/src/components/ui/card"
 
-//* Lib imports
-import type { AuctioneerCard } from "@/src/lib/auctioneer/mock-auctioneer"
+type AuctioneerCardTileCard = {
+  id: string
+  name: string
+  imageUrl?: string
+}
 
 type AuctioneerCardTileProps = {
-  card: AuctioneerCard
+  card: AuctioneerCardTileCard
   idPrefix?: string
-  onSelect?: (card: AuctioneerCard) => void
 }
 
 export function AuctioneerCardTile(props: AuctioneerCardTileProps) {
   const idPrefix = props.idPrefix ?? ""
-  const cardId = `${idPrefix}auctioneer-card-${props.card.id}`
-  const onSelect = props.onSelect
 
-  const body = (
-    <Card.Root id={onSelect ? undefined : cardId}>
+  return (
+    <Card.Root id={`${idPrefix}-auctioneer-card-${props.card.id}`}>
       <Card.Content className="flex flex-col gap-2">
         {props.card.imageUrl ? (
           <Image
@@ -41,22 +41,5 @@ export function AuctioneerCardTile(props: AuctioneerCardTileProps) {
         </p>
       </Card.Content>
     </Card.Root>
-  )
-
-  if (!onSelect) {
-    return body
-  }
-
-  return (
-    <button
-      id={cardId}
-      type="button"
-      className="w-full cursor-pointer rounded-xl border-0 bg-transparent p-0 text-left"
-      onClick={() => {
-        onSelect(props.card)
-      }}
-    >
-      {body}
-    </button>
   )
 }

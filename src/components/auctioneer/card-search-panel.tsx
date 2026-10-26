@@ -12,7 +12,7 @@ import {
 } from "react"
 
 //* Components imports
-import { AuctioneerCardTile } from "@/src/components/auctioneer/auctioneer-card-tile"
+import { CardSearchResult } from "@/src/components/auctioneer/card-search-result"
 import { Button } from "@/src/components/ui/button"
 import Card from "@/src/components/ui/card"
 import { Input } from "@/src/components/ui/input"
@@ -40,7 +40,7 @@ import {
 } from "@/src/schemas/card"
 
 //* Lib imports
-import type { AuctioneerCard } from "@/src/lib/auctioneer/mock-auctioneer"
+import type { AuctioneerCard } from "@/src/lib/cards/auctioneer-card"
 import {
   cardSearchPageSize,
   getCardSearchPageCount,
@@ -60,7 +60,6 @@ const selectClassName =
 type CardSearchPanelProps = {
   idPrefix?: string
   framed?: boolean
-  onSelectCard?: (card: AuctioneerCard) => void
 }
 
 type CardSearchDraft = {
@@ -306,7 +305,6 @@ export function CardSearchPanel(props: CardSearchPanelProps) {
           isStale={cardsQuery.isPlaceholderData}
           hasResults={cardsQuery.data !== undefined}
           cards={cardsQuery.data?.data.map(toAuctioneerCard) ?? []}
-          onSelectCard={props.onSelectCard}
         />
       </div>
       {hasFilters && !cardsQuery.isError && pageCount > 1 ? (
@@ -358,7 +356,6 @@ type CardSearchResultsProps = {
   isStale: boolean
   hasResults: boolean
   cards: AuctioneerCard[]
-  onSelectCard?: (card: AuctioneerCard) => void
 }
 
 type CardSearchPaginationProps = {
@@ -522,11 +519,7 @@ function CardSearchResults(props: CardSearchResultsProps) {
     >
       {props.cards.map((card) => (
         <li key={card.id}>
-          <AuctioneerCardTile
-            card={card}
-            idPrefix={props.idPrefix}
-            onSelect={props.onSelectCard}
-          />
+          <CardSearchResult idPrefix={props.idPrefix} card={card} />
         </li>
       ))}
     </ul>
