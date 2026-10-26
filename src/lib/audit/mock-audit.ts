@@ -286,6 +286,69 @@ const mockLotAudits: LotAuditRecord[] = [
     ],
   },
   {
+    lotId: "lot-pot-of-greed",
+    items: [
+      {
+        id: "item-pot-of-greed",
+        name: "Pot of Greed",
+        cardType: "spell",
+        rarity: "ultraRare",
+        condition: "mint",
+        setName: "Legend of Blue Eyes White Dragon",
+      },
+      {
+        id: "item-graceful-charity",
+        name: "Graceful Charity",
+        cardType: "spell",
+        rarity: "ultraRare",
+        condition: "nearMint",
+        setName: "Dark Beginning 1",
+      },
+    ],
+    bids: [],
+  },
+  {
+    lotId: "lot-monster-reborn",
+    items: [
+      {
+        id: "item-monster-reborn",
+        name: "Monster Reborn",
+        cardType: "spell",
+        rarity: "ultraRare",
+        condition: "nearMint",
+        setName: "Metal Raiders",
+      },
+      {
+        id: "item-call-of-the-haunted",
+        name: "Call of the Haunted",
+        cardType: "trap",
+        rarity: "superRare",
+        condition: "played",
+        setName: "Metal Raiders",
+      },
+    ],
+    bids: [
+      {
+        id: "audit-bid-monster-reborn-1",
+        amount: 300,
+        placedAt: "2026-09-16T11:05:00.000-03:00",
+        bidderName: "Paulo Mendes",
+      },
+      {
+        id: "audit-bid-monster-reborn-2",
+        amount: 360,
+        placedAt: "2026-09-17T16:40:00.000-03:00",
+        bidderName: "Helena Souza",
+      },
+      {
+        id: "audit-bid-monster-reborn-3",
+        amount: 420,
+        placedAt: "2026-09-18T19:15:00.000-03:00",
+        bidderName: "Igor Almeida",
+      },
+    ],
+  },
+  {
     lotId: "lot-red-eyes-black-dragon",
     items: [
       {
