@@ -19,9 +19,14 @@ type SignUpInput = {
   email: string
   password: string
   confirmPassword: string
+  role?: "Arrematante" | "Leiloeiro"
 }
 
 async function fillSignUpForm(page: Page, input: SignUpInput) {
+  if (input.role) {
+    await page.getByRole("radio", { name: new RegExp(input.role) }).check()
+  }
+
   await page.getByLabel("Nome").fill(input.name)
   await page.getByLabel("E-mail").fill(input.email)
   await page.getByLabel("Senha", { exact: true }).fill(input.password)
@@ -49,6 +54,8 @@ describe("sign-up page", () => {
     await expect(
       page.getByRole("heading", { name: "Criar uma conta" })
     ).toBeVisible()
+    await expect(page.getByRole("radio", { name: /Arrematante/ })).toBeVisible()
+    await expect(page.getByRole("radio", { name: /Leiloeiro/ })).toBeVisible()
     await expect(page.getByLabel("Nome")).toBeVisible()
     await expect(page.getByLabel("E-mail")).toBeVisible()
     await expect(page.getByLabel("Senha", { exact: true })).toBeVisible()
@@ -108,6 +115,7 @@ describe("sign-up page", () => {
       email: "ada@example.com",
       password: "correct-horse-1",
       confirmPassword: "correct-horse-1",
+      role: "Arrematante",
     })
     await page.getByRole("button", { name: "Criar conta" }).click()
 
@@ -117,8 +125,35 @@ describe("sign-up page", () => {
     await expect(page).toHaveURL(/\/sign-up$/)
   })
 
-  it("redirects home when the API accepts the sign-up", async ({ page }) => {
+  it("asks for a role before calling the API", async ({ page }) => {
+    let requestCount = 0
+
     await mockSignUp(page, async (route) => {
+      requestCount += 1
+      await route.abort()
+    })
+
+    await page.goto("/sign-up")
+    await fillSignUpForm(page, {
+      name: "Ada Lovelace",
+      email: "ada@example.com",
+      password: "correct-horse-1",
+      confirmPassword: "correct-horse-1",
+    })
+    await page.getByRole("button", { name: "Criar conta" }).click()
+
+    await expect(
+      page.getByText("Escolha se você quer ser arrematante ou leiloeiro.")
+    ).toBeVisible()
+    expect(requestCount).toBe(0)
+    await expect(page).toHaveURL(/\/sign-up$/)
+  })
+
+  it("redirects home when the API accepts the sign-up", async ({ page }) => {
+    let requestRole: string | undefined
+
+    await mockSignUp(page, async (route) => {
+      requestRole = route.request().postDataJSON().role
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -136,7 +171,7 @@ describe("sign-up page", () => {
             image: null,
             createdAt: "2026-10-24T18:00:00.000Z",
             updatedAt: "2026-10-24T18:00:00.000Z",
-            role: "BIDDER",
+            role: "AUCTIONEER",
           },
         }),
       })
@@ -148,9 +183,11 @@ describe("sign-up page", () => {
       email: "ada@example.com",
       password: "correct-horse-1",
       confirmPassword: "correct-horse-1",
+      role: "Leiloeiro",
     })
     await page.getByRole("button", { name: "Criar conta" }).click()
 
     await expect(page).toHaveURL("/")
+    expect(requestRole).toBe("AUCTIONEER")
   })
 })

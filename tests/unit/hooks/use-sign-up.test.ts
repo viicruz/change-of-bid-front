@@ -50,6 +50,7 @@ function SignUpHarness() {
             name: "Bidder",
             email: "bidder@bidder.bidder",
             password: "correct-horse-1",
+            role: "BIDDER",
           })
           .catch(() => undefined)
       },
@@ -106,6 +107,12 @@ describe("useSignUp", () => {
 
     await vi.waitFor(() => {
       expect(container.textContent).toBe("BIDDER")
+    })
+    expect(authClient.signUp.email).toHaveBeenCalledWith({
+      name: "Bidder",
+      email: "bidder@bidder.bidder",
+      password: "correct-horse-1",
+      role: "BIDDER",
     })
   })
 
