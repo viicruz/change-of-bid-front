@@ -45,7 +45,7 @@ export const authClient = createAuthClient({
         role: {
           type: ["AUCTIONEER", "BIDDER"],
           required: true,
-          input: false,
+          input: true,
         },
       },
     }),

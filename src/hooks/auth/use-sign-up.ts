@@ -7,7 +7,7 @@ import { useMutation } from "@tanstack/react-query"
 import { authClient } from "@/src/lib/auth-client"
 
 //* Schema imports
-import { authUserSchema } from "@/src/schemas/user"
+import { authUserSchema, type UserRole } from "@/src/schemas/user"
 
 //* Local imports
 import { queryClient } from "@/src/lib/query-client"
@@ -16,6 +16,7 @@ export type SignUpInput = {
   name: string
   email: string
   password: string
+  role: UserRole
 }
 
 export class SignUpError extends Error {
@@ -33,6 +34,7 @@ async function signUp(input: SignUpInput) {
     name: input.name,
     email: input.email,
     password: input.password,
+    role: input.role,
   })
 
   if (result.error) {
