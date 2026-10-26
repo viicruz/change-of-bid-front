@@ -1,6 +1,9 @@
 //* Libraries imports
 import * as z from "zod"
 
+//* Auth imports
+import { readBearerToken } from "@/src/lib/auth-client"
+
 //* Env imports
 import { env } from "@/src/env/client"
 
@@ -9,6 +12,13 @@ type ApiGetOptions<T> = {
   schema: z.ZodType<T>
   errorSchema: z.ZodType<{ message: string }>
   params?: Record<string, string | undefined>
+}
+
+type ApiPostOptions<T> = {
+  url: string
+  schema: z.ZodType<T>
+  errorSchema: z.ZodType<{ message: string }>
+  body: unknown
 }
 
 export class ApiError extends Error {
@@ -108,6 +118,20 @@ function parseSuccess<T>(text: string, schema: z.ZodType<T>) {
   return parsed.data
 }
 
+function jsonHeaders() {
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  }
+  const token = readBearerToken()
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`
+  }
+
+  return headers
+}
+
 export const api = {
   async get<T>(options: ApiGetOptions<T>) {
     const url = resolveUrl(options.url, options.params)
@@ -116,6 +140,22 @@ export const api = {
       headers: {
         Accept: "application/json",
       },
+    })
+    const text = await response.text()
+
+    if (!response.ok) {
+      throw readHttpError(response.status, text, options.errorSchema)
+    }
+
+    return parseSuccess(text, options.schema)
+  },
+
+  async post<T>(options: ApiPostOptions<T>) {
+    const url = resolveUrl(options.url, undefined)
+    const response = await fetch(url, {
+      method: "POST",
+      headers: jsonHeaders(),
+      body: JSON.stringify(options.body),
     })
     const text = await response.text()
 

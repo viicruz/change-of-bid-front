@@ -6,7 +6,7 @@ import { env } from "@/src/env/client"
 
 const TOKEN_KEY = "change-of-bid.bearer-token"
 
-function readToken() {
+export function readBearerToken() {
   if (typeof window === "undefined") {
     return undefined
   }
@@ -32,7 +32,7 @@ export const authClient = createAuthClient({
     credentials: "include",
     auth: {
       type: "Bearer",
-      token: readToken,
+      token: readBearerToken,
     },
     onSuccess: (context) => {
       storeToken(context.response)
