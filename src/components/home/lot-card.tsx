@@ -21,7 +21,7 @@ const scheduleFormat = {
 } as const
 
 function bidLabelKey(status: LotStatus) {
-  if (status === "closed") {
+  if (status === "closed" || status === "canceled") {
     return "finalBid" as const
   }
 
@@ -36,7 +36,7 @@ function scheduleFor(lot: Lot) {
     }
   }
 
-  if (lot.status === "closed") {
+  if (lot.status === "closed" || lot.status === "canceled") {
     return {
       labelKey: "endedAt" as const,
       value: lot.endsAt,
