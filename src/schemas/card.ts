@@ -117,7 +117,7 @@ export const cardBanlistStatusArray: CardBanlistStatus[] =
 
 export const numericComparisonSchema = z.object({
   operator: numericComparisonOperatorSchema,
-  value: z.number(),
+  value: z.coerce.number(),
 })
 
 export type NumericComparison = z.infer<typeof numericComparisonSchema>
@@ -135,7 +135,7 @@ const cardSetSchema = z.object({
 export type CardSet = z.infer<typeof cardSetSchema>
 
 const cardImageSchema = z.object({
-  id: z.number(),
+  id: z.coerce.number(),
   image_url: z.string(),
   image_url_small: z.string(),
   image_url_cropped: z.string().optional(),
@@ -163,31 +163,31 @@ export type CardBanlistInfo = z.infer<typeof cardBanlistInfoSchema>
 
 const cardMiscInfoSchema = z.object({
   beta_name: z.string().optional(),
-  beta_id: z.number().optional(),
+  beta_id: z.coerce.number().optional(),
   staple: z.string().optional(),
-  views: z.number(),
-  viewsweek: z.number(),
-  upvotes: z.number(),
-  downvotes: z.number(),
+  views: z.coerce.number(),
+  viewsweek: z.coerce.number(),
+  upvotes: z.coerce.number(),
+  downvotes: z.coerce.number(),
   formats: z.array(z.string()),
   treated_as: z.string().optional(),
   tcg_date: z.string().optional(),
   ocg_date: z.string().optional(),
-  konami_id: z.number().optional(),
+  konami_id: z.coerce.number().optional(),
   md_rarity: z.string().optional(),
   has_effect: binaryFlagSchema,
   question_atk: binaryFlagSchema.optional(),
   question_def: binaryFlagSchema.optional(),
-  genesys_points: z.number().optional(),
-  genesys_ocg_points: z.number().optional(),
+  genesys_points: z.coerce.number().optional(),
+  genesys_ocg_points: z.coerce.number().optional(),
 })
 
 export type CardMiscInfo = z.infer<typeof cardMiscInfoSchema>
 
 export const cardSchema = z.object({
-  id: z.number(),
+  id: z.coerce.number(),
   name: z.string(),
-  type: z.string(),
+  type: z.string().nullable(),
   humanReadableCardType: z.string(),
   frameType: z.string(),
   desc: z.string(),
@@ -196,11 +196,11 @@ export const cardSchema = z.object({
   race: z.string().optional(),
   archetype: z.string().optional(),
   attribute: cardAttributeSchema.optional(),
-  atk: z.number().optional(),
-  def: z.number().nullable().optional(),
-  level: z.number().optional(),
-  scale: z.number().optional(),
-  linkval: z.number().optional(),
+  atk: z.coerce.number().optional(),
+  def: z.coerce.number().nullable().optional(),
+  level: z.coerce.number().optional(),
+  scale: z.coerce.number().optional(),
+  linkval: z.coerce.number().optional(),
   linkmarkers: z.array(cardLinkMarkerSchema).optional(),
   typeline: z.array(z.string()).optional(),
   ygoprodeck_url: z.string(),
