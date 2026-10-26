@@ -136,7 +136,7 @@ export function AuctioneerPanel() {
                 </div>
               </Card.Footer>
             </Card.Root>
-            <div className="hidden lg:block">
+            <div className="hidden h-full min-h-0 lg:block">
               <CardSearchPanel />
             </div>
           </div>
