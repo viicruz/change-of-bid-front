@@ -17,6 +17,7 @@
       "sections": {
         "live": "Live lots",
         "scheduled": "Scheduled lots",
+        "canceled": "Canceled lots",
         "closed": "Closed lots"
       },
       "empty": "No lots found.",
@@ -106,7 +107,24 @@
       "statuses": {
         "live": "Live",
         "scheduled": "Scheduled",
+        "canceled": "Canceled",
         "closed": "Closed"
+      }
+    },
+    "/auction/[id]": {
+      "title": "Lot room",
+      "description": "Follow a live, pending, canceled, or finished lot.",
+      "lotInfo": "Lot information",
+      "currentBid": "Current bid",
+      "bidValue": "Bid value",
+      "placeBid": "Place bid",
+      "bidHistory": "Bid history",
+      "emptyBids": "No bids yet.",
+      "statuses": {
+        "live": "Live",
+        "scheduled": "Pending",
+        "canceled": "Canceled",
+        "closed": "Finished"
       }
     },
     "/auctioneer": {
@@ -133,6 +151,7 @@
       "statuses": {
         "live": "Live",
         "scheduled": "Scheduled",
+        "canceled": "Canceled",
         "closed": "Closed"
       },
       "cardTypes": {
