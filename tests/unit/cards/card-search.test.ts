@@ -199,6 +199,14 @@ describe("isEmptyCardSearchError", () => {
     expect(isEmptyCardSearchError(error)).toBe(true)
   })
 
+  it("matches the longer plain-text response for no matching cards", () => {
+    const message =
+      "No card matching your query was found in the database. Please see https://db.ygoprodeck.com/api-guide/ for syntax usage."
+    const error = new ApiError(500, message, message)
+
+    expect(isEmptyCardSearchError(error)).toBe(true)
+  })
+
   it("ignores other server failures", () => {
     expect(
       isEmptyCardSearchError(
