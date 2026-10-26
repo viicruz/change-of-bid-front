@@ -118,6 +118,8 @@
       "lotFiltersLabel": "Filter lots",
       "lotsLabel": "Lots",
       "cardsInLot": "Cards already in the lot",
+      "addCard": "Add card",
+      "toggleSidebar": "Toggle sidebar",
       "assistanceMenu": "Assistance menu",
       "lotName": "Name",
       "lotDescription": "Description",

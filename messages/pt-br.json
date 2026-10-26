@@ -118,6 +118,8 @@
       "lotFiltersLabel": "Filtrar lotes",
       "lotsLabel": "Lotes",
       "cardsInLot": "Cartas já no lote",
+      "addCard": "Adicionar carta",
+      "toggleSidebar": "Abrir ou fechar a sidebar",
       "assistanceMenu": "Menu de auxílio",
       "lotName": "Nome",
       "lotDescription": "Descrição",
