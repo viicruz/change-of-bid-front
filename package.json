@@ -49,6 +49,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.4.2",
     "fallow": "^3.35.0",
+    "happy-dom": "^21.0.4",
     "prettier": "^3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4",
