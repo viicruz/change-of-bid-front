@@ -160,6 +160,12 @@
       "cardSearchLoading": "Buscando cartas...",
       "cardSearchEmpty": "Nenhuma carta encontrada.",
       "cardSearchError": "Não foi possível buscar as cartas.",
+      "cardSearchPrevious": "Anterior",
+      "cardSearchNext": "Próxima",
+      "cardSearchPagination": "Páginas da busca de cartas",
+      "cardSearchGoToPage": "Ir para a página {page}",
+      "cardSearchCurrentPage": "Página {page}",
+      "cardSearchMorePages": "Mais páginas",
       "cardSearchTypes": {
         "effectMonster": "Monstro de Efeito",
         "flipEffectMonster": "Monstro de Efeito Flip",

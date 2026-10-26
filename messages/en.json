@@ -160,6 +160,12 @@
       "cardSearchLoading": "Searching cards...",
       "cardSearchEmpty": "No cards found.",
       "cardSearchError": "Unable to search cards.",
+      "cardSearchPrevious": "Previous",
+      "cardSearchNext": "Next",
+      "cardSearchPagination": "Card search pages",
+      "cardSearchGoToPage": "Go to page {page}",
+      "cardSearchCurrentPage": "Page {page}",
+      "cardSearchMorePages": "More pages",
       "cardSearchTypes": {
         "effectMonster": "Effect Monster",
         "flipEffectMonster": "Flip Effect Monster",
