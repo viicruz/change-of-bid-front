@@ -47,7 +47,7 @@ type StringFilter = string | readonly string[]
 
 /**
  * Search filters for GET /public/yugioh/cards/search.
- * link, scale, misc, staple, has_effect, num, and offset are omitted:
+ * link, scale, misc, staple, and has_effect are omitted:
  * a plain query string for those fields is rejected with 422.
  * Attack, defense, and level only accept a comparison object.
  */
@@ -77,8 +77,14 @@ export type CardSearchFilters =
   | (Omit<CardSearchFilterFields, "id"> & { id?: never })
   | (Omit<CardSearchFilterFields, "name"> & { name?: never })
 
+export type CardSearchPagination = {
+  num: number
+  offset: number
+}
+
 export interface IndexCardsInput {
   filters?: CardSearchFilters
+  pagination?: CardSearchPagination
   enabled?: boolean
 }
 
@@ -130,7 +136,22 @@ function encodeComparison(comparison: NumericComparison) {
   })
 }
 
-export function buildCardSearchParams(filters: CardSearchFilterFields) {
+function assignCount(
+  params: Record<string, string>,
+  key: string,
+  value: number
+) {
+  if (!Number.isInteger(value) || value < 0) {
+    throw new CardSearchFiltersError(`${key} must be a non-negative integer`)
+  }
+
+  params[key] = String(value)
+}
+
+export function buildCardSearchParams(
+  filters: CardSearchFilterFields,
+  pagination?: CardSearchPagination
+) {
   if (filters.name !== undefined && filters.id !== undefined) {
     throw new CardSearchFiltersError("name and id cannot be used together")
   }
@@ -197,6 +218,11 @@ export function buildCardSearchParams(filters: CardSearchFilterFields) {
   assignParam(params, "enddate", filters.enddate)
   assignParam(params, "dateregion", filters.dateregion)
 
+  if (pagination) {
+    assignCount(params, "num", pagination.num)
+    assignCount(params, "offset", pagination.offset)
+  }
+
   return params
 }
 
@@ -238,7 +264,10 @@ function comparisonKey(value: NumericComparison | undefined) {
   return `${value.operator}:${value.value}`
 }
 
-function cardSearchQueryKey(filters: CardSearchFilterFields) {
+export function cardSearchQueryKey(
+  filters: CardSearchFilterFields,
+  pagination?: CardSearchPagination
+) {
   return [
     QUERY_KEYS.CARDS.ALL,
     textKey(filters.fname),
@@ -260,7 +289,22 @@ function cardSearchQueryKey(filters: CardSearchFilterFields) {
     textKey(filters.startdate),
     textKey(filters.enddate),
     filters.dateregion ?? null,
+    pagination?.num ?? null,
+    pagination?.offset ?? null,
   ]
+}
+
+export function shouldKeepCardSearchPage(
+  previousKey: readonly unknown[],
+  nextKey: readonly unknown[]
+) {
+  if (previousKey.length !== nextKey.length || nextKey.length === 0) {
+    return false
+  }
+
+  return nextKey
+    .slice(0, -1)
+    .every((part, index) => part === previousKey[index])
 }
 
 function hasFilterValue(value: unknown) {
@@ -287,11 +331,14 @@ export function isEmptyCardSearchError(error: unknown) {
   )
 }
 
-async function indexCards(filters: CardSearchFilterFields) {
+async function indexCards(
+  filters: CardSearchFilterFields,
+  pagination?: CardSearchPagination
+) {
   try {
     return await api.get({
       url: "/public/yugioh/cards/search",
-      params: buildCardSearchParams(filters),
+      params: buildCardSearchParams(filters, pagination),
       schema: cardSearchResponseSchema,
       errorSchema: apiResponseErrorSchema,
     })
@@ -306,12 +353,24 @@ async function indexCards(filters: CardSearchFilterFields) {
 
 export function useIndexCards(props: IndexCardsInput) {
   const filters = props.filters ?? {}
+  const pagination = props.pagination
   const enabled = props.enabled ?? hasCardSearchFilter(filters)
+  const queryKey = cardSearchQueryKey(filters, pagination)
 
   return useQuery({
-    queryKey: cardSearchQueryKey(filters),
-    queryFn: () => indexCards(filters),
+    queryKey,
+    queryFn: () => indexCards(filters, pagination),
     enabled,
+    placeholderData: (previousData, previousQuery) => {
+      if (
+        !previousQuery ||
+        !shouldKeepCardSearchPage(previousQuery.queryKey, queryKey)
+      ) {
+        return undefined
+      }
+
+      return previousData
+    },
     staleTime: 1000 * 60 * 10, // 10 minutes
     retry: (failureCount, error) => {
       if (error instanceof CardSearchFiltersError) {
