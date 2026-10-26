@@ -1,4 +1,5 @@
 //* Libraries imports
+import { inferAdditionalFields } from "better-auth/client/plugins"
 import { createAuthClient } from "better-auth/react"
 
 //* Env imports
@@ -38,4 +39,15 @@ export const authClient = createAuthClient({
       storeToken(context.response)
     },
   },
+  plugins: [
+    inferAdditionalFields({
+      user: {
+        role: {
+          type: ["AUCTIONEER", "BIDDER"],
+          required: true,
+          input: false,
+        },
+      },
+    }),
+  ],
 })

@@ -6,6 +6,9 @@ import { useMutation } from "@tanstack/react-query"
 //* Auth imports
 import { authClient } from "@/src/lib/auth-client"
 
+//* Schema imports
+import { authUserSchema } from "@/src/schemas/user"
+
 //* Local imports
 import { queryClient } from "@/src/lib/query-client"
 
@@ -38,7 +41,16 @@ async function signUp(input: SignUpInput) {
     throw new SignUpError(typeof code === "string" ? code : "")
   }
 
-  return result.data
+  const user = authUserSchema.safeParse(result.data?.user)
+
+  if (!user.success) {
+    throw new SignUpError("")
+  }
+
+  return {
+    ...result.data,
+    user: user.data,
+  }
 }
 
 export function useSignUp() {
