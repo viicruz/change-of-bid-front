@@ -250,11 +250,19 @@
     "PASSWORD_TOO_SHORT": "Password must be at least 8 characters",
     "PASSWORD_TOO_LONG": "Password must be at most 128 characters",
     "PASSWORDS_DO_NOT_MATCH": "Passwords do not match",
+    "TITLE_REQUIRED": "Title is required",
+    "INVALID_MONEY": "Money values must be greater than zero and have at most 2 decimal places.",
+    "INVALID_DATETIME": "Enter an ISO datetime with a timezone offset.",
+    "INVALID_SCHEDULE": "The lot must last at least 24 hours, and the end must be in the future.",
+    "CARD_IDS_REQUIRED": "Add at least one card.",
     "00000_UNKNOWN_ERROR": "Unable to create the account."
   },
   "exceptions": {
     "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": "User already exists. Use another email.",
-    "INVALID_EMAIL_OR_PASSWORD": "Invalid email or password."
+    "INVALID_EMAIL_OR_PASSWORD": "Invalid email or password.",
+    "NOT_AUCTIONEER": "Only an auctioneer can create a lot.",
+    "UNKNOWN_CARDS": "One or more cards are not in the catalog.",
+    "CARD_WITHOUT_IMAGE": "One or more cards do not have an image."
   },
   "localeSelect": {
     "label": "Language",

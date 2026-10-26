@@ -250,11 +250,19 @@
     "PASSWORD_TOO_SHORT": "A senha deve ter pelo menos 8 caracteres",
     "PASSWORD_TOO_LONG": "A senha deve ter no máximo 128 caracteres",
     "PASSWORDS_DO_NOT_MATCH": "As senhas não coincidem",
+    "TITLE_REQUIRED": "O título é obrigatório",
+    "INVALID_MONEY": "Os valores em dinheiro devem ser maiores que zero e ter no máximo 2 casas decimais.",
+    "INVALID_DATETIME": "Informe uma data e hora ISO com fuso horário.",
+    "INVALID_SCHEDULE": "O lote deve durar pelo menos 24 horas, e o término deve estar no futuro.",
+    "CARD_IDS_REQUIRED": "Adicione pelo menos uma carta.",
     "00000_UNKNOWN_ERROR": "Não foi possível criar a conta."
   },
   "exceptions": {
     "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": "O usuário já existe. Use outro e-mail.",
-    "INVALID_EMAIL_OR_PASSWORD": "E-mail ou senha inválidos."
+    "INVALID_EMAIL_OR_PASSWORD": "E-mail ou senha inválidos.",
+    "NOT_AUCTIONEER": "Apenas um leiloeiro pode criar um lote.",
+    "UNKNOWN_CARDS": "Uma ou mais cartas não estão no catálogo.",
+    "CARD_WITHOUT_IMAGE": "Uma ou mais cartas não têm imagem."
   },
   "localeSelect": {
     "label": "Idioma",
