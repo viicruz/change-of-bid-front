@@ -109,6 +109,39 @@
         "closed": "Closed"
       }
     },
+    "/auctioneer": {
+      "title": "Auctioneer panel",
+      "description": "Manage your lots and the cards in them.",
+      "createLot": "Create lot",
+      "lotSearchLabel": "Search lots",
+      "lotSearchPlaceholder": "Search by lot name",
+      "lotFiltersLabel": "Filter lots",
+      "lotsLabel": "Lots",
+      "cardsInLot": "Cards already in the lot",
+      "addCard": "Add card",
+      "toggleSidebar": "Toggle sidebar",
+      "assistanceMenu": "Assistance menu",
+      "lotName": "Name",
+      "lotDescription": "Description",
+      "minimalValue": "Starting bid",
+      "minimumIncrement": "Minimum increment",
+      "startsAt": "Auction start",
+      "cardSearchTitle": "Card search",
+      "cardSearchLabel": "Search cards",
+      "cardSearchPlaceholder": "Search by card name",
+      "cardFiltersLabel": "Filter by type",
+      "statuses": {
+        "live": "Live",
+        "scheduled": "Scheduled",
+        "closed": "Closed"
+      },
+      "cardTypes": {
+        "monster": "Monster",
+        "spell": "Spell",
+        "trap": "Trap",
+        "extra": "Extra Deck"
+      }
+    },
     "/sign-in": {
       "title": "Sign in",
       "description": "Sign in with your email and password.",
