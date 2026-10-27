@@ -26,7 +26,8 @@
       "finalBid": "Final bid",
       "endsAt": "Ends at",
       "startsAt": "Starts at",
-      "endedAt": "Ended at"
+      "endedAt": "Ended at",
+      "audit": "Audit"
     },
     "/sign-up": {
       "title": "Create an account",
@@ -113,6 +114,7 @@
       "won": "Won",
       "viewLot": "View lot",
       "viewReceipt": "View receipt",
+      "audit": "Audit",
       "previous": "Previous",
       "next": "Next",
       "pagination": "Bid pages",

@@ -26,7 +26,8 @@
       "finalBid": "Lance final",
       "endsAt": "Termina em",
       "startsAt": "Começa em",
-      "endedAt": "Encerrado em"
+      "endedAt": "Encerrado em",
+      "audit": "Auditar"
     },
     "/sign-up": {
       "title": "Criar uma conta",
@@ -113,6 +114,7 @@
       "won": "Arrematado",
       "viewLot": "Ver lote",
       "viewReceipt": "Ver comprovante",
+      "audit": "Auditar",
       "previous": "Anterior",
       "next": "Próxima",
       "pagination": "Páginas de lances",
