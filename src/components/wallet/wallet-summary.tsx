@@ -8,7 +8,7 @@ import { useState, type MouseEvent } from "react"
 import Pagination from "@/src/components/ui/pagination"
 import { Skeleton } from "@/src/components/ui/skeleton"
 import { BalanceCard } from "@/src/components/wallet/balance-card"
-import { DevBalanceNotice } from "@/src/components/wallet/dev-balance-notice"
+import { DepositForm } from "@/src/components/wallet/deposit-form"
 import { TransactionList } from "@/src/components/wallet/transaction-list"
 
 //* Hooks imports
@@ -24,7 +24,6 @@ export function WalletSummary() {
   const t = useTranslations("pages./wallet")
   const walletQuery = useShowWallet()
   const [page, setPage] = useState(1)
-  const [sessionCredit, setSessionCredit] = useState(0)
   const movementsQuery = useIndexWalletMovements({
     page,
     limit: movementPageLimit,
@@ -37,10 +36,8 @@ export function WalletSummary() {
   const showPagination =
     page > 1 || (total !== undefined && total > movementPageLimit)
 
-  function onAddBalance(amount: number) {
-    setSessionCredit((current) => {
-      return current + amount
-    })
+  function onDeposited() {
+    setPage(1)
   }
 
   function onPageChange(nextPage: number) {
@@ -61,12 +58,10 @@ export function WalletSummary() {
           <Skeleton className="h-24 w-full max-w-lg" />
         </>
       ) : (
-        <BalanceCard
-          balance={Number(walletQuery.data.totalBalance) + sessionCredit}
-        />
+        <BalanceCard balance={Number(walletQuery.data.totalBalance)} />
       )}
       <div className="w-full max-w-lg">
-        <DevBalanceNotice onAddBalance={onAddBalance} />
+        <DepositForm onDeposited={onDeposited} />
       </div>
       <section
         className="flex w-full flex-col items-center gap-3"
