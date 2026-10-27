@@ -6,9 +6,8 @@ import { useFormatter, useTranslations } from "next-intl"
 //* Components imports
 import Card from "@/src/components/ui/card"
 
-//* Lib imports
-import { censorBidderName } from "@/src/lib/audit/censor-bidder-name"
-import type { AuditBid } from "@/src/lib/audit/mock-audit"
+//* Hooks imports
+import type { ShowLotAudit } from "@/src/hooks/lots/queries/use-show-lot-audit"
 
 const currencyFormat = {
   style: "currency",
@@ -20,25 +19,31 @@ const dateFormat = {
   timeStyle: "short",
 } as const
 
+type AuditBid = ShowLotAudit["audit"]["bids"][number]
+
+function moneyToNumber(value: string) {
+  return Number(value)
+}
+
 export function AuditBidCard(props: { bid: AuditBid }) {
   const t = useTranslations("pages./auction/[id]/audit")
   const format = useFormatter()
-  const bidderName = censorBidderName(props.bid.bidderName)
+  const bid = props.bid
 
   return (
-    <Card.Root id={`audit-bid-${props.bid.id}`}>
+    <Card.Root id={`audit-bid-${bid.sequence}`}>
       <Card.Content className="flex flex-col gap-1">
         <p>
-          <span className="text-muted-foreground">{t("bidder")}</span>{" "}
-          {bidderName}
+          <span className="text-muted-foreground">{t("participant")}</span>{" "}
+          {bid.participantNo}
         </p>
         <p>
           <span className="text-muted-foreground">{t("bidAmount")}</span>{" "}
-          {format.number(props.bid.amount, currencyFormat)}
+          {format.number(moneyToNumber(bid.amount), currencyFormat)}
         </p>
         <p>
           <span className="text-muted-foreground">{t("bidTime")}</span>{" "}
-          {format.dateTime(new Date(props.bid.placedAt), dateFormat)}
+          {format.dateTime(bid.createdAt, dateFormat)}
         </p>
       </Card.Content>
     </Card.Root>
