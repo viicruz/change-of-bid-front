@@ -4,7 +4,7 @@ import { getLocale } from "next-intl/server"
 import { Geist_Mono, Merriweather, Roboto } from "next/font/google"
 
 //* Components imports
-import { LanguageSelect } from "@/src/components/button/language-select"
+import { Navbar } from "@/src/components/navbar/navbar"
 import { QueryProvider } from "@/src/components/query-provider"
 import { ThemeProvider } from "@/src/components/theme-provider"
 
@@ -49,9 +49,7 @@ export default async function RootLayout({
         <NextIntlClientProvider locale={locale}>
           <QueryProvider>
             <ThemeProvider>
-              <div className="flex justify-end px-6 pt-6">
-                <LanguageSelect />
-              </div>
+              <Navbar />
               {children}
             </ThemeProvider>
           </QueryProvider>
