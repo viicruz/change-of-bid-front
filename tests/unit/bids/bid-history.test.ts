@@ -151,16 +151,32 @@ describe("BidHistory", () => {
     vi.clearAllMocks()
   })
 
-  async function renderParticipations() {
-    vi.mocked(api.get).mockResolvedValue({ lots: participations })
+  function numberedParticipations(count: number) {
+    return Array.from({ length: count }, (_, index) => {
+      const number = index + 1
+
+      return participation({
+        id: `11111111-1111-4111-8111-${String(number).padStart(12, "0")}`,
+        title: `Lot ${number}`,
+        status: "LIVE",
+      })
+    })
+  }
+
+  async function renderParticipations(
+    lots: IndexParticipation[] = participations
+  ) {
+    vi.mocked(api.get).mockResolvedValue({ lots })
 
     act(() => {
       root.render(createElement(HistoryHarness))
     })
 
+    const readyTitle = lots[0]?.title ?? "You have not bid on any lots yet."
+
     await act(async () => {
       await vi.waitFor(() => {
-        expect(container.textContent).toContain("Blue-Eyes")
+        expect(container.textContent).toContain(readyTitle)
       })
     })
   }
@@ -172,9 +188,13 @@ describe("BidHistory", () => {
   }
 
   function clickFilter(filter: string) {
+    clickButton(`bid-filter-${filter}`)
+  }
+
+  function clickButton(id: string) {
     act(() => {
       container
-        .querySelector<HTMLButtonElement>(`#bid-filter-${filter}`)
+        .querySelector<HTMLButtonElement>(`#${id}`)
         ?.dispatchEvent(new MouseEvent("click", { bubbles: true }))
     })
   }
@@ -441,6 +461,167 @@ describe("BidHistory", () => {
     expect(link).toBeInstanceOf(HTMLAnchorElement)
     expect(link?.getAttribute("href")).toBe(`/auction/${liveParticipation.id}`)
     expect(link?.getAttribute("target")).toBeNull()
+  })
+
+  describe("pagination", () => {
+    it("hides pagination when every bid fits on the first page", async () => {
+      await renderParticipations()
+
+      expect(container.querySelector("#bid-history-pagination")).toBeNull()
+      expect(titlesInOrder()).toEqual([
+        "Blue-Eyes",
+        "Scheduled lot",
+        "Dark Magician",
+        "Mirror Force",
+      ])
+    })
+
+    it("shows the first page and moves to the next page", async () => {
+      await renderParticipations(numberedParticipations(6))
+
+      expect(titlesInOrder()).toEqual([
+        "Lot 1",
+        "Lot 2",
+        "Lot 3",
+        "Lot 4",
+        "Lot 5",
+      ])
+      expect(
+        container
+          .querySelector("#bid-history-page-1")
+          ?.getAttribute("aria-current")
+      ).toBe("page")
+      expect(container.querySelector("#bid-history-previous")).toBeInstanceOf(
+        HTMLButtonElement
+      )
+      expect(container.querySelector("#bid-history-next")).toBeInstanceOf(
+        HTMLButtonElement
+      )
+      expect(
+        container.querySelector<HTMLButtonElement>("#bid-history-previous")
+          ?.disabled
+      ).toBe(true)
+
+      clickButton("bid-history-next")
+
+      expect(titlesInOrder()).toEqual(["Lot 6"])
+      expect(
+        container
+          .querySelector("#bid-history-page-2")
+          ?.getAttribute("aria-current")
+      ).toBe("page")
+      expect(
+        container.querySelector<HTMLButtonElement>("#bid-history-next")
+          ?.disabled
+      ).toBe(true)
+    })
+
+    it("opens the page selected from the page links", async () => {
+      await renderParticipations(numberedParticipations(6))
+
+      clickButton("bid-history-page-2")
+
+      expect(titlesInOrder()).toEqual(["Lot 6"])
+      expect(
+        container
+          .querySelector("#bid-history-page-2")
+          ?.getAttribute("aria-current")
+      ).toBe("page")
+    })
+
+    it("returns to the first page when the search changes", async () => {
+      await renderParticipations(numberedParticipations(6))
+
+      clickButton("bid-history-next")
+      expect(titlesInOrder()).toEqual(["Lot 6"])
+
+      act(() => {
+        setInputValue(
+          container.querySelector("#bid-search") as HTMLInputElement,
+          "lot"
+        )
+      })
+
+      expect(titlesInOrder()).toEqual([
+        "Lot 1",
+        "Lot 2",
+        "Lot 3",
+        "Lot 4",
+        "Lot 5",
+      ])
+      expect(
+        container
+          .querySelector("#bid-history-page-1")
+          ?.getAttribute("aria-current")
+      ).toBe("page")
+    })
+
+    it("returns to the first page when the active filter changes", async () => {
+      const lots = numberedParticipations(6)
+      lots[5] = participation({
+        ...lots[5],
+        status: "ENDED",
+      })
+
+      await renderParticipations(lots)
+
+      clickButton("bid-history-next")
+      expect(titlesInOrder()).toEqual(["Lot 6"])
+
+      clickFilter("LIVE")
+
+      expect(titlesInOrder()).toEqual([
+        "Lot 1",
+        "Lot 2",
+        "Lot 3",
+        "Lot 4",
+        "Lot 5",
+      ])
+      expect(container.querySelector("#bid-history-pagination")).toBeNull()
+    })
+
+    it("collapses distant pages and opens the selected page", async () => {
+      await renderParticipations(numberedParticipations(26))
+
+      expect(container.querySelector("#bid-history-page-1")).toBeInstanceOf(
+        HTMLButtonElement
+      )
+      expect(container.querySelector("#bid-history-page-2")).toBeInstanceOf(
+        HTMLButtonElement
+      )
+      expect(container.querySelector("#bid-history-page-6")).toBeInstanceOf(
+        HTMLButtonElement
+      )
+      expect(container.querySelector("#bid-history-page-3")).toBeNull()
+      expect(
+        container.querySelector("[data-slot='pagination-ellipsis']")
+      ).not.toBeNull()
+
+      clickButton("bid-history-page-6")
+
+      expect(titlesInOrder()).toEqual(["Lot 26"])
+      expect(
+        container
+          .querySelector("#bid-history-page-6")
+          ?.getAttribute("aria-current")
+      ).toBe("page")
+    })
+
+    it("gives every pagination button an id and a button type", async () => {
+      await renderParticipations(numberedParticipations(6))
+
+      for (const id of [
+        "bid-history-previous",
+        "bid-history-next",
+        "bid-history-page-1",
+        "bid-history-page-2",
+      ]) {
+        const button = container.querySelector(`#${id}`)
+
+        expect(button).toBeInstanceOf(HTMLButtonElement)
+        expect(button?.getAttribute("type")).toBe("button")
+      }
+    })
   })
 
   it("gives every filter button an id and a button type", async () => {
