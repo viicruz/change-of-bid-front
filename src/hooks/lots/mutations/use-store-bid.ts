@@ -64,6 +64,7 @@ export function useStoreBid() {
       )
       await queryInvalidator([
         [QUERY_KEYS.LOTS.ALL],
+        [QUERY_KEYS.LOTS.SINGLE, variables.id],
         [QUERY_KEYS.WALLETS.SINGLE],
         [QUERY_KEYS.WALLETS.ALL, QUERY_KEYS.WALLETS.MOVEMENTS],
       ])

@@ -10,7 +10,7 @@ import { QueryProvider } from "@/src/components/query-provider"
 
 //* Hooks imports
 import { useShowLot } from "@/src/hooks/lots/queries/use-show-lot"
-import { usePublicLotLive } from "@/src/hooks/lots/use-public-lot-live"
+import { usePublicLotLive } from "@/src/hooks/lots/queries/use-public-lot-live"
 
 //* Local imports
 import { queryClient } from "@/src/lib/query-client"
@@ -265,6 +265,43 @@ describe("usePublicLotLive", () => {
       expect(FakeSocket.instances[1]?.url).toBe(
         `ws://localhost:3001/public/lots/${lotId}/live`
       )
+    })
+
+    it("refreshes the lot after an opened socket reconnects", async () => {
+      const refreshedResponse = {
+        ...publicLotResponse,
+        serverNow: "2026-10-27T12:30:00.000Z",
+        lot: {
+          ...publicLotResponse.lot,
+          currentBid: "25.00",
+          bidCount: 3,
+        },
+      }
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce(jsonResponse(publicLotResponse))
+        .mockResolvedValueOnce(jsonResponse(refreshedResponse))
+
+      vi.stubGlobal("fetch", fetchMock)
+
+      await renderLive()
+      await waitForText("connecting:15.00:6:2")
+      vi.useFakeTimers()
+
+      await act(async () => {
+        latestSocket().dispatch("open", {})
+        latestSocket().dispatch("close", { code: 1006 })
+        await vi.advanceTimersByTimeAsync(1000)
+      })
+
+      await act(async () => {
+        latestSocket().dispatch("open", {})
+        await vi.waitFor(() => {
+          expect(container.textContent).toBe("open:25.00:6:3")
+        })
+      })
+
+      expect(fetchMock).toHaveBeenCalledTimes(2)
     })
 
     it("reconnects with backoff after a dropped connection and resets it once the socket opens", async () => {

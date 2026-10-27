@@ -26,7 +26,7 @@ import { useLotCountdown } from "@/src/hooks/lots/use-lot-countdown"
 import {
   usePublicLotLive,
   type PublicLotLiveStatus,
-} from "@/src/hooks/lots/use-public-lot-live"
+} from "@/src/hooks/lots/queries/use-public-lot-live"
 
 //* Local imports
 import { ApiError } from "@/src/lib/api"

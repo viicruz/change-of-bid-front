@@ -12,7 +12,8 @@ import { QueryProvider } from "@/src/components/query-provider"
 import { useShowLot, type ShowLot } from "@/src/hooks/lots/queries/use-show-lot"
 
 //* Local imports
-import { QUERY_KEYS, queryClient } from "@/src/lib/query-client"
+import { publicLotQueryKey } from "@/src/lib/lots/public-lot-room"
+import { queryClient } from "@/src/lib/query-client"
 
 const tokenKey = "change-of-bid.bearer-token"
 const lotId = "6f1c2a40-7b3e-4d1a-9c20-1a2b3c4d5e6f"
@@ -75,7 +76,7 @@ function jsonResponse(body: unknown, status = 200) {
 }
 
 function queryKey(id: string) {
-  return [QUERY_KEYS.LOTS.ALL, QUERY_KEYS.LOTS.SINGLE, id]
+  return publicLotQueryKey(id)
 }
 
 function ShowLotHarness(props: { id: string; enabled?: boolean }) {

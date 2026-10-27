@@ -2,10 +2,8 @@
 import type { QueryClient } from "@tanstack/react-query"
 
 //* Hooks imports
-import type {
-  PublicLotLiveMessage,
-  ShowLot,
-} from "@/src/hooks/lots/queries/use-show-lot"
+import type { PublicLotLiveMessage } from "@/src/hooks/lots/queries/use-public-lot-live"
+import type { ShowLot } from "@/src/hooks/lots/queries/use-show-lot"
 
 //* Env imports
 import { env } from "@/src/env/client"
@@ -14,7 +12,7 @@ import { env } from "@/src/env/client"
 import { QUERY_KEYS } from "@/src/lib/query-client"
 
 export function publicLotQueryKey(lotId: string) {
-  return [QUERY_KEYS.LOTS.ALL, QUERY_KEYS.LOTS.SINGLE, lotId] as const
+  return [QUERY_KEYS.LOTS.SINGLE, lotId] as const
 }
 
 export function publicLotLiveUrl(

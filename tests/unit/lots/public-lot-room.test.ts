@@ -82,7 +82,6 @@ describe("publicLotLiveUrl", () => {
 describe("publicLotQueryKey", () => {
   it("matches the public lot cache key", () => {
     expect(publicLotQueryKey(lotId)).toEqual([
-      QUERY_KEYS.LOTS.ALL,
       QUERY_KEYS.LOTS.SINGLE,
       lotId,
     ])
