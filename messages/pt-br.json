@@ -67,6 +67,9 @@
         "previous": "Anterior",
         "next": "Próxima",
         "pagination": "Páginas de transações",
+        "goToPage": "Ir para a página {page}",
+        "currentPage": "Página {page}",
+        "morePages": "Mais páginas",
         "types": {
           "DEPOSIT": "Depósito",
           "HOLD": "Reserva de lance",

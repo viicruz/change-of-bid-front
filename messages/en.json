@@ -67,6 +67,9 @@
         "previous": "Previous",
         "next": "Next",
         "pagination": "Transaction pages",
+        "goToPage": "Go to page {page}",
+        "currentPage": "Page {page}",
+        "morePages": "More pages",
         "types": {
           "DEPOSIT": "Deposit",
           "HOLD": "Bid hold",
