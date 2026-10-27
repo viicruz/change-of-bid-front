@@ -1,0 +1,269 @@
+"use client"
+
+//* Libraries imports
+import { useTranslations } from "next-intl"
+import { useState } from "react"
+
+//* Components imports
+import { CardSearchPanel } from "@/src/components/auctioneer/card-search-panel"
+import {
+  CreateLotForm,
+  CreateLotSubmit,
+} from "@/src/components/auctioneer/create-lot-form"
+import { CreateLotProvider } from "@/src/components/auctioneer/create-lot-provider"
+import { LotCards } from "@/src/components/auctioneer/lot-cards"
+import { LotDetailsFields } from "@/src/components/auctioneer/lot-details-fields"
+import { AuctioneerSidebar } from "@/src/components/auctioneer/auctioneer-sidebar"
+import { PrivateLotDetails } from "@/src/components/auctioneer/private-lot-details"
+import { Button } from "@/src/components/ui/button"
+import Card from "@/src/components/ui/card"
+import Drawer from "@/src/components/ui/drawer"
+import Sidebar from "@/src/components/ui/sidebar"
+
+//* Hooks imports
+import { useCancelLot } from "@/src/hooks/lots/mutations/use-cancel-lot"
+import {
+  useShowPrivateLot,
+  type ShowPrivateLot,
+} from "@/src/hooks/lots/queries/use-show-private-lot"
+
+//* Local imports
+import { ApiError } from "@/src/lib/api"
+
+const searchIdPrefix = "mobile-search-"
+
+const cancelErrorMessageKey = {
+  NOT_AUCTIONEER: "cancelErrors.NOT_AUCTIONEER",
+  LOT_NOT_OWNED: "cancelErrors.LOT_NOT_OWNED",
+  LOT_NOT_FOUND: "cancelErrors.LOT_NOT_FOUND",
+  LOT_NOT_CANCELABLE: "cancelErrors.LOT_NOT_CANCELABLE",
+} as const
+
+type CancelErrorCode = keyof typeof cancelErrorMessageKey
+
+function isCancelErrorCode(code: string): code is CancelErrorCode {
+  return Object.hasOwn(cancelErrorMessageKey, code)
+}
+
+function canCancelLot(props: {
+  status: ShowPrivateLot["lot"]["status"]
+  endsAt: Date
+  serverNow: Date
+}) {
+  const isOpen = props.status === "SCHEDULED" || props.status === "LIVE"
+
+  return isOpen && props.endsAt.getTime() > props.serverNow.getTime()
+}
+
+function readCancelErrorCode(error: unknown) {
+  if (!(error instanceof ApiError)) {
+    return null
+  }
+
+  const body = error.body
+
+  if (
+    body !== null &&
+    typeof body === "object" &&
+    "code" in body &&
+    typeof body.code === "string"
+  ) {
+    return body.code
+  }
+
+  return null
+}
+
+function CancelLotFooter(props: {
+  lotId: string
+  status: ShowPrivateLot["lot"]["status"]
+  endsAt: Date
+  serverNow: Date
+}) {
+  const t = useTranslations("pages./auctioneer")
+  const cancelLot = useCancelLot()
+  const errorCode = cancelLot.isError
+    ? readCancelErrorCode(cancelLot.error)
+    : null
+  const cancelable = canCancelLot({
+    status: props.status,
+    endsAt: props.endsAt,
+    serverNow: props.serverNow,
+  })
+
+  return (
+    <div className="flex w-full flex-col gap-4">
+      {cancelLot.isSuccess ? (
+        <p id="cancel-lot-success" role="status" className="text-sm">
+          {t("canceledLot")}
+        </p>
+      ) : null}
+      {cancelLot.isError ? (
+        <p
+          id="cancel-lot-error"
+          role="alert"
+          className="text-sm text-destructive"
+        >
+          {errorCode && isCancelErrorCode(errorCode)
+            ? t(cancelErrorMessageKey[errorCode])
+            : t("cancelError")}
+        </p>
+      ) : null}
+      <Button
+        id="cancel-lot"
+        type="button"
+        variant="destructive"
+        className="w-full"
+        disabled={!cancelable || cancelLot.isPending}
+        onClick={() => {
+          cancelLot.mutate({ id: props.lotId })
+        }}
+      >
+        {cancelLot.isPending ? t("cancelingLot") : t("cancelLot")}
+      </Button>
+    </div>
+  )
+}
+
+function PrivateLotWorkspace(props: {
+  query: ReturnType<typeof useShowPrivateLot>
+}) {
+  const t = useTranslations("pages./auctioneer")
+
+  if (props.query.isError) {
+    return (
+      <Card.Root id="private-lot-error-card" className="min-h-160">
+        <Card.Content>
+          <p id="private-lot-error">{t("lotError")}</p>
+        </Card.Content>
+      </Card.Root>
+    )
+  }
+
+  if (!props.query.data) {
+    return (
+      <Card.Root id="private-lot-loading-card" className="min-h-160">
+        <Card.Content>
+          <p id="private-lot-loading">{t("lotLoading")}</p>
+        </Card.Content>
+      </Card.Root>
+    )
+  }
+
+  const lot = props.query.data.lot
+
+  return (
+    <PrivateLotDetails
+      lot={lot}
+      footer={
+        <CancelLotFooter
+          lotId={lot.id}
+          status={lot.status}
+          endsAt={lot.endsAt}
+          serverNow={props.query.data.serverNow}
+        />
+      }
+    />
+  )
+}
+
+export function AuctioneerPanel() {
+  const t = useTranslations("pages./auctioneer")
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [selectedLotId, setSelectedLotId] = useState<string | null>(null)
+  const privateLot = useShowPrivateLot({
+    id: selectedLotId ?? "",
+    enabled: selectedLotId !== null,
+  })
+
+  function onSelectLot(lotId: string) {
+    setSelectedLotId(lotId)
+  }
+
+  function onCreateLot() {
+    setSelectedLotId(null)
+  }
+
+  return (
+    <CreateLotProvider>
+      <Sidebar.Provider className="min-h-0 w-full">
+        <div
+          id="auctioneer-panel"
+          className="flex w-full flex-col gap-4 md:flex-row md:items-stretch"
+        >
+          <AuctioneerSidebar
+            selectedLotId={selectedLotId}
+            onSelectLot={onSelectLot}
+            onCreateLot={onCreateLot}
+          />
+          <div className="flex min-w-0 flex-1 flex-col gap-4">
+            <header className="flex items-center justify-end rounded-xl bg-card p-2 ring-1 ring-foreground/10 md:hidden">
+              <Sidebar.Trigger
+                id="auctioneer-sidebar-toggle"
+                type="button"
+                aria-label={t("toggleSidebar")}
+              />
+            </header>
+            {selectedLotId === null ? (
+              <div className="grid w-full gap-4 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-stretch">
+                <Card.Root id="auctioneer-lot-column" className="min-h-160">
+                  <CreateLotForm>
+                    <Card.Content className="flex flex-1 flex-col">
+                      <LotCards
+                        action={
+                          <div className="lg:hidden">
+                            <Drawer.Root
+                              open={searchOpen}
+                              onOpenChange={setSearchOpen}
+                            >
+                              <Drawer.Trigger
+                                render={
+                                  <Button
+                                    id="auctioneer-add-card"
+                                    type="button"
+                                    variant="outline"
+                                    className="w-full border-dashed"
+                                  />
+                                }
+                              >
+                                {t("addCard")}
+                              </Drawer.Trigger>
+                              <Drawer.Content>
+                                <Drawer.Header>
+                                  <Drawer.Title
+                                    id={`${searchIdPrefix}card-search-title`}
+                                  >
+                                    {t("cardSearchTitle")}
+                                  </Drawer.Title>
+                                </Drawer.Header>
+                                <div className="min-h-0 flex-1 overflow-y-auto p-4">
+                                  <CardSearchPanel
+                                    idPrefix={searchIdPrefix}
+                                    framed={false}
+                                  />
+                                </div>
+                              </Drawer.Content>
+                            </Drawer.Root>
+                          </div>
+                        }
+                      />
+                    </Card.Content>
+                    <Card.Footer className="flex-col items-stretch gap-4">
+                      <LotDetailsFields />
+                      <CreateLotSubmit />
+                    </Card.Footer>
+                  </CreateLotForm>
+                </Card.Root>
+                <div className="hidden h-full min-h-0 lg:block">
+                  <CardSearchPanel />
+                </div>
+              </div>
+            ) : (
+              <PrivateLotWorkspace query={privateLot} />
+            )}
+          </div>
+        </div>
+      </Sidebar.Provider>
+    </CreateLotProvider>
+  )
+}
