@@ -72,6 +72,34 @@ describe("lotSchema", () => {
     )
   })
 
+  it("accepts an item quantity greater than one", () => {
+    const parsed = lotSchema.parse({
+      ...createdLot,
+      items: [
+        {
+          ...createdLot.items[0],
+          quantity: 3,
+        },
+      ],
+    })
+
+    expect(parsed.items[0]?.quantity).toBe(3)
+  })
+
+  it("rejects a non-positive item quantity", () => {
+    const result = lotSchema.safeParse({
+      ...createdLot,
+      items: [
+        {
+          ...createdLot.items[0],
+          quantity: 0,
+        },
+      ],
+    })
+
+    expect(result.success).toBe(false)
+  })
+
   it("rejects response money that is not a positive two-decimal string", () => {
     const result = lotSchema.safeParse({
       ...createdLot,

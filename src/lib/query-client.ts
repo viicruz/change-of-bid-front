@@ -14,6 +14,10 @@ export const QUERY_KEYS = {
     SINGLE: "lot",
     PRIVATE: "private",
   },
+  WALLETS: {
+    ALL: "wallets",
+    SINGLE: "wallet",
+  },
 } as const
 
 export async function queryInvalidator(queryKeys: (string | number)[][]) {

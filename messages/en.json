@@ -56,6 +56,8 @@
       "devNotice": "Development mode. Balance added here is artificial and exists only in this session.",
       "devAmountLabel": "Amount to add",
       "devSubmit": "Add balance",
+      "loading": "Loading balance.",
+      "error": "Could not load your balance.",
       "totalBalance": "Total balance",
       "historyTitle": "Transaction history",
       "transactions": {
