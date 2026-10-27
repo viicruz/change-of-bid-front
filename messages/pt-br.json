@@ -87,7 +87,7 @@
       "searchLabel": "Buscar lances",
       "searchPlaceholder": "Buscar pelo nome do lote",
       "filtersLabel": "Filtrar lances",
-      "historyTitle": "Histórico de bids",
+      "historyTitle": "Histórico de lances",
       "loading": "Carregando lances.",
       "error": "Não foi possível carregar seus lances.",
       "empty": "Você ainda não deu lance em nenhum lote.",
@@ -141,43 +141,34 @@
     "/auction/[id]/audit": {
       "title": "Auditoria",
       "description": "Registro público de um lote e dos seus lances.",
+      "loading": "Carregando auditoria.",
+      "error": "Não foi possível carregar a auditoria.",
+      "notFound": "Lote não encontrado.",
       "lotInfo": "Informações do lote",
-      "bidHistory": "Histórico de bids",
+      "bidHistory": "Histórico de lances",
       "currentBid": "Lance atual",
       "finalBid": "Lance final",
+      "noCurrentBid": "Nenhum lance atual.",
       "startsAt": "Começa em",
       "endsAt": "Termina em",
       "endedAt": "Encerrado em",
-      "bidder": "Licitante",
+      "participant": "Participante",
       "bidAmount": "Valor",
       "bidTime": "Horário",
-      "cardType": "Tipo",
-      "rarity": "Raridade",
-      "condition": "Condição",
-      "setName": "Coleção",
-      "cardTypes": {
-        "monster": "Monstro",
-        "spell": "Magia",
-        "trap": "Armadilha",
-        "extra": "Extra Deck"
-      },
-      "rarities": {
-        "common": "Comum",
-        "rare": "Rara",
-        "superRare": "Super Rara",
-        "ultraRare": "Ultra Rara",
-        "secretRare": "Secreta"
-      },
-      "conditions": {
-        "mint": "Mint",
-        "nearMint": "Near Mint",
-        "played": "Usada"
-      },
+      "quantity": "Quantidade",
+      "emptyBids": "Este lote não tem lances aceitos.",
+      "tamperedWarning": "Os lances armazenados não conferem com a cadeia. Este registro não é confiável.",
+      "verificationFailedWarning": "O servidor não conseguiu verificar a cadeia de lances. Não trate este registro como íntegro nem adulterado.",
       "statuses": {
         "live": "Ao vivo",
         "scheduled": "Agendado",
         "canceled": "Cancelado",
         "closed": "Encerrado"
+      },
+      "auditStatuses": {
+        "INTACT": "Cadeia íntegra",
+        "TAMPERED": "Cadeia adulterada",
+        "VERIFICATION_FAILED": "Verificação falhou"
       }
     },
     "/auction/[id]": {
