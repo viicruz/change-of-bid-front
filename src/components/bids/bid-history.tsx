@@ -20,7 +20,10 @@ import {
 } from "@/src/hooks/participations/queries/use-index-participations"
 
 //* Lib imports
-import { getPaginationPageItems } from "@/src/lib/pagination"
+import {
+  getPaginationPageItems,
+  type PaginationPageItem,
+} from "@/src/lib/pagination"
 
 const loadingSkeletonCount = 3
 const bidHistoryPageSize = 5
@@ -148,48 +151,86 @@ export function BidHistory() {
               )
             })}
           </div>
-          {participationsQuery.isError ? (
-            <p id="bid-history-error">{t("error")}</p>
-          ) : participationsQuery.isPending ? (
-            <>
-              <p className="sr-only">{t("loading")}</p>
-              <ul
-                aria-labelledby="bid-history-title"
-                aria-busy="true"
-                className="flex flex-col gap-3"
-              >
-                {Array.from({ length: loadingSkeletonCount }, (_, index) => (
-                  <li key={`bid-history-skeleton-${index}`}>
-                    <Skeleton className="h-24 w-full" />
-                  </li>
-                ))}
-              </ul>
-            </>
-          ) : participations.length === 0 ? (
-            <p id="bid-history-empty">{t("empty")}</p>
-          ) : visibleParticipations.length === 0 ? (
-            <p id="bid-history-empty-filtered">{t("emptyFiltered")}</p>
-          ) : (
-            <>
-              <ul id="bid-history" className="flex flex-col gap-3">
-                {pageParticipations.map((participation) => (
-                  <li key={participation.id} id={`bid-${participation.id}`}>
-                    <BidCard participation={participation} />
-                  </li>
-                ))}
-              </ul>
-              {showPagination ? (
-                <BidHistoryPagination
-                  page={currentPage}
-                  pageCount={pageCount}
-                  onPageChange={onPageChange}
-                />
-              ) : null}
-            </>
-          )}
+          <BidHistoryResults
+            isError={participationsQuery.isError}
+            isPending={participationsQuery.isPending}
+            participationCount={participations.length}
+            visibleCount={visibleParticipations.length}
+            pageParticipations={pageParticipations}
+            showPagination={showPagination}
+            page={currentPage}
+            pageCount={pageCount}
+            onPageChange={onPageChange}
+          />
         </Card.Content>
       </Card.Root>
     </section>
+  )
+}
+
+type BidHistoryResultsProps = {
+  isError: boolean
+  isPending: boolean
+  participationCount: number
+  visibleCount: number
+  pageParticipations: IndexParticipation[]
+  showPagination: boolean
+  page: number
+  pageCount: number
+  onPageChange: (page: number) => void
+}
+
+function BidHistoryResults(props: BidHistoryResultsProps) {
+  const t = useTranslations("pages./my-bids")
+
+  if (props.isError) {
+    return <p id="bid-history-error">{t("error")}</p>
+  }
+
+  if (props.isPending) {
+    return (
+      <>
+        <p className="sr-only">{t("loading")}</p>
+        <ul
+          aria-labelledby="bid-history-title"
+          aria-busy="true"
+          className="flex flex-col gap-3"
+        >
+          {Array.from({ length: loadingSkeletonCount }, (_, index) => (
+            <li key={`bid-history-skeleton-${index}`}>
+              <Skeleton className="h-24 w-full" />
+            </li>
+          ))}
+        </ul>
+      </>
+    )
+  }
+
+  if (props.participationCount === 0) {
+    return <p id="bid-history-empty">{t("empty")}</p>
+  }
+
+  if (props.visibleCount === 0) {
+    return <p id="bid-history-empty-filtered">{t("emptyFiltered")}</p>
+  }
+
+  return (
+    <>
+      <ul id="bid-history" className="flex flex-col gap-3">
+        {props.pageParticipations.map((participation) => (
+          <li key={participation.id} id={`bid-${participation.id}`}>
+            <BidCard participation={participation} />
+          </li>
+        ))}
+      </ul>
+      {props.showPagination ? (
+        <BidHistoryPagination
+          page={props.page}
+          pageCount={props.pageCount}
+          onPageChange={props.onPageChange}
+        />
+      ) : null}
+    </>
   )
 }
 
@@ -199,9 +240,40 @@ type BidHistoryPaginationProps = {
   onPageChange: (page: number) => void
 }
 
+function paginationEntryKey(
+  item: PaginationPageItem,
+  previousItem: PaginationPageItem | undefined
+) {
+  if (item !== "ellipsis") {
+    return String(item)
+  }
+
+  if (previousItem === 1) {
+    return "ellipsis-after-first"
+  }
+
+  return "ellipsis-before-last"
+}
+
+function getPaginationEntries(page: number, pageCount: number) {
+  const items = getPaginationPageItems(page, pageCount)
+  let previousItem: PaginationPageItem | undefined
+
+  return items.map((item) => {
+    const key = paginationEntryKey(item, previousItem)
+
+    previousItem = item
+
+    return {
+      item,
+      key,
+    }
+  })
+}
+
 function BidHistoryPagination(props: BidHistoryPaginationProps) {
   const t = useTranslations("pages./my-bids")
-  const items = getPaginationPageItems(props.page, props.pageCount)
+  const entries = getPaginationEntries(props.page, props.pageCount)
 
   function onPrevious() {
     props.onPageChange(props.page - 1)
@@ -236,30 +308,30 @@ function BidHistoryPagination(props: BidHistoryPaginationProps) {
             onClick={onPrevious}
           />
         </Pagination.Item>
-        {items.map((item, index) => {
-          if (item === "ellipsis") {
+        {entries.map((entry) => {
+          if (entry.item === "ellipsis") {
             return (
-              <Pagination.Item key={`bid-history-ellipsis-${index}`}>
+              <Pagination.Item key={entry.key}>
                 <Pagination.Ellipsis label={t("morePages")} />
               </Pagination.Item>
             )
           }
 
           return (
-            <Pagination.Item key={item}>
+            <Pagination.Item key={entry.key}>
               <Pagination.Link
-                id={`bid-history-page-${item}`}
+                id={`bid-history-page-${entry.item}`}
                 type="button"
-                isActive={item === props.page}
-                data-page={item}
+                isActive={entry.item === props.page}
+                data-page={entry.item}
                 aria-label={
-                  item === props.page
-                    ? t("currentPage", { page: String(item) })
-                    : t("goToPage", { page: String(item) })
+                  entry.item === props.page
+                    ? t("currentPage", { page: String(entry.item) })
+                    : t("goToPage", { page: String(entry.item) })
                 }
                 onClick={onPageClick}
               >
-                {item}
+                {entry.item}
               </Pagination.Link>
             </Pagination.Item>
           )
