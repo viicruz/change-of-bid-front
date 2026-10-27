@@ -9,6 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 //* Components imports
 import { AuctioneerLotList } from "@/src/components/auctioneer/auctioneer-lot-list"
 import { QueryProvider } from "@/src/components/query-provider"
+import Sidebar from "@/src/components/ui/sidebar"
 
 //* Hooks imports
 import type { IndexPrivateLot } from "@/src/hooks/lots/queries/use-index-private-lots"
@@ -69,7 +70,12 @@ const endedLot = privateLot({
   currentBid: null,
 })
 
-function ListHarness(props: { query: string; status?: PrivateLotStatus }) {
+function ListHarness(props: {
+  query: string
+  status?: PrivateLotStatus
+  selectedLotId?: string | null
+  onSelectLot?: (lotId: string) => void
+}) {
   return createElement(
     NextIntlClientProvider,
     {
@@ -80,10 +86,16 @@ function ListHarness(props: { query: string; status?: PrivateLotStatus }) {
     createElement(
       QueryProvider,
       null,
-      createElement(AuctioneerLotList, {
-        query: props.query,
-        status: props.status,
-      })
+      createElement(
+        Sidebar.Provider,
+        null,
+        createElement(AuctioneerLotList, {
+          query: props.query,
+          status: props.status,
+          selectedLotId: props.selectedLotId ?? null,
+          onSelectLot: props.onSelectLot ?? (() => undefined),
+        })
+      )
     )
   )
 }
@@ -138,14 +150,22 @@ describe("AuctioneerLotList", () => {
     })
   })
 
-  it("links each lot to its auction page in the same tab", async () => {
+  it("selects a lot in place when its button is clicked", async () => {
+    const onSelectLot = vi.fn()
+
     vi.mocked(api.get).mockResolvedValue({
       totalReceived: "0.00",
       lots: [liveLot],
     })
 
     act(() => {
-      root.render(createElement(ListHarness, { query: "", status: "LIVE" }))
+      root.render(
+        createElement(ListHarness, {
+          query: "",
+          status: "LIVE",
+          onSelectLot,
+        })
+      )
     })
 
     await act(async () => {
@@ -154,11 +174,45 @@ describe("AuctioneerLotList", () => {
       })
     })
 
-    const link = container.querySelector(`#auctioneer-lot-link-${liveLot.id}`)
+    const button = container.querySelector(`#auctioneer-lot-${liveLot.id}`)
 
-    expect(link).toBeInstanceOf(HTMLAnchorElement)
-    expect(link?.getAttribute("href")).toBe(`/auction/${liveLot.id}`)
-    expect(link?.getAttribute("target")).toBeNull()
+    expect(button).toBeInstanceOf(HTMLButtonElement)
+    expect(button?.getAttribute("type")).toBe("button")
+    expect(container.querySelector("a")).toBeNull()
+
+    act(() => {
+      button?.dispatchEvent(new MouseEvent("click", { bubbles: true }))
+    })
+
+    expect(onSelectLot).toHaveBeenCalledWith(liveLot.id)
+  })
+
+  it("marks the selected lot as active", async () => {
+    vi.mocked(api.get).mockResolvedValue({
+      totalReceived: "0.00",
+      lots: [endedLot, liveLot],
+    })
+
+    act(() => {
+      root.render(
+        createElement(ListHarness, {
+          query: "",
+          selectedLotId: liveLot.id,
+        })
+      )
+    })
+
+    await act(async () => {
+      await vi.waitFor(() => {
+        expect(container.textContent).toContain("Dragon lot")
+      })
+    })
+
+    const selected = container.querySelector(`#auctioneer-lot-${liveLot.id}`)
+    const other = container.querySelector(`#auctioneer-lot-${endedLot.id}`)
+
+    expect(selected?.hasAttribute("data-active")).toBe(true)
+    expect(other?.hasAttribute("data-active")).toBe(false)
   })
 
   it("shows an empty message when the auctioneer has no lots", async () => {
@@ -226,11 +280,13 @@ describe("AuctioneerLotList", () => {
       })
     })
 
-    const links = [...container.querySelectorAll("a")].map((link) => link.id)
+    const buttons = [
+      ...container.querySelectorAll("button[id^='auctioneer-lot-']"),
+    ].map((button) => button.id)
 
-    expect(links).toEqual([
-      `auctioneer-lot-link-${endedLot.id}`,
-      `auctioneer-lot-link-${liveLot.id}`,
+    expect(buttons).toEqual([
+      `auctioneer-lot-${endedLot.id}`,
+      `auctioneer-lot-${liveLot.id}`,
     ])
     expect(container.textContent?.indexOf("Starting bid")).toBeLessThan(
       container.textContent?.indexOf("Current bid") ?? -1
