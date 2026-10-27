@@ -119,6 +119,21 @@
       "currentPage": "Página {page}",
       "morePages": "Mais páginas"
     },
+    "/receipts/[shareToken]": {
+      "title": "Comprovante de arremate",
+      "description": "Comprovante de um lote de leilão encerrado.",
+      "eyebrow": "Comprovante de leilão",
+      "loading": "Carregando comprovante.",
+      "error": "Não foi possível carregar o comprovante.",
+      "notFound": "Comprovante não encontrado.",
+      "invalid": "Este link de comprovante é inválido.",
+      "finalAmount": "Valor do arremate",
+      "endedAt": "Encerrado em",
+      "winner": "Número do vencedor",
+      "items": "Cartas do lote",
+      "quantity": "Quantidade",
+      "print": "Imprimir comprovante"
+    },
     "/auction/[id]/audit": {
       "title": "Auditoria",
       "description": "Registro público de um lote e dos seus lances.",

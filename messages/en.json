@@ -119,6 +119,21 @@
       "currentPage": "Page {page}",
       "morePages": "More pages"
     },
+    "/receipts/[shareToken]": {
+      "title": "Winning receipt",
+      "description": "Proof of a settled auction lot.",
+      "eyebrow": "Auction receipt",
+      "loading": "Loading receipt.",
+      "error": "Could not load the receipt.",
+      "notFound": "Receipt was not found.",
+      "invalid": "This receipt link is invalid.",
+      "finalAmount": "Winning amount",
+      "endedAt": "Settled at",
+      "winner": "Winner number",
+      "items": "Cards in the lot",
+      "quantity": "Quantity",
+      "print": "Print receipt"
+    },
     "/auction/[id]/audit": {
       "title": "Audit",
       "description": "Public record of a lot and its bids.",
