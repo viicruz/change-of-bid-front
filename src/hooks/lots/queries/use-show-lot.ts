@@ -1,7 +1,7 @@
 "use client"
 
 //* Libraries imports
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import * as z from "zod"
 
 //* Schema imports
@@ -14,7 +14,10 @@ import {
 
 //* Local imports
 import { ApiError, ApiSchemaError, api } from "@/src/lib/api"
-import { QUERY_KEYS } from "@/src/lib/query-client"
+import {
+  mergePublicLotRead,
+  publicLotQueryKey,
+} from "@/src/lib/lots/public-lot-room"
 
 const showLotItemSchema = lotItemSchema.extend({
   cardSnapshot: z.record(z.string(), z.unknown()),
@@ -54,7 +57,12 @@ const apiResponseSchema = z.object({
   lot: showLotSchema,
 })
 
+export const publicLotLiveMessageSchema = apiResponseSchema.omit({
+  viewerParticipantNo: true,
+})
+
 export type ShowLot = z.infer<typeof apiResponseSchema>
+export type PublicLotLiveMessage = z.infer<typeof publicLotLiveMessageSchema>
 
 export interface ShowLotInput {
   id: string
@@ -70,12 +78,20 @@ async function showLot(id: string) {
 }
 
 export function useShowLot(props: ShowLotInput) {
+  const queryClient = useQueryClient()
   const idIsUuid = z.uuid().safeParse(props.id).success
   const enabled = (props.enabled ?? true) && idIsUuid
 
   return useQuery({
-    queryKey: [QUERY_KEYS.LOTS.ALL, QUERY_KEYS.LOTS.SINGLE, props.id],
-    queryFn: () => showLot(props.id),
+    queryKey: publicLotQueryKey(props.id),
+    queryFn: async () => {
+      const body = await showLot(props.id)
+      const cached = queryClient.getQueryData<ShowLot>(
+        publicLotQueryKey(props.id)
+      )
+
+      return mergePublicLotRead(cached, body)
+    },
     enabled,
     staleTime: 0,
     retry: (failureCount, error) => {

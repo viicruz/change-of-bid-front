@@ -1,7 +1,7 @@
 "use client"
 
 //* Libraries imports
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import * as z from "zod"
 
 //* Schema imports
@@ -10,6 +10,7 @@ import { lotSchema } from "@/src/schemas/lot"
 
 //* Local imports
 import { api } from "@/src/lib/api"
+import { rememberViewerParticipant } from "@/src/lib/lots/public-lot-room"
 import { QUERY_KEYS, queryInvalidator } from "@/src/lib/query-client"
 
 const bidAmountSchema = z
@@ -50,10 +51,17 @@ async function storeBid(input: StoreBid) {
 }
 
 export function useStoreBid() {
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: storeBid,
     retry: false,
-    onSuccess: async () => {
+    onSuccess: async (storedBid, variables) => {
+      rememberViewerParticipant(
+        queryClient,
+        variables.id,
+        storedBid.participantNo
+      )
       await queryInvalidator([
         [QUERY_KEYS.LOTS.ALL],
         [QUERY_KEYS.WALLETS.SINGLE],
