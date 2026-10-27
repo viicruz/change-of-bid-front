@@ -160,6 +160,18 @@
       "you": "You",
       "bidValue": "Bid value",
       "placeBid": "Place bid",
+      "placingBid": "Placing bid...",
+      "bidError": "Unable to place the bid.",
+      "bidErrors": {
+        "NOT_BIDDER": "Only a bidder can place a bid.",
+        "LOT_NOT_FOUND": "Lot was not found.",
+        "BID_BELOW_MINIMUM": "The bid is below the minimum accepted amount.",
+        "INSUFFICIENT_BALANCE": "Your available balance does not cover this bid.",
+        "ALREADY_LEADER": "You already hold the current bid.",
+        "LOT_NOT_STARTED": "This lot has not started yet.",
+        "LOT_ENDED": "This lot has already ended.",
+        "LOT_CANCELED": "This lot is canceled."
+      },
       "bidHistory": "Bid history",
       "emptyBids": "No bids yet.",
       "participant": "Participant",
