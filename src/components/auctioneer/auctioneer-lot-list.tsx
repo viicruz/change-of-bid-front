@@ -2,7 +2,6 @@
 
 //* Libraries imports
 import { useFormatter, useTranslations } from "next-intl"
-import Link from "next/link"
 
 //* Components imports
 import Sidebar from "@/src/components/ui/sidebar"
@@ -52,30 +51,44 @@ function bidFor(lot: IndexPrivateLot) {
   }
 }
 
-function AuctioneerLotListItem(props: { lot: IndexPrivateLot }) {
+function AuctioneerLotListItem(props: {
+  lot: IndexPrivateLot
+  selected: boolean
+  onSelectLot: (lotId: string) => void
+}) {
   const t = useTranslations("pages./auctioneer")
   const format = useFormatter()
   const bid = bidFor(props.lot)
   const statusKey = auctioneerLotStatusLabelKey[props.lot.status]
 
+  function onSelect() {
+    props.onSelectLot(props.lot.id)
+  }
+
   return (
     <Sidebar.MenuItem>
-      <Link
-        id={`auctioneer-lot-link-${props.lot.id}`}
-        href={`/auction/${props.lot.id}`}
-        className="flex flex-col gap-1 rounded-md p-2 text-sm outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+      <Sidebar.MenuButton
+        id={`auctioneer-lot-${props.lot.id}`}
+        type="button"
+        isActive={props.selected}
+        className="h-auto items-start py-2 whitespace-normal"
+        onClick={onSelect}
       >
-        <span className="line-clamp-2 font-medium wrap-break-word">
-          {props.lot.title}
-        </span>
-        <span className="text-xs text-sidebar-foreground/70">
-          {t(`statuses.${statusKey}`)}
-        </span>
-        <span>
-          <span className="text-sidebar-foreground/70">{t(bid.labelKey)}</span>{" "}
-          {format.number(moneyToNumber(bid.amount), currencyFormat)}
-        </span>
-      </Link>
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <span className="line-clamp-2 font-medium wrap-break-word">
+            {props.lot.title}
+          </span>
+          <span className="text-xs text-sidebar-foreground/70">
+            {t(`statuses.${statusKey}`)}
+          </span>
+          <span className="wrap-break-word whitespace-normal">
+            <span className="text-sidebar-foreground/70">
+              {t(bid.labelKey)}
+            </span>{" "}
+            {format.number(moneyToNumber(bid.amount), currencyFormat)}
+          </span>
+        </div>
+      </Sidebar.MenuButton>
     </Sidebar.MenuItem>
   )
 }
@@ -83,6 +96,8 @@ function AuctioneerLotListItem(props: { lot: IndexPrivateLot }) {
 export function AuctioneerLotList(props: {
   query: string
   status?: PrivateLotStatus
+  selectedLotId: string | null
+  onSelectLot: (lotId: string) => void
 }) {
   const t = useTranslations("pages./auctioneer")
   const lotsQuery = useIndexPrivateLots({
@@ -129,7 +144,12 @@ export function AuctioneerLotList(props: {
       ) : (
         <Sidebar.Menu>
           {lots.map((lot) => (
-            <AuctioneerLotListItem key={lot.id} lot={lot} />
+            <AuctioneerLotListItem
+              key={lot.id}
+              lot={lot}
+              selected={props.selectedLotId === lot.id}
+              onSelectLot={props.onSelectLot}
+            />
           ))}
         </Sidebar.Menu>
       )}

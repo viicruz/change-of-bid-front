@@ -30,9 +30,16 @@ const auctioneerLotFilters = [
   "CANCELED",
 ] as const satisfies readonly PrivateLotStatus[]
 
-export function AuctioneerSidebar() {
+type AuctioneerSidebarProps = {
+  selectedLotId: string | null
+  onSelectLot: (lotId: string) => void
+  onCreateLot: () => void
+}
+
+export function AuctioneerSidebar(props: AuctioneerSidebarProps) {
   const t = useTranslations("pages./auctioneer")
   const isMobile = useIsMobile()
+  const { setOpenMobile } = Sidebar.useSidebar()
   const [query, setQuery] = useState("")
   const [status, setStatus] = useState<PrivateLotStatus | undefined>(undefined)
   const debouncedQuery = useDebounce(query, searchDebounceMs)
@@ -51,6 +58,11 @@ export function AuctioneerSidebar() {
     })
   }
 
+  function onSelectLot(lotId: string) {
+    props.onSelectLot(lotId)
+    setOpenMobile(false)
+  }
+
   return (
     <Sidebar.Root
       id="auctioneer-sidebar"
@@ -62,7 +74,7 @@ export function AuctioneerSidebar() {
       }
     >
       <Sidebar.Header className="gap-4 p-4">
-        <CreateLotButton />
+        <CreateLotButton onCreateLot={props.onCreateLot} />
         <div className="flex flex-col gap-2">
           <Label htmlFor="auctioneer-lot-search">{t("lotSearchLabel")}</Label>
           <Sidebar.Input
@@ -99,7 +111,12 @@ export function AuctioneerSidebar() {
         </div>
       </Sidebar.Header>
       <Sidebar.Content className="px-2 py-2">
-        <AuctioneerLotList query={debouncedQuery} status={status} />
+        <AuctioneerLotList
+          query={debouncedQuery}
+          status={status}
+          selectedLotId={props.selectedLotId}
+          onSelectLot={onSelectLot}
+        />
       </Sidebar.Content>
     </Sidebar.Root>
   )

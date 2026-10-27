@@ -14,7 +14,11 @@ import {
   type CreateLotFormValues,
 } from "@/src/components/auctioneer/create-lot-form-schema"
 
-export function CreateLotButton() {
+type CreateLotButtonProps = {
+  onCreateLot: () => void
+}
+
+export function CreateLotButton(props: CreateLotButtonProps) {
   const t = useTranslations("pages./auctioneer")
   const form = useFormContext<CreateLotFormValues>()
   const storeLot = useCreateLotMutation()
@@ -22,6 +26,7 @@ export function CreateLotButton() {
   function onClick() {
     form.reset(emptyCreateLotForm)
     storeLot.reset()
+    props.onCreateLot()
   }
 
   return (
