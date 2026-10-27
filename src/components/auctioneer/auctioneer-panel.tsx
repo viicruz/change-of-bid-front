@@ -21,9 +21,109 @@ import Drawer from "@/src/components/ui/drawer"
 import Sidebar from "@/src/components/ui/sidebar"
 
 //* Hooks imports
-import { useShowPrivateLot } from "@/src/hooks/lots/queries/use-show-private-lot"
+import { useCancelLot } from "@/src/hooks/lots/mutations/use-cancel-lot"
+import {
+  useShowPrivateLot,
+  type ShowPrivateLot,
+} from "@/src/hooks/lots/queries/use-show-private-lot"
+
+//* Local imports
+import { ApiError } from "@/src/lib/api"
 
 const searchIdPrefix = "mobile-search-"
+
+const cancelErrorMessageKey = {
+  NOT_AUCTIONEER: "cancelErrors.NOT_AUCTIONEER",
+  LOT_NOT_OWNED: "cancelErrors.LOT_NOT_OWNED",
+  LOT_NOT_FOUND: "cancelErrors.LOT_NOT_FOUND",
+  LOT_NOT_CANCELABLE: "cancelErrors.LOT_NOT_CANCELABLE",
+} as const
+
+type CancelErrorCode = keyof typeof cancelErrorMessageKey
+
+function isCancelErrorCode(code: string): code is CancelErrorCode {
+  return Object.hasOwn(cancelErrorMessageKey, code)
+}
+
+function canCancelLot(props: {
+  status: ShowPrivateLot["lot"]["status"]
+  endsAt: Date
+  serverNow: Date
+}) {
+  const isOpen = props.status === "SCHEDULED" || props.status === "LIVE"
+
+  return isOpen && props.endsAt.getTime() > props.serverNow.getTime()
+}
+
+function readCancelErrorCode(error: unknown) {
+  if (!(error instanceof ApiError)) {
+    return null
+  }
+
+  const body = error.body
+
+  if (
+    body !== null &&
+    typeof body === "object" &&
+    "code" in body &&
+    typeof body.code === "string"
+  ) {
+    return body.code
+  }
+
+  return null
+}
+
+function CancelLotFooter(props: {
+  lotId: string
+  status: ShowPrivateLot["lot"]["status"]
+  endsAt: Date
+  serverNow: Date
+}) {
+  const t = useTranslations("pages./auctioneer")
+  const cancelLot = useCancelLot()
+  const errorCode = cancelLot.isError
+    ? readCancelErrorCode(cancelLot.error)
+    : null
+  const cancelable = canCancelLot({
+    status: props.status,
+    endsAt: props.endsAt,
+    serverNow: props.serverNow,
+  })
+
+  return (
+    <div className="flex w-full flex-col gap-4">
+      {cancelLot.isSuccess ? (
+        <p id="cancel-lot-success" role="status" className="text-sm">
+          {t("canceledLot")}
+        </p>
+      ) : null}
+      {cancelLot.isError ? (
+        <p
+          id="cancel-lot-error"
+          role="alert"
+          className="text-sm text-destructive"
+        >
+          {errorCode && isCancelErrorCode(errorCode)
+            ? t(cancelErrorMessageKey[errorCode])
+            : t("cancelError")}
+        </p>
+      ) : null}
+      <Button
+        id="cancel-lot"
+        type="button"
+        variant="destructive"
+        className="w-full"
+        disabled={!cancelable || cancelLot.isPending}
+        onClick={() => {
+          cancelLot.mutate({ id: props.lotId })
+        }}
+      >
+        {cancelLot.isPending ? t("cancelingLot") : t("cancelLot")}
+      </Button>
+    </div>
+  )
+}
 
 function PrivateLotWorkspace(props: {
   query: ReturnType<typeof useShowPrivateLot>
@@ -50,7 +150,21 @@ function PrivateLotWorkspace(props: {
     )
   }
 
-  return <PrivateLotDetails lot={props.query.data.lot} />
+  const lot = props.query.data.lot
+
+  return (
+    <PrivateLotDetails
+      lot={lot}
+      footer={
+        <CancelLotFooter
+          lotId={lot.id}
+          status={lot.status}
+          endsAt={lot.endsAt}
+          serverNow={props.query.data.serverNow}
+        />
+      }
+    />
+  )
 }
 
 export function AuctioneerPanel() {

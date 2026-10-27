@@ -179,6 +179,16 @@
       "submit": "Publish lot",
       "submitting": "Publishing...",
       "created": "Lot created.",
+      "cancelLot": "Cancel lot",
+      "cancelingLot": "Canceling...",
+      "canceledLot": "Lot canceled.",
+      "cancelError": "Unable to cancel the lot.",
+      "cancelErrors": {
+        "NOT_AUCTIONEER": "Only an auctioneer can cancel a lot.",
+        "LOT_NOT_OWNED": "Only the owner can cancel this lot.",
+        "LOT_NOT_FOUND": "Lot was not found.",
+        "LOT_NOT_CANCELABLE": "Only a scheduled or live lot can be canceled."
+      },
       "cardSearchTitle": "Card search",
       "cardSearchLabel": "Search cards",
       "cardSearchPlaceholder": "Search by card name",

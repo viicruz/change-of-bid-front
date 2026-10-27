@@ -2,6 +2,7 @@
 
 //* Libraries imports
 import { useFormatter, useTranslations } from "next-intl"
+import { type ReactNode } from "react"
 
 //* Components imports
 import { auctioneerLotStatusLabelKey } from "@/src/components/auctioneer/auctioneer-lot-list"
@@ -32,7 +33,10 @@ function itemsByPosition(items: PrivateLot["items"]) {
   return [...items].sort((left, right) => left.position - right.position)
 }
 
-export function PrivateLotDetails(props: { lot: PrivateLot }) {
+export function PrivateLotDetails(props: {
+  lot: PrivateLot
+  footer?: ReactNode
+}) {
   const t = useTranslations("pages./auctioneer")
   const format = useFormatter()
   const lot = props.lot
@@ -188,6 +192,11 @@ export function PrivateLotDetails(props: { lot: PrivateLot }) {
           )}
         </div>
       </Card.Content>
+      {props.footer ? (
+        <Card.Footer className="flex-col items-stretch gap-4">
+          {props.footer}
+        </Card.Footer>
+      ) : null}
     </Card.Root>
   )
 }

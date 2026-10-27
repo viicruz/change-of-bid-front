@@ -179,6 +179,16 @@
       "submit": "Publicar lote",
       "submitting": "Publicando...",
       "created": "Lote criado.",
+      "cancelLot": "Cancelar lote",
+      "cancelingLot": "Cancelando...",
+      "canceledLot": "Lote cancelado.",
+      "cancelError": "Não foi possível cancelar o lote.",
+      "cancelErrors": {
+        "NOT_AUCTIONEER": "Apenas um leiloeiro pode cancelar um lote.",
+        "LOT_NOT_OWNED": "Apenas o dono pode cancelar este lote.",
+        "LOT_NOT_FOUND": "O lote não foi encontrado.",
+        "LOT_NOT_CANCELABLE": "Apenas um lote agendado ou ao vivo pode ser cancelado."
+      },
       "cardSearchTitle": "Pesquisa de cartas",
       "cardSearchLabel": "Buscar cartas",
       "cardSearchPlaceholder": "Buscar pelo nome da carta",

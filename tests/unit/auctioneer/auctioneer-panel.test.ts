@@ -18,7 +18,7 @@ import type { ShowPrivateLot } from "@/src/hooks/lots/queries/use-show-private-l
 import enMessages from "@/messages/en.json"
 
 //* Local imports
-import { api } from "@/src/lib/api"
+import { ApiError, api } from "@/src/lib/api"
 import { queryClient } from "@/src/lib/query-client"
 
 vi.mock("@/src/lib/api", async () => {
@@ -29,7 +29,7 @@ vi.mock("@/src/lib/api", async () => {
     ...actual,
     api: {
       get: vi.fn(),
-      post: actual.api.post,
+      post: vi.fn(),
     },
   }
 })
@@ -114,15 +114,18 @@ function PanelHarness() {
 describe("AuctioneerPanel", () => {
   let container: HTMLDivElement
   let root: Root
+  let currentShownLot: ShowPrivateLot
 
   beforeEach(() => {
     queryClient.clear()
+    currentShownLot = shownLot
     container = document.createElement("div")
     document.body.append(container)
     root = createRoot(container)
+    vi.mocked(api.post).mockReset()
     vi.mocked(api.get).mockImplementation(async (options) => {
       if (options.url === `/private/lots/${lotId}`) {
-        return shownLot
+        return currentShownLot
       }
 
       if (options.url === "/private/lots") {
@@ -191,5 +194,166 @@ describe("AuctioneerPanel", () => {
     expect(container.querySelector("#private-lot-details")).toBeNull()
     expect(container.querySelector("#create-lot-form")).not.toBeNull()
     expect(container.querySelector("#card-search-panel")).not.toBeNull()
+  })
+
+  describe("cancel lot", () => {
+    async function openListedLot() {
+      act(() => {
+        root.render(createElement(PanelHarness))
+      })
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(container.textContent).toContain("Listed dragon lot")
+        })
+      })
+
+      act(() => {
+        container
+          .querySelector<HTMLButtonElement>(`#auctioneer-lot-${lotId}`)
+          ?.click()
+      })
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(container.querySelector("#cancel-lot")).not.toBeNull()
+        })
+      })
+    }
+
+    function cancelButton() {
+      const button = container.querySelector<HTMLButtonElement>("#cancel-lot")
+
+      if (!button) {
+        throw new Error("Expected the cancel lot button")
+      }
+
+      return button
+    }
+
+    it("enables cancel for a live lot that still has time left", async () => {
+      await openListedLot()
+
+      expect(cancelButton().disabled).toBe(false)
+      expect(cancelButton().textContent).toBe("Cancel lot")
+    })
+
+    it("cancels the selected lot and disables the button after the lot is refetched", async () => {
+      let canceled = false
+
+      vi.mocked(api.get).mockImplementation(async (options) => {
+        if (options.url === `/private/lots/${lotId}`) {
+          return {
+            ...shownLot,
+            lot: {
+              ...shownLot.lot,
+              status: canceled ? "CANCELED" : shownLot.lot.status,
+            },
+          }
+        }
+
+        if (options.url === "/private/lots") {
+          return {
+            totalReceived: "0.00",
+            lots: [listedLot],
+          }
+        }
+
+        return {
+          data: [],
+        }
+      })
+      vi.mocked(api.post).mockImplementation(async () => {
+        canceled = true
+
+        return {
+          id: lotId,
+          status: "CANCELED",
+          canceledAt: new Date("2026-10-27T03:39:00.000Z"),
+        }
+      })
+
+      await openListedLot()
+
+      await act(async () => {
+        cancelButton().click()
+        await vi.waitFor(() => {
+          expect(cancelButton().disabled).toBe(true)
+        })
+      })
+
+      const request = vi.mocked(api.post).mock.calls.at(-1)?.[0]
+
+      expect(request?.url).toBe(`/private/lots/${lotId}/cancel`)
+      expect(request?.body).toBeUndefined()
+      expect(container.querySelector("#cancel-lot-success")?.textContent).toBe(
+        "Lot canceled."
+      )
+      expect(container.querySelector("#private-lot-status")?.textContent).toBe(
+        "Canceled"
+      )
+    })
+
+    it("disables cancel when the lot has ended", async () => {
+      currentShownLot = {
+        ...shownLot,
+        lot: {
+          ...shownLot.lot,
+          status: "ENDED",
+        },
+      }
+
+      await openListedLot()
+
+      expect(cancelButton().disabled).toBe(true)
+    })
+
+    it("disables cancel when the lot is already canceled", async () => {
+      currentShownLot = {
+        ...shownLot,
+        lot: {
+          ...shownLot.lot,
+          status: "CANCELED",
+        },
+      }
+
+      await openListedLot()
+
+      expect(cancelButton().disabled).toBe(true)
+    })
+
+    it("disables cancel when the end time is not after the server time", async () => {
+      currentShownLot = {
+        ...shownLot,
+        lot: {
+          ...shownLot.lot,
+          endsAt: shownLot.serverNow,
+        },
+      }
+
+      await openListedLot()
+
+      expect(cancelButton().disabled).toBe(true)
+    })
+
+    it("shows the business error when the lot cannot be canceled", async () => {
+      vi.mocked(api.post).mockRejectedValue(
+        new ApiError(409, "Only a scheduled or live lot can be canceled.", {
+          code: "LOT_NOT_CANCELABLE",
+          message: "Only a scheduled or live lot can be canceled.",
+        })
+      )
+
+      await openListedLot()
+
+      await act(async () => {
+        cancelButton().click()
+        await vi.waitFor(() => {
+          expect(
+            container.querySelector("#cancel-lot-error")?.textContent
+          ).toBe("Only a scheduled or live lot can be canceled.")
+        })
+      })
+    })
   })
 })

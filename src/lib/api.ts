@@ -18,7 +18,7 @@ type ApiPostOptions<T> = {
   url: string
   schema: z.ZodType<T>
   errorSchema: z.ZodType<{ message: string }>
-  body: unknown
+  body?: unknown
 }
 
 export class ApiError extends Error {
@@ -159,10 +159,11 @@ export const api = {
 
   async post<T>(options: ApiPostOptions<T>) {
     const url = resolveUrl(options.url, undefined)
+    const hasBody = options.body !== undefined
     const response = await fetch(url, {
       method: "POST",
-      headers: jsonHeaders(),
-      body: JSON.stringify(options.body),
+      headers: hasBody ? jsonHeaders() : acceptHeaders(),
+      body: hasBody ? JSON.stringify(options.body) : undefined,
     })
     const text = await response.text()
 
