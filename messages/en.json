@@ -60,11 +60,20 @@
       "error": "Could not load your balance.",
       "totalBalance": "Total balance",
       "historyTitle": "Transaction history",
-      "transactions": {
-        "deposit": "Initial deposit",
-        "bid": "Bid on Blue-Eyes White Dragon",
-        "refund": "Bid refund",
-        "devTopUp": "Artificial credit"
+      "movements": {
+        "loading": "Loading transactions.",
+        "error": "Could not load your transactions.",
+        "empty": "No transactions yet.",
+        "previous": "Previous",
+        "next": "Next",
+        "pagination": "Transaction pages",
+        "types": {
+          "DEPOSIT": "Deposit",
+          "HOLD": "Bid hold",
+          "RELEASE": "Hold released",
+          "SETTLEMENT_DEBIT": "Settlement charge",
+          "SETTLEMENT_CREDIT": "Settlement credit"
+        }
       }
     },
     "/my-bids": {
