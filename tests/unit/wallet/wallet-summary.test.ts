@@ -25,7 +25,7 @@ vi.mock("@/src/lib/api", async () => {
     ...actual,
     api: {
       get: vi.fn(),
-      post: actual.api.post,
+      post: vi.fn(),
     },
   }
 })
@@ -109,6 +109,27 @@ function SummaryHarness() {
   })
 }
 
+async function submitDeposit(root: ParentNode, value: string) {
+  const amount = root.querySelector("#deposit-amount")
+  const form = root.querySelector("#deposit-form")
+
+  expect(amount).toBeInstanceOf(HTMLInputElement)
+  expect(form).toBeInstanceOf(HTMLFormElement)
+
+  const inputElement = amount as HTMLInputElement
+  const formElement = form as HTMLFormElement
+
+  await act(async () => {
+    setInputValue(inputElement, value)
+  })
+
+  await act(async () => {
+    formElement.dispatchEvent(
+      new Event("submit", { bubbles: true, cancelable: true })
+    )
+  })
+}
+
 function setInputValue(input: HTMLInputElement, value: string) {
   const valueSetter = Object.getOwnPropertyDescriptor(
     HTMLInputElement.prototype,
@@ -177,7 +198,7 @@ describe("WalletSummary", () => {
       url: "/private/wallet/movements",
       params: {
         page: "1",
-        limit: "20",
+        limit: "5",
       },
       schema: expect.anything(),
       errorSchema: expect.anything(),
@@ -187,8 +208,10 @@ describe("WalletSummary", () => {
     expect(container.textContent).toContain("-R$2.00")
     expect(container.textContent).toContain("R$10.00")
     expect(container.querySelector("#wallet-movements-pagination")).toBeNull()
+    expect(container.textContent).toContain("Deposit funds into your wallet.")
     expect(container.textContent).not.toContain("Initial deposit")
     expect(container.textContent).not.toContain("Artificial credit")
+    expect(container.textContent).not.toContain("Development mode")
   })
 
   it("shows an empty history when the wallet has no movements", async () => {
@@ -235,7 +258,7 @@ describe("WalletSummary", () => {
     })
 
     expect(container.querySelector("#wallet-balance")).toBeNull()
-    expect(container.querySelector("#dev-balance-form")).toBeInstanceOf(
+    expect(container.querySelector("#deposit-form")).toBeInstanceOf(
       HTMLFormElement
     )
     expect(container.textContent).toContain("Transaction history")
@@ -322,7 +345,50 @@ describe("WalletSummary", () => {
     expect(container.querySelector("[data-slot='skeleton']")).not.toBeNull()
   })
 
-  it("adds a session credit on top of the API total balance", async () => {
+  it("deposits the amount and shows the wallet returned by the API", async () => {
+    mockWalletGet()
+    vi.mocked(api.post).mockResolvedValue({
+      totalBalance: "15.10",
+      committedBalance: "0.01",
+      availableBalance: "15.09",
+    })
+
+    act(() => {
+      root.render(createElement(SummaryHarness))
+    })
+
+    await act(async () => {
+      await vi.waitFor(() => {
+        expect(container.querySelector("#wallet-balance")?.textContent).toBe(
+          "R$10.10"
+        )
+      })
+    })
+
+    await submitDeposit(container, "  5.00  ")
+
+    await act(async () => {
+      await vi.waitFor(() => {
+        expect(container.querySelector("#wallet-balance")?.textContent).toBe(
+          "R$15.10"
+        )
+      })
+    })
+
+    expect(api.post).toHaveBeenCalledWith({
+      url: "/private/wallet/deposits",
+      body: { amount: "5.00" },
+      schema: expect.anything(),
+      errorSchema: expect.anything(),
+    })
+    expect(
+      (container.querySelector("#deposit-amount") as HTMLInputElement).value
+    ).toBe("")
+    expect(container.textContent).toContain("Deposit")
+    expect(container.textContent).not.toContain("Artificial credit")
+  })
+
+  it("shows a money error and does not deposit an invalid amount", async () => {
     mockWalletGet()
 
     act(() => {
@@ -337,31 +403,115 @@ describe("WalletSummary", () => {
       })
     })
 
-    const amount = container.querySelector("#dev-balance-amount")
-    const form = container.querySelector("#dev-balance-form")
+    await submitDeposit(container, "01.50")
 
-    expect(amount).toBeInstanceOf(HTMLInputElement)
-    expect(form).toBeInstanceOf(HTMLFormElement)
+    expect(container.querySelector("#deposit-error")?.textContent).toBe(
+      "Money values must be greater than zero and have at most 2 decimal places."
+    )
+    expect(api.post).not.toHaveBeenCalled()
+    expect(container.querySelector("#wallet-balance")?.textContent).toBe(
+      "R$10.10"
+    )
+  })
 
-    const inputElement = amount as HTMLInputElement
-    const formElement = form as HTMLFormElement
+  it("shows the API error and keeps the current balance when the deposit is rejected", async () => {
+    mockWalletGet()
+    vi.mocked(api.post).mockRejectedValue(
+      new ApiError(422, "The deposit exceeds the wallet balance limit.", {
+        code: "AMOUNT_OUT_OF_RANGE",
+        message: "The deposit exceeds the wallet balance limit.",
+      })
+    )
 
-    await act(async () => {
-      setInputValue(inputElement, "5")
+    act(() => {
+      root.render(createElement(SummaryHarness))
     })
 
     await act(async () => {
-      // happy-dom reports step="0.01" as a mismatch, so requestSubmit never fires.
-      formElement.dispatchEvent(
-        new Event("submit", { bubbles: true, cancelable: true })
-      )
+      await vi.waitFor(() => {
+        expect(container.querySelector("#wallet-balance")?.textContent).toBe(
+          "R$10.10"
+        )
+      })
+    })
+
+    await submitDeposit(container, "2.50")
+
+    await act(async () => {
+      await vi.waitFor(() => {
+        expect(container.querySelector("#deposit-error")?.textContent).toBe(
+          "The deposit exceeds the wallet balance limit."
+        )
+      })
     })
 
     expect(container.querySelector("#wallet-balance")?.textContent).toBe(
-      "R$15.10"
+      "R$10.10"
     )
-    expect(container.textContent).toContain("Deposit")
-    expect(container.textContent).not.toContain("Artificial credit")
+    expect(
+      (container.querySelector("#deposit-amount") as HTMLInputElement).value
+    ).toBe("2.50")
+  })
+
+  it("returns to the first movement page after a deposit", async () => {
+    vi.mocked(api.get).mockImplementation(async (input) => {
+      if (input.url === "/private/wallet/movements") {
+        return movementsPage(Number(input.params?.page ?? "1"))
+      }
+
+      return walletResponse
+    })
+    vi.mocked(api.post).mockResolvedValue({
+      totalBalance: "12.50",
+      committedBalance: "0.01",
+      availableBalance: "12.49",
+    })
+
+    act(() => {
+      root.render(createElement(SummaryHarness))
+    })
+
+    await act(async () => {
+      await vi.waitFor(() => {
+        expect(
+          container.querySelector("#wallet-movements")?.textContent
+        ).toContain("Deposit")
+      })
+    })
+
+    const next = container.querySelector("#wallet-movements-next")
+
+    await act(async () => {
+      next?.dispatchEvent(new MouseEvent("click", { bubbles: true }))
+    })
+
+    await act(async () => {
+      await vi.waitFor(() => {
+        expect(container.textContent).toContain("Hold released")
+      })
+    })
+
+    await submitDeposit(container, "2.50")
+
+    await act(async () => {
+      await vi.waitFor(() => {
+        expect(
+          container
+            .querySelector("#wallet-movements-page-1")
+            ?.getAttribute("aria-current")
+        ).toBe("page")
+      })
+    })
+
+    expect(container.querySelector("#wallet-movements")?.textContent).toContain(
+      "Deposit"
+    )
+    expect(
+      container.querySelector("#wallet-movements")?.textContent
+    ).not.toContain("Hold released")
+    expect(container.querySelector("#wallet-balance")?.textContent).toBe(
+      "R$12.50"
+    )
   })
 
   it("loads the next page when there are more movements than the page limit", async () => {
@@ -379,7 +529,9 @@ describe("WalletSummary", () => {
 
     await act(async () => {
       await vi.waitFor(() => {
-        expect(container.textContent).toContain("Deposit")
+        expect(
+          container.querySelector("#wallet-movements")?.textContent
+        ).toContain("Deposit")
       })
     })
 
@@ -406,7 +558,9 @@ describe("WalletSummary", () => {
       })
     })
 
-    expect(container.textContent).not.toContain("Deposit")
+    expect(
+      container.querySelector("#wallet-movements")?.textContent
+    ).not.toContain("Deposit")
     expect(
       container
         .querySelector("#wallet-movements-page-2")
@@ -416,7 +570,7 @@ describe("WalletSummary", () => {
       url: "/private/wallet/movements",
       params: {
         page: "2",
-        limit: "20",
+        limit: "5",
       },
       schema: expect.anything(),
       errorSchema: expect.anything(),
@@ -432,10 +586,10 @@ describe("WalletSummary", () => {
           movements: [
             {
               id: `8b1c0c3e-1b2a-4d5e-9f70-8a1b2c3d4e6${page}`,
-              type: page === 6 ? "RELEASE" : "DEPOSIT",
+              type: page === 24 ? "RELEASE" : "DEPOSIT",
               amount: "3.00",
-              lotId: page === 6 ? lotId : null,
-              bidId: page === 6 ? bidId : null,
+              lotId: page === 24 ? lotId : null,
+              bidId: page === 24 ? bidId : null,
               createdAt: "2026-03-01T00:00:00.000Z",
             },
           ],
@@ -463,18 +617,19 @@ describe("WalletSummary", () => {
     expect(container.querySelector("#wallet-movements-page-2")).toBeInstanceOf(
       HTMLButtonElement
     )
-    expect(container.querySelector("#wallet-movements-page-6")).toBeInstanceOf(
+    expect(container.querySelector("#wallet-movements-page-24")).toBeInstanceOf(
       HTMLButtonElement
     )
+    expect(container.querySelector("#wallet-movements-page-6")).toBeNull()
     expect(container.querySelector("#wallet-movements-page-3")).toBeNull()
     expect(
       container.querySelector("[data-slot='pagination-ellipsis']")
     ).not.toBeNull()
 
-    const pageSix = container.querySelector("#wallet-movements-page-6")
+    const lastPage = container.querySelector("#wallet-movements-page-24")
 
     await act(async () => {
-      pageSix?.dispatchEvent(new MouseEvent("click", { bubbles: true }))
+      lastPage?.dispatchEvent(new MouseEvent("click", { bubbles: true }))
     })
 
     await act(async () => {
@@ -485,14 +640,14 @@ describe("WalletSummary", () => {
 
     expect(
       container
-        .querySelector("#wallet-movements-page-6")
+        .querySelector("#wallet-movements-page-24")
         ?.getAttribute("aria-current")
     ).toBe("page")
     expect(api.get).toHaveBeenCalledWith({
       url: "/private/wallet/movements",
       params: {
-        page: "6",
-        limit: "20",
+        page: "24",
+        limit: "5",
       },
       schema: expect.anything(),
       errorSchema: expect.anything(),
