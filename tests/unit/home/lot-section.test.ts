@@ -111,6 +111,26 @@ describe("LotSection", () => {
     })
   })
 
+  it("links each lot to its auction page in the same tab", async () => {
+    vi.mocked(api.get).mockResolvedValue({ lots: [liveLot] })
+
+    act(() => {
+      root.render(createElement(SectionHarness, { query: "", status: "LIVE" }))
+    })
+
+    await act(async () => {
+      await vi.waitFor(() => {
+        expect(container.textContent).toContain("Blue-Eyes White Dragon")
+      })
+    })
+
+    const link = container.querySelector(`#lot-link-${liveLot.id}`)
+
+    expect(link).toBeInstanceOf(HTMLAnchorElement)
+    expect(link?.getAttribute("href")).toBe(`/auction/${liveLot.id}`)
+    expect(link?.getAttribute("target")).toBeNull()
+  })
+
   it("shows an empty message when the section has no lots", async () => {
     vi.mocked(api.get).mockResolvedValue({ lots: [] })
 

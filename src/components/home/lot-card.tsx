@@ -2,6 +2,7 @@
 
 //* Libraries imports
 import { useFormatter, useTranslations } from "next-intl"
+import Link from "next/link"
 
 //* Components imports
 import {
@@ -68,28 +69,36 @@ export function LotCard(props: { lot: IndexLot }) {
   const bidAmount = props.lot.currentBid ?? props.lot.openingBid
 
   return (
-    <Card className="absolute inset-0">
-      <CardHeader className="min-w-0">
-        <CardTitle>
-          <h3 className="line-clamp-3 font-heading text-base font-medium break-words">
-            {props.lot.title}
-          </h3>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-1">
-        {showsBid ? (
+    <Link
+      id={`lot-link-${props.lot.id}`}
+      href={`/auction/${props.lot.id}`}
+      className="absolute inset-0"
+    >
+      <Card className="h-full">
+        <CardHeader className="min-w-0">
+          <CardTitle>
+            <h3 className="line-clamp-3 font-heading text-base font-medium wrap-break-word">
+              {props.lot.title}
+            </h3>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-1">
+          {showsBid ? (
+            <p>
+              <span className="text-muted-foreground">
+                {t(bidLabelKey(props.lot.status))}
+              </span>{" "}
+              {format.number(moneyToNumber(bidAmount), currencyFormat)}
+            </p>
+          ) : null}
           <p>
             <span className="text-muted-foreground">
-              {t(bidLabelKey(props.lot.status))}
+              {t(schedule.labelKey)}
             </span>{" "}
-            {format.number(moneyToNumber(bidAmount), currencyFormat)}
+            {format.dateTime(schedule.value, scheduleFormat)}
           </p>
-        ) : null}
-        <p>
-          <span className="text-muted-foreground">{t(schedule.labelKey)}</span>{" "}
-          {format.dateTime(schedule.value, scheduleFormat)}
-        </p>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </Link>
   )
 }
