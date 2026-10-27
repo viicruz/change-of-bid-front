@@ -118,11 +118,7 @@ function parseSuccess<T>(text: string, schema: z.ZodType<T>) {
   return parsed.data
 }
 
-function jsonHeaders() {
-  const headers: Record<string, string> = {
-    Accept: "application/json",
-    "Content-Type": "application/json",
-  }
+function withAuthorization(headers: Record<string, string>) {
   const token = readBearerToken()
 
   if (token) {
@@ -132,14 +128,25 @@ function jsonHeaders() {
   return headers
 }
 
+function jsonHeaders() {
+  return withAuthorization({
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  })
+}
+
+function acceptHeaders() {
+  return withAuthorization({
+    Accept: "application/json",
+  })
+}
+
 export const api = {
   async get<T>(options: ApiGetOptions<T>) {
     const url = resolveUrl(options.url, options.params)
     const response = await fetch(url, {
       method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
+      headers: acceptHeaders(),
     })
     const text = await response.text()
 

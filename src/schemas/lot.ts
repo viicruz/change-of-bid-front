@@ -9,9 +9,19 @@ export const lotStatusArray: LotStatus[] = Object.values(lotStatusEnum)
 export const publicLotStatusSchema = z.enum(["SCHEDULED", "LIVE", "ENDED"])
 export type PublicLotStatus = z.infer<typeof publicLotStatusSchema>
 export const publicLotStatusEnum = publicLotStatusSchema.enum
-export const publicLotStatusArray: PublicLotStatus[] = Object.values(
-  publicLotStatusEnum
-)
+export const publicLotStatusArray: PublicLotStatus[] =
+  Object.values(publicLotStatusEnum)
+
+export const privateLotStatusSchema = z.enum([
+  "SCHEDULED",
+  "LIVE",
+  "ENDED",
+  "CANCELED",
+])
+export type PrivateLotStatus = z.infer<typeof privateLotStatusSchema>
+export const privateLotStatusEnum = privateLotStatusSchema.enum
+export const privateLotStatusArray: PrivateLotStatus[] =
+  Object.values(privateLotStatusEnum)
 
 const responseMoneySchema = z
   .string()
