@@ -88,13 +88,29 @@
       "searchPlaceholder": "Search by lot name",
       "filtersLabel": "Filter bids",
       "historyTitle": "Bid history",
+      "loading": "Loading bids.",
+      "error": "Could not load your bids.",
+      "empty": "You have not bid on any lots yet.",
+      "emptyFiltered": "No matching bids.",
       "filters": {
-        "leading": "Leading",
-        "outbid": "Outbid",
+        "SCHEDULED": "Scheduled",
+        "LIVE": "Live",
+        "ENDED": "Ended",
+        "CANCELED": "Canceled",
         "won": "Won"
       },
-      "bidAmount": "Bid amount",
-      "bidTime": "Bid time",
+      "statuses": {
+        "SCHEDULED": "Scheduled",
+        "LIVE": "Live",
+        "ENDED": "Ended",
+        "CANCELED": "Canceled"
+      },
+      "currentBid": "Current bid",
+      "finalBid": "Final bid",
+      "startsAt": "Starts at",
+      "endsAt": "Ends at",
+      "endedAt": "Ended at",
+      "won": "Won",
       "viewLot": "View lot"
     },
     "/auction/[id]/audit": {
