@@ -286,6 +286,8 @@
     "brand": "Change of Bid",
     "label": "Main",
     "menu": "Open menu",
+    "signOut": "Sign out",
+    "signOutError": "Unable to sign out.",
     "links": {
       "home": "Lots",
       "myBids": "My bids",

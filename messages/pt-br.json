@@ -286,6 +286,8 @@
     "brand": "Change of Bid",
     "label": "Principal",
     "menu": "Abrir menu",
+    "signOut": "Sair",
+    "signOutError": "Não foi possível sair.",
     "links": {
       "home": "Lotes",
       "myBids": "Meus lances",
