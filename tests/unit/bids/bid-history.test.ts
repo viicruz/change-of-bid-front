@@ -57,6 +57,7 @@ function participation(
     bidCount: 2,
     participantNo: 1,
     won: false,
+    shareToken: null,
     ...overrides,
   }
 }
@@ -77,6 +78,8 @@ const scheduledParticipation = participation({
   startsAt: new Date("2026-10-28T15:00:00.000Z"),
 })
 
+const wonShareToken = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefg"
+
 const endedParticipation = participation({
   id: "8f7e2e50-4d3c-4120-9e4c-3c4d5e6f7081",
   title: "Dark Magician",
@@ -84,6 +87,7 @@ const endedParticipation = participation({
   currentBid: "20.00",
   endsAt: new Date("2026-10-24T18:00:00.000Z"),
   won: true,
+  shareToken: wonShareToken,
 })
 
 const canceledParticipation = participation({
@@ -448,6 +452,37 @@ describe("BidHistory", () => {
         container.querySelector("#bid-history-empty-filtered")
       ).not.toBeNull()
       expect(container.querySelector("#bid-history")).toBeNull()
+    })
+  })
+
+  describe("receipt link", () => {
+    it("links a won lot to its receipt", async () => {
+      await renderParticipations()
+
+      const link = container.querySelector(
+        `#bid-receipt-link-${endedParticipation.id}`
+      )
+
+      expect(link).toBeInstanceOf(HTMLAnchorElement)
+      expect(link?.getAttribute("href")).toBe(`/receipts/${wonShareToken}`)
+      expect(link?.textContent).toContain("View receipt")
+      expect(link?.querySelector("svg")).not.toBeNull()
+    })
+
+    it("hides the receipt link when the bidder did not win the lot", async () => {
+      await renderParticipations()
+
+      expect(
+        container.querySelector(`#bid-receipt-link-${liveParticipation.id}`)
+      ).toBeNull()
+      expect(
+        container.querySelector(
+          `#bid-receipt-link-${scheduledParticipation.id}`
+        )
+      ).toBeNull()
+      expect(
+        container.querySelector(`#bid-receipt-link-${canceledParticipation.id}`)
+      ).toBeNull()
     })
   })
 

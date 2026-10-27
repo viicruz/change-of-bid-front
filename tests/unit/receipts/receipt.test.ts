@@ -173,6 +173,76 @@ describe("Receipt", () => {
       )
     })
 
+    it("copies the receipt link when the share button is pressed", async () => {
+      const writeText = vi.fn().mockResolvedValue(undefined)
+      const receiptUrl = `http://localhost:3000/receipts/${shareToken}`
+
+      vi.stubGlobal("navigator", { clipboard: { writeText } })
+      window.history.pushState({}, "", receiptUrl)
+      vi.mocked(api.get).mockResolvedValue(publicReceipt())
+
+      await renderReceipt(shareToken)
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(container.querySelector("#receipt-share")).toBeInstanceOf(
+            HTMLButtonElement
+          )
+        })
+      })
+
+      const shareButton = container.querySelector("#receipt-share")
+
+      expect(shareButton?.getAttribute("type")).toBe("button")
+      expect(shareButton?.getAttribute("aria-label")).toBe("Share receipt")
+      expect(shareButton?.querySelector("svg")).not.toBeNull()
+
+      await act(async () => {
+        shareButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }))
+      })
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(
+            container.querySelector("#receipt-share-status")?.textContent
+          ).toBe("Link copied.")
+        })
+      })
+
+      expect(writeText).toHaveBeenCalledWith(receiptUrl)
+    })
+
+    it("shows an error when the receipt link cannot be copied", async () => {
+      const writeText = vi.fn().mockRejectedValue(new Error("denied"))
+
+      vi.stubGlobal("navigator", { clipboard: { writeText } })
+      vi.mocked(api.get).mockResolvedValue(publicReceipt())
+
+      await renderReceipt(shareToken)
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(container.querySelector("#receipt-share")).toBeInstanceOf(
+            HTMLButtonElement
+          )
+        })
+      })
+
+      await act(async () => {
+        container
+          .querySelector("#receipt-share")
+          ?.dispatchEvent(new MouseEvent("click", { bubbles: true }))
+      })
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(
+            container.querySelector("#receipt-share-status")?.textContent
+          ).toBe("Could not copy the link.")
+        })
+      })
+    })
+
     it("prints the receipt when the print button is pressed", async () => {
       const print = vi.fn()
       vi.stubGlobal("print", print)
