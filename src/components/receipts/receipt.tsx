@@ -1,9 +1,10 @@
 "use client"
 
 //* Libraries imports
-import { PrinterIcon } from "lucide-react"
+import { PrinterIcon, Share2Icon } from "lucide-react"
 import { useFormatter, useTranslations } from "next-intl"
 import Image from "next/image"
+import { useState } from "react"
 
 //* Components imports
 import { Button } from "@/src/components/ui/button"
@@ -73,14 +74,26 @@ function ReceiptItem(props: { item: ReceiptData["items"][number] }) {
   )
 }
 
+type ShareState = "idle" | "copied" | "error"
+
 function ReceiptDocument(props: { receipt: ReceiptData }) {
   const t = useTranslations("pages./receipts/[shareToken]")
   const format = useFormatter()
   const receipt = props.receipt
   const items = itemsByPosition(receipt.items)
+  const [shareState, setShareState] = useState<ShareState>("idle")
 
   function onPrint() {
     window.print()
+  }
+
+  async function onShare() {
+    try {
+      await navigator.clipboard.writeText(window.location.href)
+      setShareState("copied")
+    } catch {
+      setShareState("error")
+    }
   }
 
   return (
@@ -88,7 +101,39 @@ function ReceiptDocument(props: { receipt: ReceiptData }) {
       id="receipt"
       className="flex w-full flex-col gap-8 rounded-xl bg-card px-6 py-8 ring-1 ring-foreground/10 sm:px-10"
     >
-      <div aria-hidden="true" className="h-1 w-16 bg-foreground" />
+      <div className="flex items-center justify-between gap-4">
+        <div aria-hidden="true" className="h-1 w-16 bg-foreground" />
+        <div className="flex items-center gap-3 print:hidden">
+          {shareState === "idle" ? null : (
+            <p
+              id="receipt-share-status"
+              role="status"
+              className="text-sm text-muted-foreground"
+            >
+              {shareState === "copied" ? t("copied") : t("shareError")}
+            </p>
+          )}
+          <Button
+            id="receipt-print"
+            type="button"
+            variant="outline"
+            onClick={onPrint}
+          >
+            <PrinterIcon aria-hidden data-icon="inline-start" />
+            {t("print")}
+          </Button>
+          <Button
+            id="receipt-share"
+            type="button"
+            variant="outline"
+            size="icon"
+            aria-label={t("share")}
+            onClick={onShare}
+          >
+            <Share2Icon aria-hidden />
+          </Button>
+        </div>
+      </div>
       <header className="flex flex-col gap-3">
         <p className="text-xs font-medium tracking-[0.18em] text-muted-foreground uppercase">
           {t("eyebrow")}
@@ -145,17 +190,6 @@ function ReceiptDocument(props: { receipt: ReceiptData }) {
           ))}
         </ul>
       </section>
-      <div className="flex justify-end print:hidden">
-        <Button
-          id="receipt-print"
-          type="button"
-          variant="outline"
-          onClick={onPrint}
-        >
-          <PrinterIcon aria-hidden />
-          {t("print")}
-        </Button>
-      </div>
     </article>
   )
 }
