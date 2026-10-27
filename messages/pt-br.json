@@ -319,6 +319,9 @@
     "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": "O usuário já existe. Use outro e-mail.",
     "INVALID_EMAIL_OR_PASSWORD": "E-mail ou senha inválidos.",
     "NOT_AUCTIONEER": "Apenas um leiloeiro pode criar um lote.",
+    "NOT_BIDDER": "Apenas um arrematante pode depositar na carteira.",
+    "WALLET_NOT_FOUND": "A carteira não foi encontrada.",
+    "AMOUNT_OUT_OF_RANGE": "O depósito ultrapassa o limite de saldo da carteira.",
     "UNKNOWN_CARDS": "Uma ou mais cartas não estão no catálogo.",
     "CARD_WITHOUT_IMAGE": "Uma ou mais cartas não têm imagem."
   },

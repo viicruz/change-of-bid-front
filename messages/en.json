@@ -319,6 +319,9 @@
     "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": "User already exists. Use another email.",
     "INVALID_EMAIL_OR_PASSWORD": "Invalid email or password.",
     "NOT_AUCTIONEER": "Only an auctioneer can create a lot.",
+    "NOT_BIDDER": "Only a bidder can deposit into a wallet.",
+    "WALLET_NOT_FOUND": "Wallet was not found.",
+    "AMOUNT_OUT_OF_RANGE": "The deposit exceeds the wallet balance limit.",
     "UNKNOWN_CARDS": "One or more cards are not in the catalog.",
     "CARD_WITHOUT_IMAGE": "One or more cards do not have an image."
   },
