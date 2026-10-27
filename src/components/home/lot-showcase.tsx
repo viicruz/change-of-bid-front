@@ -7,18 +7,27 @@ import { useState } from "react"
 import { LotSearch } from "@/src/components/home/lot-search"
 import { LotSection } from "@/src/components/home/lot-section"
 
+//* Hooks imports
+import { useDebounce } from "@/src/hooks/use-debounce"
+
+//* Schema imports
+import type { PublicLotStatus } from "@/src/schemas/lot"
+
 //* Lib imports
-import {
-  filterLots,
-  lotStatuses,
-  mockLots,
-  type CardType,
-} from "@/src/lib/lots/mock-lots"
+import type { CardType } from "@/src/lib/lots/mock-lots"
+
+const searchDebounceMs = 300
+
+const showcaseStatuses = [
+  "LIVE",
+  "SCHEDULED",
+  "ENDED",
+] as const satisfies readonly PublicLotStatus[]
 
 export function LotShowcase() {
   const [query, setQuery] = useState("")
   const [selectedTypes, setSelectedTypes] = useState<CardType[]>([])
-  const visibleLots = filterLots(mockLots, query, selectedTypes)
+  const debouncedQuery = useDebounce(query, searchDebounceMs)
 
   function onTypeToggle(cardType: CardType) {
     setSelectedTypes((current) => {
@@ -38,12 +47,8 @@ export function LotShowcase() {
         onQueryChange={setQuery}
         onTypeToggle={onTypeToggle}
       />
-      {lotStatuses.map((status) => (
-        <LotSection
-          key={status}
-          status={status}
-          lots={visibleLots.filter((lot) => lot.status === status)}
-        />
+      {showcaseStatuses.map((status) => (
+        <LotSection key={status} status={status} query={debouncedQuery} />
       ))}
     </div>
   )
