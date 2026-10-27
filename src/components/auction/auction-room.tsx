@@ -84,33 +84,48 @@ function ParticipantLine(props: {
   )
 }
 
-function LotItems(props: { items: PublicLot["items"] }) {
+function LotItemCard(props: { item: PublicLot["items"][number] }) {
   const t = useTranslations("pages./auction/[id]")
+  const item = props.item
+
+  return (
+    <li className="min-w-0">
+      <article
+        id={`lot-item-${item.id}`}
+        className="group relative aspect-59/86 overflow-hidden rounded-lg bg-muted ring-1 ring-foreground/20 transition duration-200 hover:ring-foreground/60"
+      >
+        <Image
+          src={item.imagePath}
+          alt=""
+          width={421}
+          height={614}
+          sizes="(min-width: 1024px) 8rem, 30vw"
+          className="size-full object-cover transition duration-200 group-hover:scale-105"
+        />
+        <p className="sr-only">{item.cardName}</p>
+        <p
+          id={`lot-item-quantity-${item.id}`}
+          className="absolute right-1 bottom-1 rounded-md bg-black/80 px-1.5 py-0.5 text-xs font-medium text-white shadow-sm"
+        >
+          <span className="sr-only">{t("quantity")} </span>
+          <span aria-hidden="true">×</span>
+          {item.quantity}
+        </p>
+      </article>
+    </li>
+  )
+}
+
+function LotItems(props: { items: PublicLot["items"] }) {
   const items = itemsByPosition(props.items)
 
   return (
-    <ul id="lot-items" className="flex flex-col gap-3">
+    <ul
+      id="lot-items"
+      className="grid grid-cols-[repeat(auto-fill,minmax(7.25rem,1fr))] gap-3"
+    >
       {items.map((item) => (
-        <li key={item.id}>
-          <Card.Root id={`lot-item-${item.id}`}>
-            <Card.Content className="flex gap-4">
-              <Image
-                src={item.imagePath}
-                alt=""
-                width={80}
-                height={112}
-                className="h-28 w-20 shrink-0 rounded-md object-cover"
-              />
-              <div className="flex min-w-0 flex-col gap-1">
-                <p className="font-heading font-medium">{item.cardName}</p>
-                <p id={`lot-item-quantity-${item.id}`}>
-                  <span className="text-muted-foreground">{t("quantity")}</span>{" "}
-                  {item.quantity}
-                </p>
-              </div>
-            </Card.Content>
-          </Card.Root>
-        </li>
+        <LotItemCard key={item.id} item={item} />
       ))}
     </ul>
   )

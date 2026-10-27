@@ -174,10 +174,15 @@ describe("AuctionRoom", () => {
         "button"
       )
 
+      const list = container.querySelector("#lot-items")
       const items = container.querySelectorAll("#lot-items > li")
+      const images = container.querySelectorAll("#lot-items img")
 
+      expect(list?.className).toContain("grid")
       expect(items[0]?.textContent).toContain("Blue-Eyes White Dragon")
       expect(items[1]?.textContent).toContain("Mystical Space Typhoon")
+      expect(images[0]?.getAttribute("src")).toContain("89631139")
+      expect(images[1]?.getAttribute("src")).toContain("5318639")
       expect(
         container.querySelector(
           "#lot-item-quantity-a1b2c3d4-e5f6-7890-abcd-ef1234567890"
