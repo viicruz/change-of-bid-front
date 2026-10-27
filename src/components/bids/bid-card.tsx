@@ -13,8 +13,8 @@ import {
   CardTitle,
 } from "@/src/components/ui/card"
 
-//* Lib imports
-import type { Bid } from "@/src/lib/bids/mock-bids"
+//* Hooks imports
+import type { IndexParticipation } from "@/src/hooks/participations/queries/use-index-participations"
 
 const currencyFormat = {
   style: "currency",
@@ -26,27 +26,74 @@ const dateFormat = {
   timeStyle: "short",
 } as const
 
-export function BidCard(props: { bid: Bid }) {
+function bidLabelKey(status: IndexParticipation["status"]) {
+  if (status === "ENDED") {
+    return "finalBid" as const
+  }
+
+  return "currentBid" as const
+}
+
+function scheduleFor(participation: IndexParticipation) {
+  if (participation.status === "SCHEDULED") {
+    return {
+      labelKey: "startsAt" as const,
+      value: participation.startsAt,
+    }
+  }
+
+  if (participation.status === "ENDED") {
+    return {
+      labelKey: "endedAt" as const,
+      value: participation.endsAt,
+    }
+  }
+
+  return {
+    labelKey: "endsAt" as const,
+    value: participation.endsAt,
+  }
+}
+
+function moneyToNumber(value: string) {
+  return Number(value)
+}
+
+export function BidCard(props: { participation: IndexParticipation }) {
   const t = useTranslations("pages./my-bids")
   const format = useFormatter()
+  const schedule = scheduleFor(props.participation)
+  const showsBid = props.participation.status !== "SCHEDULED"
+  const bidAmount =
+    props.participation.currentBid ?? props.participation.openingBid
 
   return (
-    <Card id={`bid-card-${props.bid.id}`}>
+    <Card id={`bid-card-${props.participation.id}`}>
       <CardHeader>
-        <CardTitle>{props.bid.lotName}</CardTitle>
+        <CardTitle>{props.participation.title}</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col items-start gap-2">
-        <p>
-          <span className="text-muted-foreground">{t("bidAmount")}</span>{" "}
-          {format.number(props.bid.amount, currencyFormat)}
+        <p id={`bid-status-${props.participation.id}`}>
+          {t(`statuses.${props.participation.status}`)}
         </p>
-        <p>
-          <span className="text-muted-foreground">{t("bidTime")}</span>{" "}
-          {format.dateTime(new Date(props.bid.placedAt), dateFormat)}
+        {showsBid ? (
+          <p id={`bid-amount-${props.participation.id}`}>
+            <span className="text-muted-foreground">
+              {t(bidLabelKey(props.participation.status))}
+            </span>{" "}
+            {format.number(moneyToNumber(bidAmount), currencyFormat)}
+          </p>
+        ) : null}
+        <p id={`bid-schedule-${props.participation.id}`}>
+          <span className="text-muted-foreground">{t(schedule.labelKey)}</span>{" "}
+          {format.dateTime(schedule.value, dateFormat)}
         </p>
+        {props.participation.won ? (
+          <p id={`bid-won-${props.participation.id}`}>{t("won")}</p>
+        ) : null}
         <Link
-          id={`bid-lot-link-${props.bid.id}`}
-          href={`/lot/${props.bid.lotId}`}
+          id={`bid-lot-link-${props.participation.id}`}
+          href={`/auction/${props.participation.id}`}
           className={buttonVariants({ variant: "outline" })}
         >
           {t("viewLot")}

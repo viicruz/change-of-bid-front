@@ -88,14 +88,36 @@
       "searchPlaceholder": "Buscar pelo nome do lote",
       "filtersLabel": "Filtrar lances",
       "historyTitle": "Histórico de bids",
+      "loading": "Carregando lances.",
+      "error": "Não foi possível carregar seus lances.",
+      "empty": "Você ainda não deu lance em nenhum lote.",
+      "emptyFiltered": "Nenhum lance correspondente.",
       "filters": {
-        "leading": "Na frente",
-        "outbid": "Superado",
+        "SCHEDULED": "Agendado",
+        "LIVE": "Ao vivo",
+        "ENDED": "Encerrado",
+        "CANCELED": "Cancelado",
         "won": "Arrematado"
       },
-      "bidAmount": "Valor do lance",
-      "bidTime": "Horário do lance",
-      "viewLot": "Ver lote"
+      "statuses": {
+        "SCHEDULED": "Agendado",
+        "LIVE": "Ao vivo",
+        "ENDED": "Encerrado",
+        "CANCELED": "Cancelado"
+      },
+      "currentBid": "Lance atual",
+      "finalBid": "Lance final",
+      "startsAt": "Começa em",
+      "endsAt": "Termina em",
+      "endedAt": "Encerrado em",
+      "won": "Arrematado",
+      "viewLot": "Ver lote",
+      "previous": "Anterior",
+      "next": "Próxima",
+      "pagination": "Páginas de lances",
+      "goToPage": "Ir para a página {page}",
+      "currentPage": "Página {page}",
+      "morePages": "Mais páginas"
     },
     "/auction/[id]/audit": {
       "title": "Auditoria",
