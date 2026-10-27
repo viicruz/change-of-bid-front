@@ -35,7 +35,7 @@ export const lotItemSchema = z.object({
   id: z.uuid(),
   position: z.number().int().positive(),
   cardId: z.number().int().positive(),
-  quantity: z.literal(1),
+  quantity: z.number().int().positive(),
   cardName: z.string(),
   imagePath: z.url(),
 })
