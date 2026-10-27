@@ -12,23 +12,42 @@ import { lotSchema, privateLotStatusSchema } from "@/src/schemas/lot"
 import { ApiError, ApiSchemaError, api } from "@/src/lib/api"
 import { QUERY_KEYS } from "@/src/lib/query-client"
 
-const indexParticipationSchema = z.object({
-  ...lotSchema.pick({
-    id: true,
-    title: true,
-    description: true,
-    openingBid: true,
-    minIncrement: true,
-    startsAt: true,
-    endsAt: true,
-    items: true,
-  }).shape,
-  status: privateLotStatusSchema,
-  currentBid: lotSchema.shape.openingBid.nullable(),
-  bidCount: z.number().int().nonnegative(),
-  participantNo: z.number().int().positive(),
-  won: z.boolean(),
-})
+const shareTokenSchema = z.string().regex(/^[A-Za-z0-9_-]{43}$/)
+
+const indexParticipationSchema = z
+  .object({
+    ...lotSchema.pick({
+      id: true,
+      title: true,
+      description: true,
+      openingBid: true,
+      minIncrement: true,
+      startsAt: true,
+      endsAt: true,
+      items: true,
+    }).shape,
+    status: privateLotStatusSchema,
+    currentBid: lotSchema.shape.openingBid.nullable(),
+    bidCount: z.number().int().nonnegative(),
+    participantNo: z.number().int().positive(),
+    won: z.boolean(),
+    shareToken: shareTokenSchema.nullable(),
+  })
+  .superRefine((participation, context) => {
+    const hasShareToken = participation.shareToken !== null
+
+    if (participation.won === hasShareToken) {
+      return
+    }
+
+    context.addIssue({
+      code: "custom",
+      path: ["shareToken"],
+      message: participation.won
+        ? "Won participation is missing its receipt"
+        : "Share token belongs only to the winner",
+    })
+  })
 
 export type IndexParticipation = z.infer<typeof indexParticipationSchema>
 

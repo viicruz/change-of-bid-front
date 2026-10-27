@@ -22,6 +22,10 @@ export const QUERY_KEYS = {
   PARTICIPATIONS: {
     ALL: "participations",
   },
+  RECEIPTS: {
+    ALL: "receipts",
+    SINGLE: "receipt",
+  },
 } as const
 
 export async function queryInvalidator(queryKeys: (string | number)[][]) {

@@ -31,6 +31,7 @@ const participationsResponse = {
       bidCount: 2,
       participantNo: 3,
       won: false,
+      shareToken: null,
       items: [
         {
           id: "a1b2c3d4-e5f6-4890-abcd-ef1234567890",
@@ -55,6 +56,7 @@ const participationsResponse = {
       bidCount: 0,
       participantNo: 1,
       won: false,
+      shareToken: null,
       items: [
         {
           id: "7e6d1d4f-3c2b-401f-8d3b-2b3c4d5e6f71",
@@ -98,6 +100,8 @@ function ParticipationsHarness() {
           String(firstLot?.won),
           secondLot?.description ?? "null",
           secondLot?.currentBid ?? "null",
+          firstLot?.shareToken ?? "null",
+          secondLot?.shareToken ?? "null",
         ].join(":")
       : participations.isError
         ? "error"
@@ -179,7 +183,7 @@ describe("useIndexParticipations", () => {
 
     await renderAndWait(
       createElement(ParticipationsHarness),
-      "success:2:6d8f0c3e-1b2a-4c5d-9e0f-123456789abc,7e6d1d4f-3c2b-401f-8d3b-2b3c4d5e6f70:LIVE:true:true:12.50:3:false:null:null"
+      "success:2:6d8f0c3e-1b2a-4c5d-9e0f-123456789abc,7e6d1d4f-3c2b-401f-8d3b-2b3c4d5e6f70:LIVE:true:true:12.50:3:false:null:null:null:null"
     )
 
     const request = lastRequest()
@@ -217,14 +221,14 @@ describe("useIndexParticipations", () => {
 
     await renderAndWait(
       createElement(ParticipationsHarness),
-      "success:2:7e6d1d4f-3c2b-401f-8d3b-2b3c4d5e6f70,6d8f0c3e-1b2a-4c5d-9e0f-123456789abc:SCHEDULED:true:true:null:1:false:Main deck:12.50"
+      "success:2:7e6d1d4f-3c2b-401f-8d3b-2b3c4d5e6f70,6d8f0c3e-1b2a-4c5d-9e0f-123456789abc:SCHEDULED:true:true:null:1:false:Main deck:12.50:null:null"
     )
 
     queryClient.clear()
 
     await renderAndWait(
       createElement(ParticipationsHarness),
-      "success:0::none:false:false:null:none:undefined:null:null"
+      "success:0::none:false:false:null:none:undefined:null:null:null:null"
     )
 
     expect(lastRequest().url.pathname).toBe("/private/participations")
@@ -252,6 +256,90 @@ describe("useIndexParticipations", () => {
         403
       )
     )
+    vi.stubGlobal("fetch", fetchMock)
+
+    await renderAndWait(createElement(ParticipationsHarness), "error")
+
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+
+  it("keeps the share token when this bidder won the lot", async () => {
+    const shareToken = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefg"
+    const wonResponse = {
+      lots: [
+        {
+          ...participationsResponse.lots[0],
+          status: "ENDED",
+          won: true,
+          shareToken,
+        },
+      ],
+    }
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse(wonResponse))
+    vi.stubGlobal("fetch", fetchMock)
+
+    await renderAndWait(
+      createElement(ParticipationsHarness),
+      `success:1:6d8f0c3e-1b2a-4c5d-9e0f-123456789abc:ENDED:true:true:12.50:3:true:null:null:${shareToken}:null`
+    )
+
+    const cached = queryClient.getQueryData([
+      QUERY_KEYS.PARTICIPATIONS.ALL,
+    ]) as {
+      lots: { won: boolean; shareToken: string | null }[]
+    }
+
+    expect(cached.lots[0]?.won).toBe(true)
+    expect(cached.lots[0]?.shareToken).toBe(shareToken)
+  })
+
+  it("rejects a won lot that is missing its share token", async () => {
+    const invalidResponse = {
+      lots: [
+        {
+          ...participationsResponse.lots[0],
+          won: true,
+          shareToken: null,
+        },
+      ],
+    }
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse(invalidResponse))
+    vi.stubGlobal("fetch", fetchMock)
+
+    await renderAndWait(createElement(ParticipationsHarness), "error")
+
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+
+  it("rejects a share token on a lot this bidder did not win", async () => {
+    const invalidResponse = {
+      lots: [
+        {
+          ...participationsResponse.lots[0],
+          won: false,
+          shareToken: "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefg",
+        },
+      ],
+    }
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse(invalidResponse))
+    vi.stubGlobal("fetch", fetchMock)
+
+    await renderAndWait(createElement(ParticipationsHarness), "error")
+
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+
+  it("rejects a share token that is not a receipt link", async () => {
+    const invalidResponse = {
+      lots: [
+        {
+          ...participationsResponse.lots[0],
+          won: true,
+          shareToken: "6d8f0c3e-1b2a-4c5d-9e0f-123456789abc",
+        },
+      ],
+    }
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse(invalidResponse))
     vi.stubGlobal("fetch", fetchMock)
 
     await renderAndWait(createElement(ParticipationsHarness), "error")

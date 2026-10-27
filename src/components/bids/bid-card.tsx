@@ -1,6 +1,7 @@
 "use client"
 
 //* Libraries imports
+import { ReceiptTextIcon } from "lucide-react"
 import { useFormatter, useTranslations } from "next-intl"
 import Link from "next/link"
 
@@ -8,6 +9,7 @@ import Link from "next/link"
 import { buttonVariants } from "@/src/components/ui/button"
 import {
   Card,
+  CardAction,
   CardContent,
   CardHeader,
   CardTitle,
@@ -67,10 +69,25 @@ export function BidCard(props: { participation: IndexParticipation }) {
   const bidAmount =
     props.participation.currentBid ?? props.participation.openingBid
 
+  const shareToken = props.participation.shareToken
+  const showsReceipt = props.participation.won && shareToken !== null
+
   return (
     <Card id={`bid-card-${props.participation.id}`}>
       <CardHeader>
         <CardTitle>{props.participation.title}</CardTitle>
+        {showsReceipt ? (
+          <CardAction>
+            <Link
+              id={`bid-receipt-link-${props.participation.id}`}
+              href={`/receipts/${shareToken}`}
+              className={buttonVariants({ variant: "outline", size: "sm" })}
+            >
+              <ReceiptTextIcon aria-hidden data-icon="inline-start" />
+              {t("viewReceipt")}
+            </Link>
+          </CardAction>
+        ) : null}
       </CardHeader>
       <CardContent className="flex flex-col items-start gap-2">
         <p id={`bid-status-${props.participation.id}`}>
