@@ -112,6 +112,7 @@
       "endedAt": "Ended at",
       "won": "Won",
       "viewLot": "View lot",
+      "viewReceipt": "View receipt",
       "previous": "Previous",
       "next": "Next",
       "pagination": "Bid pages",
@@ -132,7 +133,10 @@
       "winner": "Winner number",
       "items": "Cards in the lot",
       "quantity": "Quantity",
-      "print": "Print receipt"
+      "print": "Print receipt",
+      "share": "Share receipt",
+      "copied": "Link copied.",
+      "shareError": "Could not copy the link."
     },
     "/auction/[id]/audit": {
       "title": "Audit",

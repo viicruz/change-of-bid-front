@@ -112,6 +112,7 @@
       "endedAt": "Encerrado em",
       "won": "Arrematado",
       "viewLot": "Ver lote",
+      "viewReceipt": "Ver comprovante",
       "previous": "Anterior",
       "next": "Próxima",
       "pagination": "Páginas de lances",
@@ -132,7 +133,10 @@
       "winner": "Número do vencedor",
       "items": "Cartas do lote",
       "quantity": "Quantidade",
-      "print": "Imprimir comprovante"
+      "print": "Imprimir comprovante",
+      "share": "Compartilhar comprovante",
+      "copied": "Link copiado.",
+      "shareError": "Não foi possível copiar o link."
     },
     "/auction/[id]/audit": {
       "title": "Auditoria",
