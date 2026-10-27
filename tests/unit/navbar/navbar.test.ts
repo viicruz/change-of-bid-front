@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 //* Components imports
 import { Navbar } from "@/src/components/navbar/navbar"
+import { QueryProvider } from "@/src/components/query-provider"
 
 //* Message imports
 import enMessages from "@/messages/en.json"
@@ -42,11 +43,15 @@ vi.mock("next/navigation", async () => {
 })
 
 function renderNavbar() {
-  return createElement(NextIntlClientProvider, {
-    locale: "en",
-    messages: enMessages,
-    children: createElement(Navbar),
-  })
+  return createElement(
+    QueryProvider,
+    null,
+    createElement(NextIntlClientProvider, {
+      locale: "en",
+      messages: enMessages,
+      children: createElement(Navbar),
+    })
+  )
 }
 
 function linkById(container: HTMLElement, id: string) {
@@ -93,6 +98,8 @@ describe("Navbar", () => {
       expect(linkById(container, "navbar-brand")?.getAttribute("href")).toBe(
         "/"
       )
+      expect(linkById(container, "navbar-sign-out")).toBeNull()
+      expect(linkById(container, "navbar-menu-sign-out")).toBeNull()
     })
   })
 
@@ -115,6 +122,9 @@ describe("Navbar", () => {
       ).toBe("/wallet")
       expect(linkById(container, "navbar-link-sign-in")).toBeNull()
       expect(linkById(container, "navbar-link-auctioneer")).toBeNull()
+      expect(linkById(container, "navbar-sign-out")?.textContent).toBe(
+        "Sign out"
+      )
     })
   })
 
@@ -135,6 +145,9 @@ describe("Navbar", () => {
       expect(linkById(container, "navbar-link-my-bids")).toBeNull()
       expect(linkById(container, "navbar-link-wallet")).toBeNull()
       expect(linkById(container, "navbar-link-sign-in")).toBeNull()
+      expect(linkById(container, "navbar-sign-out")?.textContent).toBe(
+        "Sign out"
+      )
     })
   })
 
@@ -182,6 +195,8 @@ describe("Navbar", () => {
       expect(linkById(container, "navbar-link-sign-in")).toBeNull()
       expect(linkById(container, "navbar-link-my-bids")).toBeNull()
       expect(linkById(container, "navbar-menu")).toBeNull()
+      expect(linkById(container, "navbar-sign-out")).toBeNull()
+      expect(linkById(container, "navbar-menu-sign-out")).toBeNull()
       expect(linkById(container, "navbar-brand")).toBeInstanceOf(
         HTMLAnchorElement
       )
