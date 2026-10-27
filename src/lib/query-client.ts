@@ -17,6 +17,7 @@ export const QUERY_KEYS = {
   WALLETS: {
     ALL: "wallets",
     SINGLE: "wallet",
+    MOVEMENTS: "movements",
   },
 } as const
 
