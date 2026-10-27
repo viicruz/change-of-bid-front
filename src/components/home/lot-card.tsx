@@ -2,9 +2,9 @@
 
 //* Libraries imports
 import { useFormatter, useTranslations } from "next-intl"
+import Link from "next/link"
 
 //* Components imports
-import { Badge } from "@/src/components/ui/badge"
 import {
   Card,
   CardContent,
@@ -12,31 +12,39 @@ import {
   CardTitle,
 } from "@/src/components/ui/card"
 
-//* Lib imports
-import type { Lot, LotStatus } from "@/src/lib/lots/mock-lots"
+//* Hooks imports
+import type { IndexLot } from "@/src/hooks/lots/queries/use-index-lots"
+
+//* Schema imports
+import type { PublicLotStatus } from "@/src/schemas/lot"
 
 const scheduleFormat = {
   dateStyle: "short",
   timeStyle: "short",
 } as const
 
-function bidLabelKey(status: LotStatus) {
-  if (status === "closed" || status === "canceled") {
+const currencyFormat = {
+  style: "currency",
+  currency: "BRL",
+} as const
+
+function bidLabelKey(status: PublicLotStatus) {
+  if (status === "ENDED") {
     return "finalBid" as const
   }
 
   return "currentBid" as const
 }
 
-function scheduleFor(lot: Lot) {
-  if (lot.status === "scheduled") {
+function scheduleFor(lot: IndexLot) {
+  if (lot.status === "SCHEDULED") {
     return {
       labelKey: "startsAt" as const,
       value: lot.startsAt,
     }
   }
 
-  if (lot.status === "closed" || lot.status === "canceled") {
+  if (lot.status === "ENDED") {
     return {
       labelKey: "endedAt" as const,
       value: lot.endsAt,
@@ -49,41 +57,48 @@ function scheduleFor(lot: Lot) {
   }
 }
 
-export function LotCard(props: { lot: Lot }) {
+function moneyToNumber(value: string) {
+  return Number(value)
+}
+
+export function LotCard(props: { lot: IndexLot }) {
   const t = useTranslations("pages./")
   const format = useFormatter()
   const schedule = scheduleFor(props.lot)
-  const showsBid = props.lot.status !== "scheduled"
+  const showsBid = props.lot.status !== "SCHEDULED"
+  const bidAmount = props.lot.currentBid ?? props.lot.openingBid
 
   return (
-    <Card className="absolute inset-0">
-      <CardHeader className="min-w-0">
-        <CardTitle>
-          <h3 className="line-clamp-3 font-heading text-base font-medium break-words">
-            {props.lot.name}
-          </h3>
-        </CardTitle>
-        <Badge variant="secondary">
-          {t(`cardTypes.${props.lot.cardType}`)}
-        </Badge>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-1">
-        {showsBid ? (
+    <Link
+      id={`lot-link-${props.lot.id}`}
+      href={`/auction/${props.lot.id}`}
+      className="absolute inset-0"
+    >
+      <Card className="h-full">
+        <CardHeader className="min-w-0">
+          <CardTitle>
+            <h3 className="line-clamp-3 font-heading text-base font-medium wrap-break-word">
+              {props.lot.title}
+            </h3>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-1">
+          {showsBid ? (
+            <p>
+              <span className="text-muted-foreground">
+                {t(bidLabelKey(props.lot.status))}
+              </span>{" "}
+              {format.number(moneyToNumber(bidAmount), currencyFormat)}
+            </p>
+          ) : null}
           <p>
             <span className="text-muted-foreground">
-              {t(bidLabelKey(props.lot.status))}
+              {t(schedule.labelKey)}
             </span>{" "}
-            {format.number(props.lot.currentBid, {
-              style: "currency",
-              currency: "BRL",
-            })}
+            {format.dateTime(schedule.value, scheduleFormat)}
           </p>
-        ) : null}
-        <p>
-          <span className="text-muted-foreground">{t(schedule.labelKey)}</span>{" "}
-          {format.dateTime(new Date(schedule.value), scheduleFormat)}
-        </p>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </Link>
   )
 }

@@ -15,11 +15,12 @@
         "extra": "Extra Deck"
       },
       "sections": {
-        "live": "Live lots",
-        "scheduled": "Scheduled lots",
-        "canceled": "Canceled lots",
-        "closed": "Closed lots"
+        "LIVE": "Live lots",
+        "SCHEDULED": "Scheduled lots",
+        "ENDED": "Closed lots"
       },
+      "loading": "Loading lots.",
+      "error": "Could not load lots.",
       "empty": "No lots found.",
       "currentBid": "Current bid",
       "finalBid": "Final bid",

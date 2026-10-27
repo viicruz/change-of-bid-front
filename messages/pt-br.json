@@ -15,11 +15,12 @@
         "extra": "Extra Deck"
       },
       "sections": {
-        "live": "Lotes ao vivo",
-        "scheduled": "Lotes agendados",
-        "canceled": "Lotes cancelados",
-        "closed": "Lotes encerrados"
+        "LIVE": "Lotes ao vivo",
+        "SCHEDULED": "Lotes agendados",
+        "ENDED": "Lotes encerrados"
       },
+      "loading": "Carregando lotes.",
+      "error": "Não foi possível carregar os lotes.",
       "empty": "Nenhum lote encontrado.",
       "currentBid": "Lance atual",
       "finalBid": "Lance final",
