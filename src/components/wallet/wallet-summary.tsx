@@ -2,7 +2,7 @@
 
 //* Libraries imports
 import { useTranslations } from "next-intl"
-import { useState } from "react"
+import { useState, type MouseEvent } from "react"
 
 //* Components imports
 import Pagination from "@/src/components/ui/pagination"
@@ -15,7 +15,10 @@ import { TransactionList } from "@/src/components/wallet/transaction-list"
 import { useIndexWalletMovements } from "@/src/hooks/wallets/queries/use-index-wallet-movements"
 import { useShowWallet } from "@/src/hooks/wallets/queries/use-show-wallet"
 
-const movementPageLimit = 20
+//* Lib imports
+import { getPaginationPageItems } from "@/src/lib/pagination"
+
+const movementPageLimit = 5
 
 export function WalletSummary() {
   const t = useTranslations("pages./wallet")
@@ -40,16 +43,12 @@ export function WalletSummary() {
     })
   }
 
-  function onPreviousPage() {
-    setPage((current) => {
-      return Math.max(1, current - 1)
-    })
-  }
+  function onPageChange(nextPage: number) {
+    if (nextPage === page || nextPage < 1 || nextPage > pageCount) {
+      return
+    }
 
-  function onNextPage() {
-    setPage((current) => {
-      return Math.min(pageCount, current + 1)
-    })
+    setPage(nextPage)
   }
 
   return (
@@ -92,35 +91,104 @@ export function WalletSummary() {
           <TransactionList movements={movementsQuery.data.movements} />
         )}
         {showPagination ? (
-          <Pagination.Root
-            id="wallet-movements-pagination"
-            aria-label={t("movements.pagination")}
-          >
-            <Pagination.Content>
-              <Pagination.Item>
-                <Pagination.Previous
-                  id="wallet-movements-previous"
-                  type="button"
-                  text={t("movements.previous")}
-                  aria-label={t("movements.previous")}
-                  disabled={page === 1}
-                  onClick={onPreviousPage}
-                />
-              </Pagination.Item>
-              <Pagination.Item>
-                <Pagination.Next
-                  id="wallet-movements-next"
-                  type="button"
-                  text={t("movements.next")}
-                  aria-label={t("movements.next")}
-                  disabled={page >= pageCount}
-                  onClick={onNextPage}
-                />
-              </Pagination.Item>
-            </Pagination.Content>
-          </Pagination.Root>
+          <WalletMovementsPagination
+            page={page}
+            pageCount={pageCount}
+            onPageChange={onPageChange}
+          />
         ) : null}
       </section>
     </div>
+  )
+}
+
+type WalletMovementsPaginationProps = {
+  page: number
+  pageCount: number
+  onPageChange: (page: number) => void
+}
+
+function WalletMovementsPagination(props: WalletMovementsPaginationProps) {
+  const t = useTranslations("pages./wallet")
+  const items = getPaginationPageItems(props.page, props.pageCount)
+
+  function onPrevious() {
+    props.onPageChange(props.page - 1)
+  }
+
+  function onNext() {
+    props.onPageChange(props.page + 1)
+  }
+
+  function onPageClick(event: MouseEvent<HTMLButtonElement>) {
+    const nextPage = Number(event.currentTarget.dataset.page)
+
+    if (!Number.isInteger(nextPage)) {
+      return
+    }
+
+    props.onPageChange(nextPage)
+  }
+
+  return (
+    <Pagination.Root
+      id="wallet-movements-pagination"
+      aria-label={t("movements.pagination")}
+    >
+      <Pagination.Content className="flex-wrap justify-center">
+        <Pagination.Item>
+          <Pagination.Previous
+            id="wallet-movements-previous"
+            type="button"
+            size="icon"
+            text={t("movements.previous")}
+            aria-label={t("movements.previous")}
+            disabled={props.page <= 1}
+            className="px-0! **:data-[slot=pagination-label]:sr-only"
+            onClick={onPrevious}
+          />
+        </Pagination.Item>
+        {items.map((item, index) => {
+          if (item === "ellipsis") {
+            return (
+              <Pagination.Item key={`wallet-movements-ellipsis-${index}`}>
+                <Pagination.Ellipsis label={t("movements.morePages")} />
+              </Pagination.Item>
+            )
+          }
+
+          return (
+            <Pagination.Item key={item}>
+              <Pagination.Link
+                id={`wallet-movements-page-${item}`}
+                type="button"
+                isActive={item === props.page}
+                data-page={item}
+                aria-label={
+                  item === props.page
+                    ? t("movements.currentPage", { page: String(item) })
+                    : t("movements.goToPage", { page: String(item) })
+                }
+                onClick={onPageClick}
+              >
+                {item}
+              </Pagination.Link>
+            </Pagination.Item>
+          )
+        })}
+        <Pagination.Item>
+          <Pagination.Next
+            id="wallet-movements-next"
+            type="button"
+            size="icon"
+            text={t("movements.next")}
+            aria-label={t("movements.next")}
+            disabled={props.page >= props.pageCount}
+            className="px-0! **:data-[slot=pagination-label]:sr-only"
+            onClick={onNext}
+          />
+        </Pagination.Item>
+      </Pagination.Content>
+    </Pagination.Root>
   )
 }
