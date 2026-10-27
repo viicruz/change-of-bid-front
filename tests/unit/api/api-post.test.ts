@@ -56,6 +56,34 @@ describe("api.post", () => {
     expect(headers.get("Content-Type")).toBe("application/json")
   })
 
+  it("omits the body and the content type when no body is provided", async () => {
+    sessionStorage.setItem(tokenKey, "session-token")
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(
+        new Response(JSON.stringify({ ok: true }), { status: 200 })
+      )
+    vi.stubGlobal("fetch", fetchMock)
+
+    await api.post({
+      url: "/private/lots/3f1c2a4e-8b0d-4e6a-9c11-2d5f7a8b9c0d/cancel",
+      schema: successSchema,
+      errorSchema: apiResponseErrorSchema,
+    })
+
+    const [url, init] = fetchMock.mock.calls[0] as [URL, RequestInit]
+    const headers = new Headers(init.headers)
+
+    expect(url.href).toBe(
+      "http://localhost:3001/private/lots/3f1c2a4e-8b0d-4e6a-9c11-2d5f7a8b9c0d/cancel"
+    )
+    expect(init.method).toBe("POST")
+    expect(init.body).toBeUndefined()
+    expect(headers.get("Authorization")).toBe("Bearer session-token")
+    expect(headers.get("Accept")).toBe("application/json")
+    expect(headers.get("Content-Type")).toBeNull()
+  })
+
   it("omits the authorization header when no session token is stored", async () => {
     const fetchMock = vi
       .fn()
