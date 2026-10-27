@@ -111,7 +111,13 @@
       "endsAt": "Termina em",
       "endedAt": "Encerrado em",
       "won": "Arrematado",
-      "viewLot": "Ver lote"
+      "viewLot": "Ver lote",
+      "previous": "Anterior",
+      "next": "Próxima",
+      "pagination": "Páginas de lances",
+      "goToPage": "Ir para a página {page}",
+      "currentPage": "Página {page}",
+      "morePages": "Mais páginas"
     },
     "/auction/[id]/audit": {
       "title": "Auditoria",

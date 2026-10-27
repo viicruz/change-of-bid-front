@@ -111,7 +111,13 @@
       "endsAt": "Ends at",
       "endedAt": "Ended at",
       "won": "Won",
-      "viewLot": "View lot"
+      "viewLot": "View lot",
+      "previous": "Previous",
+      "next": "Next",
+      "pagination": "Bid pages",
+      "goToPage": "Go to page {page}",
+      "currentPage": "Page {page}",
+      "morePages": "More pages"
     },
     "/auction/[id]/audit": {
       "title": "Audit",
