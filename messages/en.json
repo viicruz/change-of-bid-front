@@ -282,6 +282,19 @@
     "UNKNOWN_CARDS": "One or more cards are not in the catalog.",
     "CARD_WITHOUT_IMAGE": "One or more cards do not have an image."
   },
+  "navbar": {
+    "brand": "Change of Bid",
+    "label": "Main",
+    "menu": "Open menu",
+    "links": {
+      "home": "Lots",
+      "myBids": "My bids",
+      "wallet": "Wallet",
+      "auctioneer": "Auctioneer",
+      "signIn": "Sign in",
+      "signUp": "Create account"
+    }
+  },
   "localeSelect": {
     "label": "Language",
     "locales": {
