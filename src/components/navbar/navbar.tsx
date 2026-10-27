@@ -6,6 +6,7 @@ import {
   HouseIcon,
   LayoutDashboardIcon,
   LogInIcon,
+  LogOutIcon,
   MenuIcon,
   UserPlusIcon,
   WalletIcon,
@@ -13,7 +14,7 @@ import {
 } from "lucide-react"
 import { useTranslations } from "next-intl"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useState } from "react"
 
 //* Components imports
@@ -29,6 +30,7 @@ import {
 
 //* Hooks imports
 import { useAuthSession } from "@/src/hooks/auth/use-auth-session"
+import { useSignOut } from "@/src/hooks/auth/use-sign-out"
 
 //* Schema imports
 import { userRoleSchema, type UserRole } from "@/src/schemas/user"
@@ -157,7 +159,68 @@ function NavbarLinks(props: {
   )
 }
 
-function NavbarMenu(props: { links: NavbarLink[]; pathname: string }) {
+function SignOutButton(props: {
+  id: string
+  layout: "row" | "stack"
+  onDone?: () => void
+}) {
+  const t = useTranslations("navbar")
+  const router = useRouter()
+  const signOut = useSignOut()
+  const stacked = props.layout === "stack"
+
+  function onClick() {
+    signOut.mutate(undefined, {
+      onSuccess: () => {
+        props.onDone?.()
+        router.push("/")
+      },
+    })
+  }
+
+  return (
+    <div
+      className={cn(
+        stacked
+          ? "mt-auto border-t border-background/20 px-3 py-4"
+          : "hidden md:block"
+      )}
+    >
+      <Button
+        id={props.id}
+        type="button"
+        variant="ghost"
+        disabled={signOut.isPending}
+        className={cn(
+          stacked &&
+            "h-auto w-full justify-start gap-3 border-l-2 border-transparent px-4 py-3 text-background/70 hover:bg-background/10 hover:text-background"
+        )}
+        onClick={onClick}
+      >
+        <LogOutIcon aria-hidden />
+        {t("signOut")}
+      </Button>
+      {signOut.isError ? (
+        <p
+          id={`${props.id}-error`}
+          role="alert"
+          className={cn(
+            "text-sm",
+            stacked ? "px-4 pt-2 text-background" : "pt-1 text-destructive"
+          )}
+        >
+          {t("signOutError")}
+        </p>
+      ) : null}
+    </div>
+  )
+}
+
+function NavbarMenu(props: {
+  links: NavbarLink[]
+  pathname: string
+  signedIn: boolean
+}) {
   const t = useTranslations("navbar")
   const [open, setOpen] = useState(false)
 
@@ -196,6 +259,13 @@ function NavbarMenu(props: { links: NavbarLink[]; pathname: string }) {
           layout="stack"
           onNavigate={closeMenu}
         />
+        {props.signedIn ? (
+          <SignOutButton
+            id="navbar-menu-sign-out"
+            layout="stack"
+            onDone={closeMenu}
+          />
+        ) : null}
       </SheetContent>
     </Sheet>
   )
@@ -210,6 +280,7 @@ export function Navbar() {
     parsedRole.success ? parsedRole.data : null,
     session.isPending
   )
+  const signedIn = !session.isPending && session.data != null
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-md">
@@ -234,9 +305,16 @@ export function Navbar() {
         </div>
         <div className="flex items-center gap-2">
           <LanguageSelect />
+          {signedIn ? (
+            <SignOutButton id="navbar-sign-out" layout="row" />
+          ) : null}
           {links.length > 0 ? (
             <div className="md:hidden">
-              <NavbarMenu links={links} pathname={pathname} />
+              <NavbarMenu
+                links={links}
+                pathname={pathname}
+                signedIn={signedIn}
+              />
             </div>
           ) : null}
         </div>
