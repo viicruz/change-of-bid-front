@@ -1,8 +1,12 @@
 "use client"
 
 //* Libraries imports
+import { zodResolver } from "@hookform/resolvers/zod"
 import Image from "next/image"
 import { useFormatter, useTranslations } from "next-intl"
+import { type SubmitEvent } from "react"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
 
 //* Components imports
 import { Badge } from "@/src/components/ui/badge"
@@ -12,6 +16,11 @@ import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
 
 //* Hooks imports
+import { useErrorTranslations } from "@/src/hooks/commons/use-error-translations"
+import {
+  storeBidSchema,
+  useStoreBid,
+} from "@/src/hooks/lots/mutations/use-store-bid"
 import { useShowLot, type ShowLot } from "@/src/hooks/lots/queries/use-show-lot"
 
 //* Local imports
@@ -131,11 +140,87 @@ function LotItems(props: { items: PublicLot["items"] }) {
   )
 }
 
-function PlaceBidForm() {
+const placeBidSchema = storeBidSchema.pick({ amount: true })
+
+type PlaceBidValues = z.infer<typeof placeBidSchema>
+
+const bidErrorMessageKey = {
+  NOT_BIDDER: "bidErrors.NOT_BIDDER",
+  LOT_NOT_FOUND: "bidErrors.LOT_NOT_FOUND",
+  BID_BELOW_MINIMUM: "bidErrors.BID_BELOW_MINIMUM",
+  INSUFFICIENT_BALANCE: "bidErrors.INSUFFICIENT_BALANCE",
+  ALREADY_LEADER: "bidErrors.ALREADY_LEADER",
+  LOT_NOT_STARTED: "bidErrors.LOT_NOT_STARTED",
+  LOT_ENDED: "bidErrors.LOT_ENDED",
+  LOT_CANCELED: "bidErrors.LOT_CANCELED",
+} as const
+
+type BidErrorCode = keyof typeof bidErrorMessageKey
+
+function isBidErrorCode(code: string): code is BidErrorCode {
+  return code in bidErrorMessageKey
+}
+
+function readBidErrorCode(error: unknown) {
+  if (
+    error instanceof ApiError &&
+    typeof error.body === "object" &&
+    error.body !== null &&
+    "code" in error.body &&
+    typeof error.body.code === "string" &&
+    isBidErrorCode(error.body.code)
+  ) {
+    return error.body.code
+  }
+
+  return null
+}
+
+function PlaceBidForm(props: { lotId: string }) {
   const t = useTranslations("pages./auction/[id]")
+  const translateError = useErrorTranslations()
+  const storeBid = useStoreBid()
+  const form = useForm<PlaceBidValues>({
+    resolver: zodResolver(placeBidSchema),
+    defaultValues: {
+      amount: "",
+    },
+  })
+  const amountError = form.formState.errors.amount?.message
+  const requestErrorCode = storeBid.isError
+    ? readBidErrorCode(storeBid.error)
+    : null
+  const describedBy = [
+    amountError ? "bid-amount-error" : null,
+    storeBid.isError ? "place-bid-error" : null,
+  ]
+    .filter((id) => id !== null)
+    .join(" ")
+
+  function onSubmit(event: SubmitEvent<HTMLFormElement>) {
+    storeBid.reset()
+    void form.handleSubmit((values) => {
+      storeBid.mutate(
+        {
+          id: props.lotId,
+          amount: values.amount,
+        },
+        {
+          onSuccess: () => {
+            form.reset({ amount: "" })
+          },
+        }
+      )
+    })(event)
+  }
 
   return (
-    <div id="place-bid-form" className="flex flex-col gap-4">
+    <form
+      id="place-bid-form"
+      className="flex flex-col gap-4"
+      noValidate
+      onSubmit={onSubmit}
+    >
       <div className="flex flex-col gap-2">
         <Label htmlFor="bid-amount">{t("bidValue")}</Label>
         <Input
@@ -143,13 +228,40 @@ function PlaceBidForm() {
           type="text"
           inputMode="decimal"
           placeholder={t("bidValue")}
+          autoComplete="off"
+          aria-invalid={amountError || storeBid.isError ? true : undefined}
+          aria-describedby={describedBy.length > 0 ? describedBy : undefined}
+          disabled={storeBid.isPending}
           className="border-foreground/30 bg-background dark:border-foreground/30 dark:bg-background"
+          {...form.register("amount", {
+            onChange: () => {
+              if (storeBid.isError) {
+                storeBid.reset()
+              }
+            },
+          })}
         />
+        {amountError ? (
+          <p id="bid-amount-error" className="text-sm text-destructive">
+            {translateError(amountError)}
+          </p>
+        ) : null}
       </div>
-      <Button id="place-bid" type="button">
-        {t("placeBid")}
+      {storeBid.isError ? (
+        <p
+          id="place-bid-error"
+          role="alert"
+          className="text-sm text-destructive"
+        >
+          {requestErrorCode
+            ? t(bidErrorMessageKey[requestErrorCode])
+            : t("bidError")}
+        </p>
+      ) : null}
+      <Button id="place-bid" type="submit" disabled={storeBid.isPending}>
+        {storeBid.isPending ? t("placingBid") : t("placeBid")}
       </Button>
-    </div>
+    </form>
   )
 }
 
@@ -196,7 +308,7 @@ function BidPanel(props: {
             viewerParticipantNo={props.viewerParticipantNo}
           />
         ) : null}
-        {lot.status === "LIVE" ? <PlaceBidForm /> : null}
+        {lot.status === "LIVE" ? <PlaceBidForm lotId={lot.id} /> : null}
       </Card.Content>
     </Card.Root>
   )

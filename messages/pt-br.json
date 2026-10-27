@@ -160,6 +160,18 @@
       "you": "Você",
       "bidValue": "Valor do lance",
       "placeBid": "Fazer lance",
+      "placingBid": "Fazendo lance...",
+      "bidError": "Não foi possível fazer o lance.",
+      "bidErrors": {
+        "NOT_BIDDER": "Apenas um arrematante pode fazer um lance.",
+        "LOT_NOT_FOUND": "Lote não encontrado.",
+        "BID_BELOW_MINIMUM": "O lance está abaixo do valor mínimo aceito.",
+        "INSUFFICIENT_BALANCE": "Seu saldo disponível não cobre este lance.",
+        "ALREADY_LEADER": "Você já tem o lance atual.",
+        "LOT_NOT_STARTED": "Este lote ainda não começou.",
+        "LOT_ENDED": "Este lote já terminou.",
+        "LOT_CANCELED": "Este lote foi cancelado."
+      },
       "bidHistory": "Histórico de lances",
       "emptyBids": "Nenhum lance ainda.",
       "participant": "Participante",
