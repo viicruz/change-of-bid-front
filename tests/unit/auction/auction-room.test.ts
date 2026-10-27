@@ -129,6 +129,7 @@ describe("AuctionRoom", () => {
     })
     container.remove()
     queryClient.clear()
+    vi.unstubAllGlobals()
     vi.clearAllMocks()
   })
 
@@ -171,7 +172,7 @@ describe("AuctionRoom", () => {
         HTMLButtonElement
       )
       expect(container.querySelector("#place-bid")?.getAttribute("type")).toBe(
-        "button"
+        "submit"
       )
 
       const list = container.querySelector("#lot-items")
@@ -255,6 +256,142 @@ describe("AuctionRoom", () => {
         "You"
       )
       expect(container.querySelector("#place-bid")).toBeNull()
+    })
+  })
+
+  describe("when the viewer places a bid", () => {
+    const storedBidResponse = {
+      id: "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+      sequence: 3,
+      amount: "16.50",
+      createdAt: "2026-10-27T12:00:00.000Z",
+      participantNo: 6,
+      endsAt: "2026-10-27T18:00:00.000Z",
+      extensionCount: 0,
+    }
+
+    function jsonResponse(body: unknown, status = 201) {
+      return new Response(JSON.stringify(body), {
+        status,
+        headers: { "Content-Type": "application/json" },
+      })
+    }
+
+    function setInputValue(input: HTMLInputElement, value: string) {
+      const valueSetter = Object.getOwnPropertyDescriptor(
+        HTMLInputElement.prototype,
+        "value"
+      )?.set
+
+      valueSetter?.call(input, value)
+      input.dispatchEvent(new Event("input", { bubbles: true }))
+      input.dispatchEvent(new Event("change", { bubbles: true }))
+    }
+
+    async function showLiveRoom() {
+      vi.mocked(api.get).mockResolvedValue(publicLot())
+      await renderRoom(lotId)
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(container.querySelector("#bid-amount")).toBeInstanceOf(
+            HTMLInputElement
+          )
+        })
+      })
+    }
+
+    async function submitBid(value: string) {
+      const amount = container.querySelector("#bid-amount")
+      const form = container.querySelector("#place-bid-form")
+
+      expect(amount).toBeInstanceOf(HTMLInputElement)
+      expect(form).toBeInstanceOf(HTMLFormElement)
+
+      await act(async () => {
+        setInputValue(amount as HTMLInputElement, value)
+      })
+
+      await act(async () => {
+        ;(form as HTMLFormElement).dispatchEvent(
+          new Event("submit", { bubbles: true, cancelable: true })
+        )
+      })
+    }
+
+    it("posts the trimmed amount and clears the field", async () => {
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValue(jsonResponse(storedBidResponse))
+      vi.stubGlobal("fetch", fetchMock)
+
+      await showLiveRoom()
+      await submitBid("  16.50  ")
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(
+            (container.querySelector("#bid-amount") as HTMLInputElement).value
+          ).toBe("")
+        })
+      })
+
+      const call = fetchMock.mock.calls.at(-1) as [URL, RequestInit] | undefined
+
+      expect(fetchMock).toHaveBeenCalledTimes(1)
+      expect(call?.[0].href).toBe(
+        `http://localhost:3001/private/lots/${lotId}/bids`
+      )
+      expect(call?.[1].method).toBe("POST")
+      expect(call?.[1].body).toBe(JSON.stringify({ amount: "16.50" }))
+    })
+
+    it("shows an invalid money message and does not call the API", async () => {
+      const fetchMock = vi.fn()
+      vi.stubGlobal("fetch", fetchMock)
+
+      await showLiveRoom()
+      await submitBid("10,50")
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(
+            container.querySelector("#bid-amount-error")?.textContent
+          ).toBe(
+            "Money values must be greater than zero and have at most 2 decimal places."
+          )
+        })
+      })
+
+      expect(fetchMock).not.toHaveBeenCalled()
+      expect(container.querySelector("#place-bid-error")).toBeNull()
+    })
+
+    it("shows the page message when the bid is below the minimum", async () => {
+      const fetchMock = vi.fn().mockResolvedValue(
+        jsonResponse(
+          {
+            code: "BID_BELOW_MINIMUM",
+            message: "The bid is below the minimum accepted amount.",
+          },
+          409
+        )
+      )
+      vi.stubGlobal("fetch", fetchMock)
+
+      await showLiveRoom()
+      await submitBid("10.50")
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(container.querySelector("#place-bid-error")?.textContent).toBe(
+            "The bid is below the minimum accepted amount."
+          )
+        })
+      })
+
+      expect(container.querySelector("#bid-amount-error")).toBeNull()
+      expect(fetchMock).toHaveBeenCalledTimes(1)
     })
   })
 
