@@ -22,9 +22,19 @@ import {
   useStoreBid,
 } from "@/src/hooks/lots/mutations/use-store-bid"
 import { useShowLot, type ShowLot } from "@/src/hooks/lots/queries/use-show-lot"
+import { useLotCountdown } from "@/src/hooks/lots/use-lot-countdown"
+import {
+  usePublicLotLive,
+  type PublicLotLiveStatus,
+} from "@/src/hooks/lots/queries/use-public-lot-live"
 
 //* Local imports
 import { ApiError } from "@/src/lib/api"
+import {
+  publicLotCountdownTarget,
+  viewerPlacedLastBid,
+  viewerWasJustOutbid,
+} from "@/src/lib/lots/public-lot-room"
 
 const currencyFormat = {
   style: "currency",
@@ -35,6 +45,21 @@ const scheduleFormat = {
   dateStyle: "short",
   timeStyle: "short",
 } as const
+
+function formatCountdown(remainingMs: number) {
+  const totalSeconds = Math.ceil(remainingMs / 1000)
+  const hours = Math.floor(totalSeconds / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+  const seconds = totalSeconds % 60
+  const minuteText = String(minutes).padStart(2, "0")
+  const secondText = String(seconds).padStart(2, "0")
+
+  if (hours > 0) {
+    return `${String(hours)}:${minuteText}:${secondText}`
+  }
+
+  return `${minuteText}:${secondText}`
+}
 
 const statusLabelKey = {
   SCHEDULED: "scheduled",
@@ -265,13 +290,41 @@ function PlaceBidForm(props: { lotId: string }) {
   )
 }
 
-function BidPanel(props: {
-  lot: PublicLot
-  viewerParticipantNo: number | null
-}) {
+function LeadershipLine(props: { room: ShowLot }) {
+  const t = useTranslations("pages./auction/[id]")
+  const lot = props.room.lot
+
+  if (lot.status !== "LIVE") {
+    return null
+  }
+
+  if (viewerPlacedLastBid(props.room)) {
+    return <p id="auction-leadership">{t("youAreWinning")}</p>
+  }
+
+  if (viewerWasJustOutbid(props.room)) {
+    return <p id="auction-leadership">{t("youWereOutbid")}</p>
+  }
+
+  if (lot.leaderParticipantNo === null) {
+    return null
+  }
+
+  return (
+    <p id="auction-leadership">
+      {t("bidder", { number: String(lot.leaderParticipantNo) })}
+    </p>
+  )
+}
+
+function BidPanel(props: { room: ShowLot }) {
   const t = useTranslations("pages./auction/[id]")
   const format = useFormatter()
-  const lot = props.lot
+  const lot = props.room.lot
+  const viewerParticipantNo = props.room.viewerParticipantNo
+  const viewerIsLeader =
+    viewerParticipantNo !== null &&
+    lot.leaderParticipantNo === viewerParticipantNo
 
   return (
     <Card.Root id="bid-panel">
@@ -286,29 +339,38 @@ function BidPanel(props: {
             ? t("noCurrentBid")
             : format.number(moneyToNumber(lot.currentBid), currencyFormat)}
         </p>
+        <LeadershipLine room={props.room} />
         {lot.leaderParticipantNo !== null ? (
           <ParticipantLine
             id="lot-leader"
             label={t("leader")}
             participantNo={lot.leaderParticipantNo}
-            viewerParticipantNo={props.viewerParticipantNo}
+            viewerParticipantNo={viewerParticipantNo}
           />
         ) : null}
-        {props.viewerParticipantNo !== null ? (
+        {viewerParticipantNo !== null ? (
           <p id="viewer-participant">
             <span className="text-muted-foreground">{t("yourNumber")}</span>{" "}
-            {props.viewerParticipantNo}
+            {viewerParticipantNo}
           </p>
+        ) : null}
+        {lot.status === "ENDED" && lot.bidCount === 0 ? (
+          <p id="lot-ended-empty">{t("endedWithoutBids")}</p>
+        ) : null}
+        {lot.status === "ENDED" && lot.bidCount > 0 && !lot.sold ? (
+          <p id="lot-settling">{t("settling")}</p>
         ) : null}
         {lot.sold && lot.winnerParticipantNo !== null ? (
           <ParticipantLine
             id="lot-winner"
             label={t("winner")}
             participantNo={lot.winnerParticipantNo}
-            viewerParticipantNo={props.viewerParticipantNo}
+            viewerParticipantNo={viewerParticipantNo}
           />
         ) : null}
-        {lot.status === "LIVE" ? <PlaceBidForm lotId={lot.id} /> : null}
+        {lot.status === "LIVE" && !viewerIsLeader ? (
+          <PlaceBidForm lotId={lot.id} />
+        ) : null}
       </Card.Content>
     </Card.Root>
   )
@@ -371,13 +433,57 @@ function BidHistory(props: {
   )
 }
 
+function LotCountdown(props: { room: ShowLot }) {
+  const t = useTranslations("pages./auction/[id]")
+  const target = publicLotCountdownTarget(props.room.lot)
+  const remainingMs = useLotCountdown({
+    lotId: props.room.lot.id,
+    serverNow: props.room.serverNow,
+    target,
+  })
+
+  if (target === null || remainingMs === null) {
+    return null
+  }
+
+  const time = formatCountdown(remainingMs)
+  const label =
+    props.room.lot.status === "SCHEDULED"
+      ? t("countdownStarts", { time })
+      : t("countdownEnds", { time })
+
+  return <p id="auction-countdown">{label}</p>
+}
+
+function AuctionConnection(props: { liveStatus: PublicLotLiveStatus }) {
+  const t = useTranslations("pages./auction/[id]")
+
+  if (props.liveStatus === "reconnecting") {
+    return (
+      <p id="auction-connection" role="status">
+        {t("reconnecting")}
+      </p>
+    )
+  }
+
+  if (props.liveStatus === "unavailable") {
+    return (
+      <p id="auction-connection" role="alert">
+        {t("connectionProblem")}
+      </p>
+    )
+  }
+
+  return null
+}
+
 function AuctionRoomDetails(props: {
-  lot: PublicLot
-  viewerParticipantNo: number | null
+  room: ShowLot
+  liveStatus: PublicLotLiveStatus
 }) {
   const t = useTranslations("pages./auction/[id]")
   const format = useFormatter()
-  const lot = props.lot
+  const lot = props.room.lot
 
   return (
     <section
@@ -385,6 +491,7 @@ function AuctionRoomDetails(props: {
       className="flex w-full flex-col gap-4 rounded-xl p-6 ring-1 ring-foreground/10"
       aria-labelledby="auction-room-name"
     >
+      <AuctionConnection liveStatus={props.liveStatus} />
       <div
         id="auction-room-header"
         className="flex flex-wrap items-center justify-between gap-3 rounded-xl px-4 py-3 ring-1 ring-foreground/10"
@@ -426,15 +533,16 @@ function AuctionRoomDetails(props: {
                 <span className="text-muted-foreground">{t("endsAt")}</span>{" "}
                 {format.dateTime(lot.endsAt, scheduleFormat)}
               </p>
+              <LotCountdown room={props.room} />
             </div>
             <LotItems items={lot.items} />
           </Card.Content>
         </Card.Root>
         <div className="flex h-full flex-col gap-4">
-          <BidPanel lot={lot} viewerParticipantNo={props.viewerParticipantNo} />
+          <BidPanel room={props.room} />
           <BidHistory
             bids={lot.bids}
-            viewerParticipantNo={props.viewerParticipantNo}
+            viewerParticipantNo={props.room.viewerParticipantNo}
           />
         </div>
       </div>
@@ -445,6 +553,7 @@ function AuctionRoomDetails(props: {
 export function AuctionRoom(props: { id: string }) {
   const t = useTranslations("pages./auction/[id]")
   const lotQuery = useShowLot({ id: props.id })
+  const liveStatus = usePublicLotLive(props.id)
 
   if (lotQuery.isError) {
     return (
@@ -462,10 +571,5 @@ export function AuctionRoom(props: { id: string }) {
     return <p id="auction-room-loading">{t("loading")}</p>
   }
 
-  return (
-    <AuctionRoomDetails
-      lot={lotQuery.data.lot}
-      viewerParticipantNo={lotQuery.data.viewerParticipantNo}
-    />
-  )
+  return <AuctionRoomDetails room={lotQuery.data} liveStatus={liveStatus} />
 }

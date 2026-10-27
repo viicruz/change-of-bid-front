@@ -1,57 +1,23 @@
 "use client"
 
 //* Libraries imports
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import * as z from "zod"
 
 //* Schema imports
 import { apiResponseErrorSchema } from "@/src/schemas/common/api"
-import {
-  lotItemSchema,
-  lotSchema,
-  privateLotStatusSchema,
-} from "@/src/schemas/lot"
 
 //* Local imports
 import { ApiError, ApiSchemaError, api } from "@/src/lib/api"
-import { QUERY_KEYS } from "@/src/lib/query-client"
-
-const showLotItemSchema = lotItemSchema.extend({
-  cardSnapshot: z.record(z.string(), z.unknown()),
-})
-
-const showLotBidSchema = z.object({
-  sequence: z.number().int().positive(),
-  amount: lotSchema.shape.openingBid,
-  createdAt: lotSchema.shape.startsAt,
-  participantNo: z.number().int().positive(),
-})
-
-const showLotSchema = z.object({
-  ...lotSchema.pick({
-    id: true,
-    title: true,
-    description: true,
-    openingBid: true,
-    minIncrement: true,
-    startsAt: true,
-    endsAt: true,
-  }).shape,
-  extensionCount: z.number().int().nonnegative(),
-  status: privateLotStatusSchema,
-  currentBid: lotSchema.shape.openingBid.nullable(),
-  leaderParticipantNo: z.number().int().positive().nullable(),
-  bidCount: z.number().int().nonnegative(),
-  sold: z.boolean(),
-  winnerParticipantNo: z.number().int().positive().nullable(),
-  items: z.array(showLotItemSchema),
-  bids: z.array(showLotBidSchema),
-})
+import {
+  mergePublicLotRead,
+  publicLotQueryKey,
+} from "@/src/lib/lots/public-lot-room"
+import { publicLotLiveMessageSchema } from "@/src/hooks/lots/queries/use-public-lot-live"
 
 const apiResponseSchema = z.object({
-  serverNow: lotSchema.shape.startsAt,
+  ...publicLotLiveMessageSchema.shape,
   viewerParticipantNo: z.number().int().positive().nullable(),
-  lot: showLotSchema,
 })
 
 export type ShowLot = z.infer<typeof apiResponseSchema>
@@ -70,12 +36,20 @@ async function showLot(id: string) {
 }
 
 export function useShowLot(props: ShowLotInput) {
+  const queryClient = useQueryClient()
   const idIsUuid = z.uuid().safeParse(props.id).success
   const enabled = (props.enabled ?? true) && idIsUuid
 
   return useQuery({
-    queryKey: [QUERY_KEYS.LOTS.ALL, QUERY_KEYS.LOTS.SINGLE, props.id],
-    queryFn: () => showLot(props.id),
+    queryKey: publicLotQueryKey(props.id),
+    queryFn: async () => {
+      const body = await showLot(props.id)
+      const cached = queryClient.getQueryData<ShowLot>(
+        publicLotQueryKey(props.id)
+      )
+
+      return mergePublicLotRead(cached, body)
+    },
     enabled,
     staleTime: 0,
     retry: (failureCount, error) => {
