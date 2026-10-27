@@ -1,10 +1,12 @@
 "use client"
 
 //* Libraries imports
+import { FileSearchIcon } from "lucide-react"
 import { useFormatter, useTranslations } from "next-intl"
 import Link from "next/link"
 
 //* Components imports
+import { buttonVariants } from "@/src/components/ui/button"
 import {
   Card,
   CardContent,
@@ -66,39 +68,56 @@ export function LotCard(props: { lot: IndexLot }) {
   const format = useFormatter()
   const schedule = scheduleFor(props.lot)
   const showsBid = props.lot.status !== "SCHEDULED"
+  const showsAudit = props.lot.status === "ENDED"
   const bidAmount = props.lot.currentBid ?? props.lot.openingBid
 
   return (
-    <Link
-      id={`lot-link-${props.lot.id}`}
-      href={`/auction/${props.lot.id}`}
-      className="absolute inset-0"
-    >
-      <Card className="h-full">
-        <CardHeader className="min-w-0">
-          <CardTitle>
-            <h3 className="line-clamp-3 font-heading text-base font-medium wrap-break-word">
-              {props.lot.title}
-            </h3>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-1">
-          {showsBid ? (
+    <>
+      <Link
+        id={`lot-link-${props.lot.id}`}
+        href={`/auction/${props.lot.id}`}
+        className="absolute inset-0"
+      >
+        <Card className="h-full">
+          <CardHeader className={showsAudit ? "min-w-0 pr-32" : "min-w-0"}>
+            <CardTitle>
+              <h3 className="line-clamp-3 font-heading text-base font-medium wrap-break-word">
+                {props.lot.title}
+              </h3>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-1">
+            {showsBid ? (
+              <p>
+                <span className="text-muted-foreground">
+                  {t(bidLabelKey(props.lot.status))}
+                </span>{" "}
+                {format.number(moneyToNumber(bidAmount), currencyFormat)}
+              </p>
+            ) : null}
             <p>
               <span className="text-muted-foreground">
-                {t(bidLabelKey(props.lot.status))}
+                {t(schedule.labelKey)}
               </span>{" "}
-              {format.number(moneyToNumber(bidAmount), currencyFormat)}
+              {format.dateTime(schedule.value, scheduleFormat)}
             </p>
-          ) : null}
-          <p>
-            <span className="text-muted-foreground">
-              {t(schedule.labelKey)}
-            </span>{" "}
-            {format.dateTime(schedule.value, scheduleFormat)}
-          </p>
-        </CardContent>
-      </Card>
-    </Link>
+          </CardContent>
+        </Card>
+      </Link>
+      {showsAudit ? (
+        <Link
+          id={`lot-audit-link-${props.lot.id}`}
+          href={`/auction/${props.lot.id}/audit`}
+          className={buttonVariants({
+            variant: "outline",
+            size: "sm",
+            className: "absolute top-4 right-4 z-10",
+          })}
+        >
+          <FileSearchIcon aria-hidden data-icon="inline-start" />
+          {t("audit")}
+        </Link>
+      ) : null}
+    </>
   )
 }

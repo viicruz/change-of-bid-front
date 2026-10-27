@@ -13,6 +13,7 @@ export const QUERY_KEYS = {
     ALL: "lots",
     SINGLE: "lot",
     PRIVATE: "private",
+    AUDIT: "audit",
   },
   WALLETS: {
     ALL: "wallets",

@@ -1,7 +1,7 @@
 "use client"
 
 //* Libraries imports
-import { ReceiptTextIcon } from "lucide-react"
+import { FileSearchIcon, ReceiptTextIcon } from "lucide-react"
 import { useFormatter, useTranslations } from "next-intl"
 import Link from "next/link"
 
@@ -71,6 +71,7 @@ export function BidCard(props: { participation: IndexParticipation }) {
 
   const shareToken = props.participation.shareToken
   const showsReceipt = props.participation.won && shareToken !== null
+  const showsAudit = props.participation.status === "ENDED"
 
   return (
     <Card id={`bid-card-${props.participation.id}`}>
@@ -108,13 +109,25 @@ export function BidCard(props: { participation: IndexParticipation }) {
         {props.participation.won ? (
           <p id={`bid-won-${props.participation.id}`}>{t("won")}</p>
         ) : null}
-        <Link
-          id={`bid-lot-link-${props.participation.id}`}
-          href={`/auction/${props.participation.id}`}
-          className={buttonVariants({ variant: "outline" })}
-        >
-          {t("viewLot")}
-        </Link>
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            id={`bid-lot-link-${props.participation.id}`}
+            href={`/auction/${props.participation.id}`}
+            className={buttonVariants({ variant: "outline" })}
+          >
+            {t("viewLot")}
+          </Link>
+          {showsAudit ? (
+            <Link
+              id={`bid-audit-link-${props.participation.id}`}
+              href={`/auction/${props.participation.id}/audit`}
+              className={buttonVariants({ variant: "outline" })}
+            >
+              <FileSearchIcon aria-hidden data-icon="inline-start" />
+              {t("audit")}
+            </Link>
+          ) : null}
+        </div>
       </CardContent>
     </Card>
   )

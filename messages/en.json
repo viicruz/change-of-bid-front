@@ -26,7 +26,8 @@
       "finalBid": "Final bid",
       "endsAt": "Ends at",
       "startsAt": "Starts at",
-      "endedAt": "Ended at"
+      "endedAt": "Ended at",
+      "audit": "Audit"
     },
     "/sign-up": {
       "title": "Create an account",
@@ -113,6 +114,7 @@
       "won": "Won",
       "viewLot": "View lot",
       "viewReceipt": "View receipt",
+      "audit": "Audit",
       "previous": "Previous",
       "next": "Next",
       "pagination": "Bid pages",
@@ -141,43 +143,34 @@
     "/auction/[id]/audit": {
       "title": "Audit",
       "description": "Public record of a lot and its bids.",
+      "loading": "Loading audit.",
+      "error": "Could not load the audit.",
+      "notFound": "Lot was not found.",
       "lotInfo": "Lot information",
       "bidHistory": "Bid history",
       "currentBid": "Current bid",
       "finalBid": "Final bid",
+      "noCurrentBid": "No current bid.",
       "startsAt": "Starts at",
       "endsAt": "Ends at",
       "endedAt": "Ended at",
-      "bidder": "Bidder",
+      "participant": "Participant",
       "bidAmount": "Amount",
       "bidTime": "Time",
-      "cardType": "Type",
-      "rarity": "Rarity",
-      "condition": "Condition",
-      "setName": "Set",
-      "cardTypes": {
-        "monster": "Monster",
-        "spell": "Spell",
-        "trap": "Trap",
-        "extra": "Extra Deck"
-      },
-      "rarities": {
-        "common": "Common",
-        "rare": "Rare",
-        "superRare": "Super Rare",
-        "ultraRare": "Ultra Rare",
-        "secretRare": "Secret Rare"
-      },
-      "conditions": {
-        "mint": "Mint",
-        "nearMint": "Near Mint",
-        "played": "Played"
-      },
+      "quantity": "Quantity",
+      "emptyBids": "This lot has no accepted bids.",
+      "tamperedWarning": "The stored bids do not match the chain. This record is not trustworthy.",
+      "verificationFailedWarning": "The server could not verify the bid chain. Do not treat this record as intact or tampered.",
       "statuses": {
         "live": "Live",
         "scheduled": "Scheduled",
         "canceled": "Canceled",
         "closed": "Closed"
+      },
+      "auditStatuses": {
+        "INTACT": "Chain intact",
+        "TAMPERED": "Chain tampered",
+        "VERIFICATION_FAILED": "Verification failed"
       }
     },
     "/auction/[id]": {

@@ -1,44 +1,43 @@
 "use client"
 
 //* Libraries imports
+import Image from "next/image"
 import { useTranslations } from "next-intl"
 
-//* Components imports
-import Card from "@/src/components/ui/card"
+//* Hooks imports
+import type { ShowLot } from "@/src/hooks/lots/queries/use-show-lot"
 
-//* Lib imports
-import type { LotItem } from "@/src/lib/audit/mock-audit"
+type LotItem = ShowLot["lot"]["items"][number]
 
 export function LotItemCard(props: { item: LotItem }) {
   const t = useTranslations("pages./auction/[id]/audit")
+  const item = props.item
 
   return (
-    <Card.Root id={`lot-item-${props.item.id}`}>
-      <Card.Content className="flex gap-4">
-        <div
-          aria-hidden="true"
-          className="h-28 w-20 shrink-0 rounded-md bg-muted"
-        />
-        <div className="flex min-w-0 flex-col gap-1">
-          <p className="font-heading font-medium">{props.item.name}</p>
-          <p>
-            <span className="text-muted-foreground">{t("cardType")}</span>{" "}
-            {t(`cardTypes.${props.item.cardType}`)}
-          </p>
-          <p>
-            <span className="text-muted-foreground">{t("rarity")}</span>{" "}
-            {t(`rarities.${props.item.rarity}`)}
-          </p>
-          <p>
-            <span className="text-muted-foreground">{t("condition")}</span>{" "}
-            {t(`conditions.${props.item.condition}`)}
-          </p>
-          <p>
-            <span className="text-muted-foreground">{t("setName")}</span>{" "}
-            {props.item.setName}
+    <li className="min-w-0">
+      <article id={`lot-item-${item.id}`} className="flex flex-col gap-2">
+        <div className="relative aspect-59/86 overflow-hidden rounded-lg bg-muted ring-1 ring-foreground/20">
+          <Image
+            src={item.imagePath}
+            alt=""
+            width={421}
+            height={614}
+            sizes="(min-width: 1024px) 8rem, 30vw"
+            className="size-full object-cover"
+          />
+          <p
+            id={`lot-item-quantity-${item.id}`}
+            className="absolute right-1 bottom-1 rounded-md bg-black/80 px-1.5 py-0.5 text-xs font-medium text-white shadow-sm"
+          >
+            <span className="sr-only">{t("quantity")} </span>
+            <span aria-hidden="true">×</span>
+            {item.quantity}
           </p>
         </div>
-      </Card.Content>
-    </Card.Root>
+        <p id={`lot-item-name-${item.id}`} className="text-sm font-medium">
+          {item.cardName}
+        </p>
+      </article>
+    </li>
   )
 }
