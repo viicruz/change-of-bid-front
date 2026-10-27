@@ -16,9 +16,11 @@ import {
   type StoreBid,
   type StoredBid,
 } from "@/src/hooks/lots/mutations/use-store-bid"
+import type { ShowLot } from "@/src/hooks/lots/queries/use-show-lot"
 
 //* Local imports
 import { ApiError, ApiSchemaError } from "@/src/lib/api"
+import { publicLotQueryKey } from "@/src/lib/lots/public-lot-room"
 import { QUERY_KEYS, queryClient } from "@/src/lib/query-client"
 
 const tokenKey = "change-of-bid.bearer-token"
@@ -255,6 +257,44 @@ describe("useStoreBid", () => {
     })
 
     invalidateQueries.mockRestore()
+  })
+
+  it("remembers the viewer number from the accepted bid", async () => {
+    queryClient.setQueryData<ShowLot>(publicLotQueryKey(lotId), {
+      serverNow: new Date("2026-10-27T12:00:00.000Z"),
+      viewerParticipantNo: null,
+      lot: {
+        id: lotId,
+      },
+    } as ShowLot)
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse(storedBidResponse))
+    vi.stubGlobal("fetch", fetchMock)
+
+    await renderAndSubmit(lotId, "11.50", "placed:2:11.50:4:0:true:true")
+
+    expect(
+      queryClient.getQueryData<ShowLot>(publicLotQueryKey(lotId))
+        ?.viewerParticipantNo
+    ).toBe(4)
+  })
+
+  it("keeps an existing viewer number when another bid is accepted", async () => {
+    queryClient.setQueryData<ShowLot>(publicLotQueryKey(lotId), {
+      serverNow: new Date("2026-10-27T12:00:00.000Z"),
+      viewerParticipantNo: 2,
+      lot: {
+        id: lotId,
+      },
+    } as ShowLot)
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse(storedBidResponse))
+    vi.stubGlobal("fetch", fetchMock)
+
+    await renderAndSubmit(lotId, "11.50", "placed:2:11.50:4:0:true:true")
+
+    expect(
+      queryClient.getQueryData<ShowLot>(publicLotQueryKey(lotId))
+        ?.viewerParticipantNo
+    ).toBe(2)
   })
 
   it("does not call the API when the amount is invalid", async () => {

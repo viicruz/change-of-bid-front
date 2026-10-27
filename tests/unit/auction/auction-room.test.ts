@@ -40,6 +40,61 @@ vi.mock("@/src/lib/api", async () => {
 
 const lotId = "6f1c2a40-7b3e-4d1a-9c20-1a2b3c4d5e6f"
 
+type SocketListener = (event: Event) => void
+
+class FakeSocket {
+  static instances: FakeSocket[] = []
+
+  readonly url: string
+  private listeners = new Map<string, Set<SocketListener>>()
+
+  constructor(url: string) {
+    this.url = url
+    FakeSocket.instances.push(this)
+  }
+
+  addEventListener(type: string, listener: SocketListener) {
+    const current = this.listeners.get(type) ?? new Set<SocketListener>()
+    current.add(listener)
+    this.listeners.set(type, current)
+  }
+
+  close(code = 1000) {
+    this.dispatch("close", { code })
+  }
+
+  dispatch(type: string, event: object) {
+    for (const listener of this.listeners.get(type) ?? []) {
+      listener(event as Event)
+    }
+  }
+}
+
+function latestSocket() {
+  const socket = FakeSocket.instances.at(-1)
+
+  if (!socket) {
+    throw new Error("Expected a lot socket")
+  }
+
+  return socket
+}
+
+function liveFrame(lot: ShowLot["lot"], serverNow: string) {
+  return JSON.stringify({
+    serverNow,
+    lot: {
+      ...lot,
+      startsAt: lot.startsAt.toISOString(),
+      endsAt: lot.endsAt.toISOString(),
+      bids: lot.bids.map((bid) => ({
+        ...bid,
+        createdAt: bid.createdAt.toISOString(),
+      })),
+    },
+  })
+}
+
 function publicLot(overrides: Partial<ShowLot["lot"]> = {}): ShowLot {
   return {
     serverNow: new Date("2026-10-27T12:00:00.000Z"),
@@ -106,9 +161,11 @@ function RoomHarness(props: { id: string }) {
       messages: enMessages,
       timeZone: "UTC",
     } as ComponentProps<typeof NextIntlClientProvider>,
-    createElement(QueryProvider, {
-      children: createElement(AuctionRoom, { id: props.id }),
-    })
+    createElement(
+      QueryProvider,
+      null,
+      createElement(AuctionRoom, { id: props.id })
+    )
   )
 }
 
@@ -118,6 +175,8 @@ describe("AuctionRoom", () => {
 
   beforeEach(() => {
     queryClient.clear()
+    FakeSocket.instances = []
+    vi.stubGlobal("WebSocket", FakeSocket)
     container = document.createElement("div")
     document.body.append(container)
     root = createRoot(container)
@@ -367,7 +426,7 @@ describe("AuctionRoom", () => {
       expect(container.querySelector("#place-bid-error")).toBeNull()
     })
 
-    it("shows the page message when the bid is below the minimum", async () => {
+    it("shows the page message when the bid is below the minimum and leaves the room unchanged", async () => {
       const fetchMock = vi.fn().mockResolvedValue(
         jsonResponse(
           {
@@ -392,6 +451,9 @@ describe("AuctionRoom", () => {
 
       expect(container.querySelector("#bid-amount-error")).toBeNull()
       expect(fetchMock).toHaveBeenCalledTimes(1)
+      expect(
+        container.querySelector("#current-bid-value")?.textContent
+      ).toContain("15.00")
     })
   })
 
@@ -487,6 +549,7 @@ describe("AuctionRoom", () => {
         container.querySelector("#auction-room-missing")?.textContent
       ).toBe("Lot was not found.")
       expect(api.get).not.toHaveBeenCalled()
+      expect(FakeSocket.instances).toHaveLength(0)
     })
   })
 
@@ -518,6 +581,350 @@ describe("AuctionRoom", () => {
           ).toBe("Room Dragon")
         })
       })
+    })
+  })
+
+  describe("when the live room changes", () => {
+    it("applies a newer snapshot without dropping the viewer number", async () => {
+      const room = publicLot()
+      vi.mocked(api.get).mockResolvedValue(room)
+
+      await renderRoom(lotId)
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(
+            container.querySelector("#auction-leadership")?.textContent
+          ).toBe("Bidder #4")
+        })
+      })
+
+      const nextLot: ShowLot["lot"] = {
+        ...room.lot,
+        currentBid: "20.00",
+        leaderParticipantNo: 8,
+        bidCount: 3,
+        endsAt: new Date("2026-10-27T12:07:00.000Z"),
+        bids: [
+          ...room.lot.bids,
+          {
+            sequence: 3,
+            amount: "20.00",
+            createdAt: new Date("2026-10-27T12:05:00.000Z"),
+            participantNo: 8,
+          },
+        ],
+      }
+
+      await act(async () => {
+        latestSocket().dispatch("message", {
+          data: liveFrame(nextLot, "2026-10-27T12:05:00.000Z"),
+        })
+        await new Promise((resolve) => {
+          setTimeout(resolve, 0)
+        })
+      })
+
+      expect(
+        container.querySelector("#current-bid-value")?.textContent
+      ).toContain("20.00")
+      expect(container.querySelector("#auction-leadership")?.textContent).toBe(
+        "Bidder #8"
+      )
+      expect(
+        container.querySelector("#viewer-participant")?.textContent
+      ).toContain("6")
+      expect(container.querySelector("#auction-bid-3")?.textContent).toContain(
+        "20.00"
+      )
+      expect(container.querySelector("#auction-countdown")?.textContent).toBe(
+        "Ends in 02:00"
+      )
+      expect(container.querySelector("#place-bid-error")).toBeNull()
+    })
+
+    it("says the viewer is winning and closes bidding", async () => {
+      vi.mocked(api.get).mockResolvedValue(
+        publicLot({
+          leaderParticipantNo: 6,
+          bids: [
+            {
+              sequence: 1,
+              amount: "10.00",
+              createdAt: new Date("2026-10-27T13:10:00.000Z"),
+              participantNo: 4,
+            },
+            {
+              sequence: 2,
+              amount: "15.00",
+              createdAt: new Date("2026-10-27T13:20:00.000Z"),
+              participantNo: 6,
+            },
+          ],
+        })
+      )
+
+      await renderRoom(lotId)
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(
+            container.querySelector("#auction-leadership")?.textContent
+          ).toBe("You are winning")
+        })
+      })
+
+      expect(container.querySelector("#place-bid")).toBeNull()
+    })
+
+    it("says the viewer was outbid", async () => {
+      vi.mocked(api.get).mockResolvedValue(
+        publicLot({
+          leaderParticipantNo: 4,
+          bids: [
+            {
+              sequence: 1,
+              amount: "10.00",
+              createdAt: new Date("2026-10-27T13:10:00.000Z"),
+              participantNo: 6,
+            },
+            {
+              sequence: 2,
+              amount: "15.00",
+              createdAt: new Date("2026-10-27T13:20:00.000Z"),
+              participantNo: 4,
+            },
+          ],
+        })
+      )
+
+      await renderRoom(lotId)
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(
+            container.querySelector("#auction-leadership")?.textContent
+          ).toBe("You were outbid")
+        })
+      })
+
+      expect(container.querySelector("#place-bid")).toBeInstanceOf(
+        HTMLButtonElement
+      )
+    })
+
+    it("keeps the last snapshot and shows that the room is reconnecting", async () => {
+      vi.mocked(api.get).mockResolvedValue(publicLot())
+
+      await renderRoom(lotId)
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(container.querySelector("#auction-room-name")).not.toBeNull()
+        })
+      })
+
+      vi.useFakeTimers()
+
+      try {
+        await act(async () => {
+          latestSocket().dispatch("open", {})
+          latestSocket().dispatch("close", { code: 1006 })
+        })
+
+        expect(
+          container.querySelector("#auction-connection")?.textContent
+        ).toBe("Reconnecting...")
+        expect(
+          container.querySelector("#current-bid-value")?.textContent
+        ).toContain("15.00")
+        expect(container.querySelector("#place-bid-error")).toBeNull()
+      } finally {
+        vi.useRealTimers()
+      }
+    })
+
+    it("shows a connection problem when the socket never opens", async () => {
+      vi.mocked(api.get).mockResolvedValue(publicLot())
+
+      await renderRoom(lotId)
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(container.querySelector("#auction-room-name")).not.toBeNull()
+        })
+      })
+
+      vi.useFakeTimers()
+
+      try {
+        await act(async () => {
+          latestSocket().dispatch("close", { code: 1006 })
+          await vi.advanceTimersByTimeAsync(0)
+        })
+
+        expect(
+          container.querySelector("#auction-connection")?.textContent
+        ).toBe("The live connection failed. Trying again.")
+        expect(container.querySelector("#auction-room-name")?.textContent).toBe(
+          "Room Dragon"
+        )
+        expect(container.querySelector("#place-bid-error")).toBeNull()
+      } finally {
+        vi.useRealTimers()
+      }
+    })
+  })
+
+  describe("when the countdown reaches a deadline", () => {
+    it("counts the remaining live time and reads the lot again at the end", async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date("2026-10-27T14:59:58.000Z"))
+
+      try {
+        const room = publicLot({
+          endsAt: new Date("2026-10-27T15:00:00.000Z"),
+        })
+        vi.mocked(api.get).mockResolvedValue({
+          ...room,
+          serverNow: new Date("2026-10-27T14:59:58.000Z"),
+        })
+
+        await renderRoom(lotId)
+
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(0)
+          await vi.waitFor(() => {
+            expect(
+              container.querySelector("#auction-countdown")?.textContent
+            ).toBe("Ends in 00:02")
+          })
+        })
+
+        expect(vi.mocked(api.get)).toHaveBeenCalledTimes(1)
+
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(2000)
+        })
+
+        expect(container.querySelector("#auction-countdown")?.textContent).toBe(
+          "Ends in 00:00"
+        )
+        expect(vi.mocked(api.get).mock.calls.length).toBeGreaterThan(1)
+      } finally {
+        vi.useRealTimers()
+      }
+    })
+
+    it("counts until the start while bidding stays closed", async () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date("2026-10-27T12:58:55.000Z"))
+
+      try {
+        vi.mocked(api.get).mockResolvedValue({
+          ...publicLot({
+            status: "SCHEDULED",
+            currentBid: null,
+            leaderParticipantNo: null,
+            bidCount: 0,
+            bids: [],
+            startsAt: new Date("2026-10-27T13:00:00.000Z"),
+          }),
+          serverNow: new Date("2026-10-27T12:58:55.000Z"),
+        })
+
+        await renderRoom(lotId)
+
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(0)
+        })
+
+        expect(container.querySelector("#auction-countdown")?.textContent).toBe(
+          "Starts in 01:05"
+        )
+        expect(container.querySelector("#place-bid")).toBeNull()
+      } finally {
+        vi.useRealTimers()
+      }
+    })
+  })
+
+  describe("when the lot has finished", () => {
+    it("shows that settlement is still writing the result", async () => {
+      vi.mocked(api.get).mockResolvedValue(
+        publicLot({
+          status: "ENDED",
+          sold: false,
+          winnerParticipantNo: null,
+        })
+      )
+
+      await renderRoom(lotId)
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(container.querySelector("#lot-settling")?.textContent).toBe(
+            "The result is still being recorded."
+          )
+        })
+      })
+
+      expect(container.querySelector("#lot-winner")).toBeNull()
+      expect(container.querySelector("#auction-countdown")).toBeNull()
+      expect(container.querySelector("#auction-bid-2")).not.toBeNull()
+      expect(container.querySelector("#place-bid")).toBeNull()
+    })
+
+    it("shows that an ended lot had no bids", async () => {
+      vi.mocked(api.get).mockResolvedValue(
+        publicLot({
+          status: "ENDED",
+          currentBid: null,
+          leaderParticipantNo: null,
+          bidCount: 0,
+          bids: [],
+          sold: false,
+          winnerParticipantNo: null,
+        })
+      )
+
+      await renderRoom(lotId)
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(container.querySelector("#lot-ended-empty")?.textContent).toBe(
+            "This lot ended with no bids."
+          )
+        })
+      })
+
+      expect(container.querySelector("#lot-winner")).toBeNull()
+      expect(container.querySelector("#lot-settling")).toBeNull()
+    })
+
+    it("keeps the history of a canceled lot and does not show a winner", async () => {
+      vi.mocked(api.get).mockResolvedValue(
+        publicLot({
+          status: "CANCELED",
+          sold: false,
+          winnerParticipantNo: null,
+        })
+      )
+
+      await renderRoom(lotId)
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(
+            container.querySelector("#auction-room-status")?.textContent
+          ).toBe("Canceled")
+        })
+      })
+
+      expect(container.querySelector("#auction-bid-1")).not.toBeNull()
+      expect(container.querySelector("#lot-winner")).toBeNull()
+      expect(container.querySelector("#lot-settling")).toBeNull()
+      expect(container.querySelector("#place-bid")).toBeNull()
     })
   })
 })

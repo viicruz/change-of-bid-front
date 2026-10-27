@@ -202,6 +202,101 @@ describe("useShowLot", () => {
       })
     })
 
+    it("keeps a newer cached snapshot when an older read resolves", async () => {
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValue(jsonResponse(publicLotResponse))
+      vi.stubGlobal("fetch", fetchMock)
+
+      await renderAndWait(
+        { id: lotId },
+        "success:LIVE:2:15.00:false:6:1:true:true"
+      )
+
+      const cached = queryClient.getQueryData<ShowLot>(queryKey(lotId))
+
+      if (!cached) {
+        throw new Error("Expected a cached lot")
+      }
+
+      queryClient.setQueryData<ShowLot>(queryKey(lotId), {
+        ...cached,
+        serverNow: new Date("2026-10-27T18:00:00.000Z"),
+        viewerParticipantNo: 9,
+        lot: {
+          ...cached.lot,
+          currentBid: "30.00",
+          bidCount: 4,
+        },
+      })
+      fetchMock.mockResolvedValue(
+        jsonResponse({
+          ...publicLotResponse,
+          viewerParticipantNo: null,
+        })
+      )
+
+      await act(async () => {
+        await queryClient.refetchQueries({ queryKey: queryKey(lotId) })
+        await new Promise((resolve) => {
+          setTimeout(resolve, 0)
+        })
+      })
+
+      expect(container.textContent).toBe(
+        "success:LIVE:4:30.00:false:9:1:true:true"
+      )
+      expect(
+        queryClient.getQueryData<ShowLot>(queryKey(lotId))?.lot.currentBid
+      ).toBe("30.00")
+    })
+
+    it("keeps a remembered viewer number when a newer read has none", async () => {
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValue(jsonResponse(publicLotResponse))
+      vi.stubGlobal("fetch", fetchMock)
+
+      await renderAndWait(
+        { id: lotId },
+        "success:LIVE:2:15.00:false:6:1:true:true"
+      )
+
+      const cached = queryClient.getQueryData<ShowLot>(queryKey(lotId))
+
+      if (!cached) {
+        throw new Error("Expected a cached lot")
+      }
+
+      queryClient.setQueryData<ShowLot>(queryKey(lotId), {
+        ...cached,
+        viewerParticipantNo: 9,
+      })
+      fetchMock.mockResolvedValue(
+        jsonResponse({
+          ...publicLotResponse,
+          serverNow: "2026-10-27T13:00:00.000Z",
+          viewerParticipantNo: null,
+          lot: {
+            ...publicLotResponse.lot,
+            currentBid: "40.00",
+            bidCount: 5,
+          },
+        })
+      )
+
+      await act(async () => {
+        await queryClient.refetchQueries({ queryKey: queryKey(lotId) })
+        await new Promise((resolve) => {
+          setTimeout(resolve, 0)
+        })
+      })
+
+      expect(container.textContent).toBe(
+        "success:LIVE:5:40.00:false:9:1:true:true"
+      )
+    })
+
     it("accepts a scheduled lot that has no bids and no items", async () => {
       const response = {
         ...publicLotResponse,
