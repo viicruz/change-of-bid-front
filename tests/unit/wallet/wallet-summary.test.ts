@@ -384,11 +384,17 @@ describe("WalletSummary", () => {
     })
 
     const next = container.querySelector("#wallet-movements-next")
+    const currentPage = container.querySelector("#wallet-movements-page-1")
 
     expect(next).toBeInstanceOf(HTMLButtonElement)
     expect(
       container.querySelector("#wallet-movements-previous")
     ).toBeInstanceOf(HTMLButtonElement)
+    expect(currentPage).toBeInstanceOf(HTMLButtonElement)
+    expect(currentPage?.getAttribute("aria-current")).toBe("page")
+    expect(container.querySelector("#wallet-movements-page-2")).toBeInstanceOf(
+      HTMLButtonElement
+    )
 
     await act(async () => {
       next?.dispatchEvent(new MouseEvent("click", { bubbles: true }))
@@ -401,10 +407,91 @@ describe("WalletSummary", () => {
     })
 
     expect(container.textContent).not.toContain("Deposit")
+    expect(
+      container
+        .querySelector("#wallet-movements-page-2")
+        ?.getAttribute("aria-current")
+    ).toBe("page")
     expect(api.get).toHaveBeenCalledWith({
       url: "/private/wallet/movements",
       params: {
         page: "2",
+        limit: "20",
+      },
+      schema: expect.anything(),
+      errorSchema: expect.anything(),
+    })
+  })
+
+  it("collapses distant pages and loads the page that was selected", async () => {
+    vi.mocked(api.get).mockImplementation(async (input) => {
+      if (input.url === "/private/wallet/movements") {
+        const page = Number(input.params?.page ?? "1")
+
+        return {
+          movements: [
+            {
+              id: `8b1c0c3e-1b2a-4d5e-9f70-8a1b2c3d4e6${page}`,
+              type: page === 6 ? "RELEASE" : "DEPOSIT",
+              amount: "3.00",
+              lotId: page === 6 ? lotId : null,
+              bidId: page === 6 ? bidId : null,
+              createdAt: "2026-03-01T00:00:00.000Z",
+            },
+          ],
+          page,
+          limit: 20,
+          total: 120,
+        }
+      }
+
+      return walletResponse
+    })
+
+    act(() => {
+      root.render(createElement(SummaryHarness))
+    })
+
+    await act(async () => {
+      await vi.waitFor(() => {
+        expect(
+          container.querySelector("#wallet-movements-page-1")
+        ).toBeInstanceOf(HTMLButtonElement)
+      })
+    })
+
+    expect(container.querySelector("#wallet-movements-page-2")).toBeInstanceOf(
+      HTMLButtonElement
+    )
+    expect(container.querySelector("#wallet-movements-page-6")).toBeInstanceOf(
+      HTMLButtonElement
+    )
+    expect(container.querySelector("#wallet-movements-page-3")).toBeNull()
+    expect(
+      container.querySelector("[data-slot='pagination-ellipsis']")
+    ).not.toBeNull()
+
+    const pageSix = container.querySelector("#wallet-movements-page-6")
+
+    await act(async () => {
+      pageSix?.dispatchEvent(new MouseEvent("click", { bubbles: true }))
+    })
+
+    await act(async () => {
+      await vi.waitFor(() => {
+        expect(container.textContent).toContain("Hold released")
+      })
+    })
+
+    expect(
+      container
+        .querySelector("#wallet-movements-page-6")
+        ?.getAttribute("aria-current")
+    ).toBe("page")
+    expect(api.get).toHaveBeenCalledWith({
+      url: "/private/wallet/movements",
+      params: {
+        page: "6",
         limit: "20",
       },
       schema: expect.anything(),
