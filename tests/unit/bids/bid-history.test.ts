@@ -455,6 +455,40 @@ describe("BidHistory", () => {
     })
   })
 
+  describe("audit link", () => {
+    it("links an ended lot to its audit page", async () => {
+      await renderParticipations()
+
+      const link = container.querySelector(
+        `#bid-audit-link-${endedParticipation.id}`
+      )
+
+      expect(link).toBeInstanceOf(HTMLAnchorElement)
+      expect(link?.getAttribute("href")).toBe(
+        `/auction/${endedParticipation.id}/audit`
+      )
+      expect(link?.getAttribute("target")).toBeNull()
+      expect(link?.textContent).toContain("Audit")
+      expect(link?.querySelector("svg")).not.toBeNull()
+    })
+
+    it("hides the audit link when the lot is not ended", async () => {
+      await renderParticipations()
+
+      expect(
+        container.querySelector(`#bid-audit-link-${liveParticipation.id}`)
+      ).toBeNull()
+      expect(
+        container.querySelector(
+          `#bid-audit-link-${scheduledParticipation.id}`
+        )
+      ).toBeNull()
+      expect(
+        container.querySelector(`#bid-audit-link-${canceledParticipation.id}`)
+      ).toBeNull()
+    })
+  })
+
   describe("receipt link", () => {
     it("links a won lot to its receipt", async () => {
       await renderParticipations()

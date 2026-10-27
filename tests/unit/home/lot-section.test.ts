@@ -51,6 +51,15 @@ const liveLot: IndexLot = {
   sold: false,
 }
 
+const endedLot: IndexLot = {
+  ...liveLot,
+  id: "7a1c6d4f-8b2e-4f3c-ad90-2b3c4d5e6f70",
+  title: "Dark Magician",
+  status: "ENDED",
+  currentBid: "20.00",
+  endsAt: new Date("2026-10-24T18:00:00.000Z"),
+}
+
 function SectionHarness(props: { query: string; status: PublicLotStatus }) {
   return createElement(NextIntlClientProvider, {
     locale: "en",
@@ -129,6 +138,31 @@ describe("LotSection", () => {
     expect(link).toBeInstanceOf(HTMLAnchorElement)
     expect(link?.getAttribute("href")).toBe(`/auction/${liveLot.id}`)
     expect(link?.getAttribute("target")).toBeNull()
+    expect(container.querySelector(`#lot-audit-link-${liveLot.id}`)).toBeNull()
+  })
+
+  it("links an ended lot to its audit page", async () => {
+    vi.mocked(api.get).mockResolvedValue({ lots: [endedLot] })
+
+    act(() => {
+      root.render(
+        createElement(SectionHarness, { query: "", status: "ENDED" })
+      )
+    })
+
+    await act(async () => {
+      await vi.waitFor(() => {
+        expect(container.textContent).toContain("Dark Magician")
+      })
+    })
+
+    const link = container.querySelector(`#lot-audit-link-${endedLot.id}`)
+
+    expect(link).toBeInstanceOf(HTMLAnchorElement)
+    expect(link?.getAttribute("href")).toBe(`/auction/${endedLot.id}/audit`)
+    expect(link?.getAttribute("target")).toBeNull()
+    expect(link?.textContent).toContain("Audit")
+    expect(link?.querySelector("svg")).not.toBeNull()
   })
 
   it("shows an empty message when the section has no lots", async () => {
