@@ -12,6 +12,7 @@ export const QUERY_KEYS = {
   LOTS: {
     ALL: "lots",
     SINGLE: "lot",
+    PRIVATE: "private",
   },
 } as const
 
