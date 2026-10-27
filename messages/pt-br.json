@@ -282,6 +282,21 @@
     "UNKNOWN_CARDS": "Uma ou mais cartas não estão no catálogo.",
     "CARD_WITHOUT_IMAGE": "Uma ou mais cartas não têm imagem."
   },
+  "navbar": {
+    "brand": "Change of Bid",
+    "label": "Principal",
+    "menu": "Abrir menu",
+    "signOut": "Sair",
+    "signOutError": "Não foi possível sair.",
+    "links": {
+      "home": "Lotes",
+      "myBids": "Meus lances",
+      "wallet": "Carteira",
+      "auctioneer": "Leiloeiro",
+      "signIn": "Entrar",
+      "signUp": "Criar conta"
+    }
+  },
   "localeSelect": {
     "label": "Idioma",
     "locales": {

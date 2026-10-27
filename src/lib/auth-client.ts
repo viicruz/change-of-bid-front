@@ -15,6 +15,14 @@ export function readBearerToken() {
   return sessionStorage.getItem(TOKEN_KEY) ?? undefined
 }
 
+export function clearBearerToken() {
+  if (typeof window === "undefined") {
+    return
+  }
+
+  sessionStorage.removeItem(TOKEN_KEY)
+}
+
 function storeToken(response: Response) {
   if (typeof window === "undefined") {
     return
