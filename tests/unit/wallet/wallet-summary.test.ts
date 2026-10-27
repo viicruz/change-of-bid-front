@@ -36,6 +36,68 @@ const walletResponse = {
   availableBalance: "10.09",
 }
 
+const lotId = "11111111-1111-4111-8111-111111111111"
+const bidId = "22222222-2222-4222-8222-222222222222"
+
+const holdMovement = {
+  id: "6f1c0c3e-1b2a-4d5e-9f70-8a1b2c3d4e5f",
+  type: "HOLD",
+  amount: "2.00",
+  lotId,
+  bidId,
+  createdAt: "2026-04-02T00:00:00.000Z",
+}
+
+const depositMovement = {
+  id: "7a1c0c3e-1b2a-4d5e-9f70-8a1b2c3d4e60",
+  type: "DEPOSIT",
+  amount: "10.00",
+  lotId: null,
+  bidId: null,
+  createdAt: "2026-04-01T12:30:00.000Z",
+}
+
+const movementsResponse = {
+  movements: [holdMovement, depositMovement],
+  page: 1,
+  limit: 20,
+  total: 2,
+}
+
+const emptyMovementsResponse = {
+  movements: [],
+  page: 1,
+  limit: 20,
+  total: 0,
+}
+
+function movementsPage(page: number) {
+  if (page === 2) {
+    return {
+      movements: [
+        {
+          id: "8b1c0c3e-1b2a-4d5e-9f70-8a1b2c3d4e61",
+          type: "RELEASE",
+          amount: "3.00",
+          lotId,
+          bidId,
+          createdAt: "2026-03-01T00:00:00.000Z",
+        },
+      ],
+      page: 2,
+      limit: 20,
+      total: 21,
+    }
+  }
+
+  return {
+    movements: [depositMovement],
+    page: 1,
+    limit: 20,
+    total: 21,
+  }
+}
+
 function SummaryHarness() {
   return createElement(NextIntlClientProvider, {
     locale: "en",
@@ -58,6 +120,19 @@ function setInputValue(input: HTMLInputElement, value: string) {
   input.dispatchEvent(new Event("change", { bubbles: true }))
 }
 
+function mockWalletGet(
+  movements:
+    typeof movementsResponse | typeof emptyMovementsResponse = movementsResponse
+) {
+  vi.mocked(api.get).mockImplementation(async (input) => {
+    if (input.url === "/private/wallet/movements") {
+      return movements
+    }
+
+    return walletResponse
+  })
+}
+
 describe("WalletSummary", () => {
   let container: HTMLDivElement
   let root: Root
@@ -78,8 +153,8 @@ describe("WalletSummary", () => {
     vi.clearAllMocks()
   })
 
-  it("shows the API total balance in BRL and keeps the mock history", async () => {
-    vi.mocked(api.get).mockResolvedValue(walletResponse)
+  it("shows the API total balance and the API movements", async () => {
+    mockWalletGet()
 
     act(() => {
       root.render(createElement(SummaryHarness))
@@ -98,19 +173,54 @@ describe("WalletSummary", () => {
       schema: expect.anything(),
       errorSchema: expect.anything(),
     })
-    expect(container.textContent).toContain("Initial deposit")
-    expect(container.textContent).toContain("Bid on Blue-Eyes White Dragon")
-    expect(container.textContent).toContain("Bid refund")
-    expect(container.textContent).not.toContain("R$430.00")
+    expect(api.get).toHaveBeenCalledWith({
+      url: "/private/wallet/movements",
+      params: {
+        page: "1",
+        limit: "20",
+      },
+      schema: expect.anything(),
+      errorSchema: expect.anything(),
+    })
+    expect(container.textContent).toContain("Bid hold")
+    expect(container.textContent).toContain("Deposit")
+    expect(container.textContent).toContain("-R$2.00")
+    expect(container.textContent).toContain("R$10.00")
+    expect(container.querySelector("#wallet-movements-pagination")).toBeNull()
+    expect(container.textContent).not.toContain("Initial deposit")
+    expect(container.textContent).not.toContain("Artificial credit")
   })
 
-  it("shows an error when the wallet request fails and keeps the history", async () => {
-    vi.mocked(api.get).mockRejectedValue(
-      new ApiError(404, "Not found", {
+  it("shows an empty history when the wallet has no movements", async () => {
+    mockWalletGet(emptyMovementsResponse)
+
+    act(() => {
+      root.render(createElement(SummaryHarness))
+    })
+
+    await act(async () => {
+      await vi.waitFor(() => {
+        expect(
+          container.querySelector("#wallet-movements-empty")?.textContent
+        ).toBe("No transactions yet.")
+      })
+    })
+
+    expect(container.querySelector("#wallet-movements")).toBeNull()
+    expect(container.querySelector("#wallet-movements-pagination")).toBeNull()
+  })
+
+  it("shows a balance error and still lists movements when the wallet request fails", async () => {
+    vi.mocked(api.get).mockImplementation(async (input) => {
+      if (input.url === "/private/wallet/movements") {
+        return movementsResponse
+      }
+
+      throw new ApiError(404, "Not found", {
         code: "WALLET_NOT_FOUND",
         message: "Wallet was not found.",
       })
-    )
+    })
 
     act(() => {
       root.render(createElement(SummaryHarness))
@@ -129,10 +239,47 @@ describe("WalletSummary", () => {
       HTMLFormElement
     )
     expect(container.textContent).toContain("Transaction history")
+    expect(container.textContent).toContain("Bid hold")
+  })
+
+  it("shows a movements error when the movements request fails", async () => {
+    vi.mocked(api.get).mockImplementation(async (input) => {
+      if (input.url === "/private/wallet/movements") {
+        throw new ApiError(404, "Not found", {
+          code: "WALLET_NOT_FOUND",
+          message: "Wallet was not found.",
+        })
+      }
+
+      return walletResponse
+    })
+
+    act(() => {
+      root.render(createElement(SummaryHarness))
+    })
+
+    await act(async () => {
+      await vi.waitFor(() => {
+        expect(
+          container.querySelector("#wallet-movements-error")?.textContent
+        ).toBe("Could not load your transactions.")
+      })
+    })
+
+    expect(container.querySelector("#wallet-balance")?.textContent).toBe(
+      "R$10.10"
+    )
+    expect(container.querySelector("#wallet-movements")).toBeNull()
   })
 
   it("shows a loading state while the wallet request is pending", async () => {
-    vi.mocked(api.get).mockReturnValue(new Promise(() => {}))
+    vi.mocked(api.get).mockImplementation(async (input) => {
+      if (input.url === "/private/wallet") {
+        return new Promise(() => {})
+      }
+
+      return movementsResponse
+    })
 
     act(() => {
       root.render(createElement(SummaryHarness))
@@ -141,6 +288,7 @@ describe("WalletSummary", () => {
     await act(async () => {
       await vi.waitFor(() => {
         expect(container.textContent).toContain("Loading balance.")
+        expect(container.textContent).toContain("Bid hold")
       })
     })
 
@@ -149,8 +297,33 @@ describe("WalletSummary", () => {
     expect(container.textContent).toContain("Transaction history")
   })
 
+  it("shows a loading state while the movements request is pending", async () => {
+    vi.mocked(api.get).mockImplementation(async (input) => {
+      if (input.url === "/private/wallet/movements") {
+        return new Promise(() => {})
+      }
+
+      return walletResponse
+    })
+
+    act(() => {
+      root.render(createElement(SummaryHarness))
+    })
+
+    await act(async () => {
+      await vi.waitFor(() => {
+        expect(container.textContent).toContain("Loading transactions.")
+        expect(container.querySelector("#wallet-balance")?.textContent).toBe(
+          "R$10.10"
+        )
+      })
+    })
+    expect(container.querySelector("#wallet-movements")).toBeNull()
+    expect(container.querySelector("[data-slot='skeleton']")).not.toBeNull()
+  })
+
   it("adds a session credit on top of the API total balance", async () => {
-    vi.mocked(api.get).mockResolvedValue(walletResponse)
+    mockWalletGet()
 
     act(() => {
       root.render(createElement(SummaryHarness))
@@ -187,7 +360,142 @@ describe("WalletSummary", () => {
     expect(container.querySelector("#wallet-balance")?.textContent).toBe(
       "R$15.10"
     )
-    expect(container.textContent).toContain("Artificial credit")
-    expect(container.textContent).toContain("Initial deposit")
+    expect(container.textContent).toContain("Deposit")
+    expect(container.textContent).not.toContain("Artificial credit")
+  })
+
+  it("loads the next page when there are more movements than the page limit", async () => {
+    vi.mocked(api.get).mockImplementation(async (input) => {
+      if (input.url === "/private/wallet/movements") {
+        return movementsPage(Number(input.params?.page ?? "1"))
+      }
+
+      return walletResponse
+    })
+
+    act(() => {
+      root.render(createElement(SummaryHarness))
+    })
+
+    await act(async () => {
+      await vi.waitFor(() => {
+        expect(container.textContent).toContain("Deposit")
+      })
+    })
+
+    const next = container.querySelector("#wallet-movements-next")
+    const currentPage = container.querySelector("#wallet-movements-page-1")
+
+    expect(next).toBeInstanceOf(HTMLButtonElement)
+    expect(
+      container.querySelector("#wallet-movements-previous")
+    ).toBeInstanceOf(HTMLButtonElement)
+    expect(currentPage).toBeInstanceOf(HTMLButtonElement)
+    expect(currentPage?.getAttribute("aria-current")).toBe("page")
+    expect(container.querySelector("#wallet-movements-page-2")).toBeInstanceOf(
+      HTMLButtonElement
+    )
+
+    await act(async () => {
+      next?.dispatchEvent(new MouseEvent("click", { bubbles: true }))
+    })
+
+    await act(async () => {
+      await vi.waitFor(() => {
+        expect(container.textContent).toContain("Hold released")
+      })
+    })
+
+    expect(container.textContent).not.toContain("Deposit")
+    expect(
+      container
+        .querySelector("#wallet-movements-page-2")
+        ?.getAttribute("aria-current")
+    ).toBe("page")
+    expect(api.get).toHaveBeenCalledWith({
+      url: "/private/wallet/movements",
+      params: {
+        page: "2",
+        limit: "20",
+      },
+      schema: expect.anything(),
+      errorSchema: expect.anything(),
+    })
+  })
+
+  it("collapses distant pages and loads the page that was selected", async () => {
+    vi.mocked(api.get).mockImplementation(async (input) => {
+      if (input.url === "/private/wallet/movements") {
+        const page = Number(input.params?.page ?? "1")
+
+        return {
+          movements: [
+            {
+              id: `8b1c0c3e-1b2a-4d5e-9f70-8a1b2c3d4e6${page}`,
+              type: page === 6 ? "RELEASE" : "DEPOSIT",
+              amount: "3.00",
+              lotId: page === 6 ? lotId : null,
+              bidId: page === 6 ? bidId : null,
+              createdAt: "2026-03-01T00:00:00.000Z",
+            },
+          ],
+          page,
+          limit: 20,
+          total: 120,
+        }
+      }
+
+      return walletResponse
+    })
+
+    act(() => {
+      root.render(createElement(SummaryHarness))
+    })
+
+    await act(async () => {
+      await vi.waitFor(() => {
+        expect(
+          container.querySelector("#wallet-movements-page-1")
+        ).toBeInstanceOf(HTMLButtonElement)
+      })
+    })
+
+    expect(container.querySelector("#wallet-movements-page-2")).toBeInstanceOf(
+      HTMLButtonElement
+    )
+    expect(container.querySelector("#wallet-movements-page-6")).toBeInstanceOf(
+      HTMLButtonElement
+    )
+    expect(container.querySelector("#wallet-movements-page-3")).toBeNull()
+    expect(
+      container.querySelector("[data-slot='pagination-ellipsis']")
+    ).not.toBeNull()
+
+    const pageSix = container.querySelector("#wallet-movements-page-6")
+
+    await act(async () => {
+      pageSix?.dispatchEvent(new MouseEvent("click", { bubbles: true }))
+    })
+
+    await act(async () => {
+      await vi.waitFor(() => {
+        expect(container.textContent).toContain("Hold released")
+      })
+    })
+
+    expect(
+      container
+        .querySelector("#wallet-movements-page-6")
+        ?.getAttribute("aria-current")
+    ).toBe("page")
+    expect(api.get).toHaveBeenCalledWith({
+      url: "/private/wallet/movements",
+      params: {
+        page: "6",
+        limit: "20",
+      },
+      schema: expect.anything(),
+      errorSchema: expect.anything(),
+    })
   })
 })

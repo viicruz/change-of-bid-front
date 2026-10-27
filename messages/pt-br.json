@@ -60,11 +60,23 @@
       "error": "Não foi possível carregar o saldo.",
       "totalBalance": "Saldo total",
       "historyTitle": "Histórico de transações",
-      "transactions": {
-        "deposit": "Depósito inicial",
-        "bid": "Lance em Blue-Eyes White Dragon",
-        "refund": "Reembolso de lance",
-        "devTopUp": "Crédito artificial"
+      "movements": {
+        "loading": "Carregando transações.",
+        "error": "Não foi possível carregar as transações.",
+        "empty": "Nenhuma transação ainda.",
+        "previous": "Anterior",
+        "next": "Próxima",
+        "pagination": "Páginas de transações",
+        "goToPage": "Ir para a página {page}",
+        "currentPage": "Página {page}",
+        "morePages": "Mais páginas",
+        "types": {
+          "DEPOSIT": "Depósito",
+          "HOLD": "Reserva de lance",
+          "RELEASE": "Reserva liberada",
+          "SETTLEMENT_DEBIT": "Débito de liquidação",
+          "SETTLEMENT_CREDIT": "Crédito de liquidação"
+        }
       }
     },
     "/my-bids": {
