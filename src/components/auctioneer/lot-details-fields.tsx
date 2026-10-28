@@ -5,10 +5,7 @@ import { useFormatter, useTranslations } from "next-intl"
 import { Controller, useFormContext, useWatch } from "react-hook-form"
 
 //* Components imports
-import {
-  LotField,
-  lotFieldDescribedBy,
-} from "@/src/components/auctioneer/lot-field"
+import { LotField } from "@/src/components/auctioneer/lot-field"
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { MoneyInput } from "@/src/components/ui/money-input"
@@ -18,6 +15,7 @@ import { useErrorTranslations } from "@/src/hooks/commons/use-error-translations
 
 //* Local imports
 import type { CreateLotFormValues } from "@/src/components/auctioneer/create-lot-form-schema"
+import { lotFieldDescribedBy } from "@/src/components/auctioneer/lot-field-described-by"
 import { scheduleForDuration } from "@/src/lib/lots/lot-schedule"
 import { cn } from "@/src/lib/utils"
 

@@ -13,10 +13,14 @@ import { CardThumb } from "@/src/components/auctioneer/card-thumb"
 import { LotSummaryGrid } from "@/src/components/auctioneer/lot-summary"
 import { Button } from "@/src/components/ui/button"
 
+//* Hooks imports
+import { useNow } from "@/src/hooks/use-now"
+
 //* Schema imports
 import type { Lot } from "@/src/schemas/lot"
 
 //* Lib imports
+import { createdLotStatus } from "@/src/lib/lots/created-lot"
 import { durationBetween } from "@/src/lib/lots/lot-schedule"
 import { cn } from "@/src/lib/utils"
 
@@ -32,27 +36,24 @@ const currencyFormat = {
   currency: "BRL",
 } as const
 
-//* A lot whose start already passed opens right away and lists as live
-export function createdLotStatus(lot: Lot, now: Date) {
-  return lot.startsAt.getTime() > now.getTime() ? "SCHEDULED" : "LIVE"
-}
-
 function itemsByPosition(items: Lot["items"]) {
   return [...items].sort((left, right) => left.position - right.position)
 }
 
 type LotCreatedProps = {
   lot: Lot
-  now: Date
   onCreateAnother: () => void
-  onViewInList: () => void
+  onViewInList: (status: ReturnType<typeof createdLotStatus>) => void
 }
 
 export function LotCreated(props: LotCreatedProps) {
   const t = useTranslations("pages./auctioneer")
   const format = useFormatter()
   const headingRef = useRef<HTMLHeadingElement>(null)
-  const scheduled = createdLotStatus(props.lot, props.now) === "SCHEDULED"
+  //* Ticks so a scheduled lot reads as live once its start passes
+  const now = useNow(15_000)
+  const status = createdLotStatus(props.lot, now)
+  const scheduled = status === "SCHEDULED"
   const values = {
     start: format.dateTime(props.lot.startsAt, whenFormat),
     end: format.dateTime(props.lot.endsAt, whenFormat),
@@ -116,7 +117,7 @@ export function LotCreated(props: LotCreatedProps) {
           id="view-created-lot"
           type="button"
           variant="outline"
-          onClick={props.onViewInList}
+          onClick={() => props.onViewInList(status)}
         >
           {scheduled ? t("viewScheduled") : t("viewLive")}
         </Button>

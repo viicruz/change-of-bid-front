@@ -34,7 +34,6 @@ import { LotDetailsFields } from "@/src/components/auctioneer/lot-details-fields
 import {
   LotCreated,
   LotCreatedDetails,
-  createdLotStatus,
 } from "@/src/components/auctioneer/lot-created"
 import { LotErrorSummary } from "@/src/components/auctioneer/lot-error-summary"
 import { LotSummary } from "@/src/components/auctioneer/lot-summary"
@@ -210,8 +209,164 @@ export function AuctioneerPanel() {
   )
 }
 
-function AuctioneerWorkspace() {
+function AuctioneerHeading(props: { viewing: boolean }) {
   const t = useTranslations("pages./auctioneer")
+
+  return (
+    <div className="flex flex-col gap-2.5">
+      <Tag tone="dark">{t("pageTag")}</Tag>
+      <h1
+        id="auctioneer-title"
+        className="font-heading text-[clamp(32px,4.4vw,56px)] leading-none font-normal"
+      >
+        {props.viewing ? t("viewHeading") : t("createHeading")}
+      </h1>
+      <p className="max-w-160 text-base text-muted-foreground">
+        {props.viewing ? t("viewSubtitle") : t("createSubtitle")}
+      </p>
+    </div>
+  )
+}
+
+function CreatedLotColumns(props: {
+  lot: Lot
+  onCreateAnother: () => void
+  onViewInList: (status: PrivateLotStatus) => void
+}) {
+  return (
+    <>
+      <section
+        id="auctioneer-lot-column"
+        aria-labelledby="create-lot-success-title"
+        className={cn("min-w-0", paneVisibility.cards)}
+      >
+        <LotCreated
+          lot={props.lot}
+          onCreateAnother={props.onCreateAnother}
+          onViewInList={props.onViewInList}
+        />
+      </section>
+      <section
+        id="auctioneer-details-column"
+        aria-labelledby="lot-details-title"
+        className={cn("min-w-0", paneVisibility.details)}
+      >
+        <LotCreatedDetails lot={props.lot} />
+      </section>
+    </>
+  )
+}
+
+function AddCardButton(props: { searchOpen: boolean; onToggle: () => void }) {
+  const t = useTranslations("pages./auctioneer")
+
+  return (
+    <Button
+      id="auctioneer-add-card"
+      type="button"
+      variant={props.searchOpen ? "outline" : "default"}
+      aria-expanded={props.searchOpen}
+      aria-controls={props.searchOpen ? "card-search-panel" : undefined}
+      onClick={props.onToggle}
+    >
+      {props.searchOpen ? (
+        <XIcon data-icon="inline-start" aria-hidden="true" />
+      ) : (
+        <PlusIcon data-icon="inline-start" aria-hidden="true" />
+      )}
+      {props.searchOpen ? t("closeCardSearch") : t("addCards")}
+    </Button>
+  )
+}
+
+function DraftLotColumns(props: {
+  searchOpen: boolean
+  onSearchOpen: () => void
+  onSearchToggle: () => void
+  onInvalid: (errors: FieldErrors<CreateLotFormValues>) => void
+  onCreated: (lot: Lot) => void
+  onRejected: () => void
+}) {
+  const t = useTranslations("pages./auctioneer")
+
+  return (
+    <>
+      <section
+        id="auctioneer-lot-column"
+        aria-labelledby="cards-in-lot-title"
+        className={cn("min-w-0", paneVisibility.cards)}
+      >
+        <LotCards
+          searchOpen={props.searchOpen}
+          emptyAction={
+            props.searchOpen ? null : (
+              <Button
+                id="auctioneer-empty-add-card"
+                type="button"
+                onClick={props.onSearchOpen}
+              >
+                {t("addCards")}
+              </Button>
+            )
+          }
+          action={
+            <AddCardButton
+              searchOpen={props.searchOpen}
+              onToggle={props.onSearchToggle}
+            />
+          }
+        >
+          {props.searchOpen ? (
+            <CardSearchPanel className="slide-in-from-top-1.5 animate-in shadow-brand-red duration-200 fade-in motion-reduce:animate-none" />
+          ) : null}
+        </LotCards>
+      </section>
+      <section
+        id="auctioneer-details-column"
+        aria-labelledby="lot-details-title"
+        className={cn("min-w-0", paneVisibility.details)}
+      >
+        <CreateLotForm
+          className={cn(
+            auctioneerPaneClassName,
+            "shadow-hard-8 shadow-brand-red"
+          )}
+          onInvalid={props.onInvalid}
+          onCreated={props.onCreated}
+          onRejected={props.onRejected}
+        >
+          <AuctioneerPaneHeader
+            titleId="lot-details-title"
+            title={t("lotDetails")}
+          />
+          <div className="flex flex-col gap-4.5 p-4.5">
+            <LotErrorSummary />
+            <LotDetailsFields />
+            <LotSummary />
+            <CreateLotSubmit />
+          </div>
+        </CreateLotForm>
+      </section>
+    </>
+  )
+}
+
+//* On a phone, show the column that holds the errors
+function tabForErrors(errors: FieldErrors<CreateLotFormValues>): AuctioneerTab {
+  const onlyCards = Object.keys(errors).every((name) => name === "cards")
+
+  return onlyCards ? "cards" : "details"
+}
+
+function lotCardCount(createdLot: Lot | null, draftCount: number) {
+  if (!createdLot) {
+    return draftCount
+  }
+
+  return createdLot.items.reduce((sum, item) => sum + item.quantity, 0)
+}
+
+function AuctioneerWorkspace() {
   const storeLot = useCreateLotMutation()
   const cards = useLotCardFields()
   const [searchOpen, setSearchOpen] = useState(true)
@@ -224,9 +379,7 @@ function AuctioneerWorkspace() {
   const viewing = selectedLotId !== null
   //* Until "create another lot", the columns show the lot just published
   const createdLot = storeLot.isSuccess ? storeLot.data : null
-  const cardCount = createdLot
-    ? createdLot.items.reduce((sum, item) => sum + item.quantity, 0)
-    : cards.fields.length
+  const cardCount = lotCardCount(createdLot, cards.fields.length)
   const privateLot = useShowPrivateLot({
     id: selectedLotId ?? "",
     enabled: viewing,
@@ -270,9 +423,7 @@ function AuctioneerWorkspace() {
   }
 
   //* The list filters to where the lot now is; the focus goes to that filter
-  function onViewCreatedLot(lot: Lot) {
-    const status = createdLotStatus(lot, new Date())
-
+  function onViewCreatedLot(status: PrivateLotStatus) {
     flushSync(() => {
       setLotStatus(status)
       setTab("lots")
@@ -284,15 +435,46 @@ function AuctioneerWorkspace() {
     setSearchOpen((open) => !open)
   }
 
-  //* On a phone, show the column that holds the errors
   function onInvalid(errors: FieldErrors<CreateLotFormValues>) {
-    const onlyCards = Object.keys(errors).every((name) => name === "cards")
-
-    setTab(onlyCards ? "cards" : "details")
+    setTab(tabForErrors(errors))
   }
 
   function onSearchOpen() {
     setSearchOpen(true)
+  }
+
+  function renderColumns() {
+    if (viewing) {
+      return (
+        <div
+          id="auctioneer-lot-view"
+          className={cn("min-w-0", paneVisibility.lot)}
+        >
+          <PrivateLotWorkspace query={privateLot} />
+        </div>
+      )
+    }
+
+    if (createdLot) {
+      return (
+        <CreatedLotColumns
+          lot={createdLot}
+          onCreateAnother={onCreateAnother}
+          onViewInList={onViewCreatedLot}
+        />
+      )
+    }
+
+    return (
+      <DraftLotColumns
+        searchOpen={searchOpen}
+        onSearchOpen={onSearchOpen}
+        onSearchToggle={onSearchToggle}
+        onInvalid={onInvalid}
+        onCreated={onCreated}
+        onRejected={onRejected}
+      />
+    )
   }
 
   return (
@@ -301,18 +483,7 @@ function AuctioneerWorkspace() {
       data-tab={tab}
       className="group/auctioneer flex flex-col gap-6"
     >
-      <div className="flex flex-col gap-2.5">
-        <Tag tone="dark">{t("pageTag")}</Tag>
-        <h1
-          id="auctioneer-title"
-          className="font-heading text-[clamp(32px,4.4vw,56px)] leading-none font-normal"
-        >
-          {viewing ? t("viewHeading") : t("createHeading")}
-        </h1>
-        <p className="max-w-160 text-base text-muted-foreground">
-          {viewing ? t("viewSubtitle") : t("createSubtitle")}
-        </p>
-      </div>
+      <AuctioneerHeading viewing={viewing} />
       <AuctioneerTabs
         tab={tab}
         viewing={viewing}
@@ -329,106 +500,7 @@ function AuctioneerWorkspace() {
           onOpenDraft={onOpenDraft}
           className={paneVisibility.lots}
         />
-        {viewing ? (
-          <div
-            id="auctioneer-lot-view"
-            className={cn("min-w-0", paneVisibility.lot)}
-          >
-            <PrivateLotWorkspace query={privateLot} />
-          </div>
-        ) : createdLot ? (
-          <>
-            <section
-              id="auctioneer-lot-column"
-              aria-labelledby="create-lot-success-title"
-              className={cn("min-w-0", paneVisibility.cards)}
-            >
-              <LotCreated
-                lot={createdLot}
-                now={new Date()}
-                onCreateAnother={onCreateAnother}
-                onViewInList={() => onViewCreatedLot(createdLot)}
-              />
-            </section>
-            <section
-              id="auctioneer-details-column"
-              aria-labelledby="lot-details-title"
-              className={cn("min-w-0", paneVisibility.details)}
-            >
-              <LotCreatedDetails lot={createdLot} />
-            </section>
-          </>
-        ) : (
-          <>
-            <section
-              id="auctioneer-lot-column"
-              aria-labelledby="cards-in-lot-title"
-              className={cn("min-w-0", paneVisibility.cards)}
-            >
-              <LotCards
-                searchOpen={searchOpen}
-                emptyAction={
-                  searchOpen ? null : (
-                    <Button
-                      id="auctioneer-empty-add-card"
-                      type="button"
-                      onClick={onSearchOpen}
-                    >
-                      {t("addCards")}
-                    </Button>
-                  )
-                }
-                action={
-                  <Button
-                    id="auctioneer-add-card"
-                    type="button"
-                    variant={searchOpen ? "outline" : "default"}
-                    aria-expanded={searchOpen}
-                    aria-controls={searchOpen ? "card-search-panel" : undefined}
-                    onClick={onSearchToggle}
-                  >
-                    {searchOpen ? (
-                      <XIcon data-icon="inline-start" aria-hidden="true" />
-                    ) : (
-                      <PlusIcon data-icon="inline-start" aria-hidden="true" />
-                    )}
-                    {searchOpen ? t("closeCardSearch") : t("addCards")}
-                  </Button>
-                }
-              >
-                {searchOpen ? (
-                  <CardSearchPanel className="slide-in-from-top-1.5 animate-in shadow-brand-red duration-200 fade-in motion-reduce:animate-none" />
-                ) : null}
-              </LotCards>
-            </section>
-            <section
-              id="auctioneer-details-column"
-              aria-labelledby="lot-details-title"
-              className={cn("min-w-0", paneVisibility.details)}
-            >
-              <CreateLotForm
-                className={cn(
-                  auctioneerPaneClassName,
-                  "shadow-hard-8 shadow-brand-red"
-                )}
-                onInvalid={onInvalid}
-                onCreated={onCreated}
-                onRejected={onRejected}
-              >
-                <AuctioneerPaneHeader
-                  titleId="lot-details-title"
-                  title={t("lotDetails")}
-                />
-                <div className="flex flex-col gap-4.5 p-4.5">
-                  <LotErrorSummary />
-                  <LotDetailsFields />
-                  <LotSummary />
-                  <CreateLotSubmit />
-                </div>
-              </CreateLotForm>
-            </section>
-          </>
-        )}
+        {renderColumns()}
       </div>
       {viewing ? null : (
         <AuctioneerMobileBar
