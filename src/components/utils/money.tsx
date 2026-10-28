@@ -1,11 +1,11 @@
 "use client"
 
 //* Libraries imports
-import { useFormatter } from "next-intl";
+import { useLocale } from "next-intl"
 
 type MoneyProps = {
-    amount: number | string;
-    className?: string;
+  amount: number | string
+  className?: string
 }
 
 /**
@@ -15,14 +15,21 @@ type MoneyProps = {
  */
 
 export function Money(props: MoneyProps) {
-    const formatter = useFormatter();
+  const locale = useLocale()
+  const formatter = new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "BRL",
+  })
+  // Intl.NumberFormat accepts decimal strings exactly; its TypeScript lib type
+  // still only allows number and bigint, so preserve the string at runtime.
+  const formattedAmount =
+    typeof props.amount === "string"
+      ? (formatter.format as unknown as (value: string) => string)(props.amount)
+      : formatter.format(props.amount)
 
-    const parsedAmount = typeof props.amount === "string" ? parseFloat(props.amount) : props.amount;
-    const formattedAmount = formatter.number(parsedAmount, { style: "currency", currency: "BRL" });
-
-    return (
-        <span className={props.className}>
-            <data value={parsedAmount}>{formattedAmount}</data>
-        </span>
-    );
+  return (
+    <span className={props.className}>
+      <data value={props.amount}>{formattedAmount}</data>
+    </span>
+  )
 }

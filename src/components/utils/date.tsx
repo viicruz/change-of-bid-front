@@ -1,7 +1,7 @@
 "use client"
 
 import { useFormatter } from "next-intl"
-import type { DateTimeFormatOptions } from "use-intl/core"
+import type { DateTimeFormatOptions } from "next-intl"
 
 type DateProps = {
   value: Date | string | number

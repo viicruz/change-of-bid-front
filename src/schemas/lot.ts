@@ -1,5 +1,8 @@
 //* Libraries imports
-import * as z from "zod"
+import { z } from "zod";
+
+//* Local imports
+import { imageSchema } from "@/src/schemas/common/image";
 
 export const lotStatusSchema = z.enum(["ACTIVE"])
 export type LotStatus = z.infer<typeof lotStatusSchema>
@@ -37,7 +40,7 @@ export const lotItemSchema = z.object({
   cardId: z.number().int().positive(),
   quantity: z.number().int().positive(),
   cardName: z.string(),
-  imagePath: z.url(),
+  imagePath: imageSchema,
 })
 
 export type LotItem = z.infer<typeof lotItemSchema>

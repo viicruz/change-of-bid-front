@@ -15,18 +15,8 @@ import type { WalletMovement } from "@/src/schemas/wallet"
 //* Utils imports
 import { cn } from "@/src/lib/utils"
 
-function signedMovementAmount(movement: WalletMovement) {
-  const amount = Number(movement.amount)
-
-  if (movement.type === "HOLD" || movement.type === "SETTLEMENT_DEBIT") {
-    return -amount
-  }
-
-  return amount
-}
-
 type TransactionListProps = {
-  movements: WalletMovement[];
+  movements: WalletMovement[]
 }
 
 export function TransactionList(props: TransactionListProps) {
@@ -35,20 +25,28 @@ export function TransactionList(props: TransactionListProps) {
   return (
     <ul id="wallet-movements" className="flex w-full flex-col gap-3">
       {props.movements.map((movement) => {
-        const amount = signedMovementAmount(movement)
-        const isIncoming = amount >= 0
+        const isIncoming =
+          movement.type !== "HOLD" && movement.type !== "SETTLEMENT_DEBIT"
         const MovementIcon = isIncoming ? ArrowDownLeft : ArrowUpRight
 
         return (
           <li key={movement.id} id={`wallet-movement-${movement.id}`}>
-            <Card.Root className="relative gap-0 border border-border/70 py-0 shadow-sm transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-md motion-reduce:transform-none motion-reduce:transition-none h-20">
+            <Card.Root className="relative h-20 gap-0 border border-border/70 py-0 shadow-sm transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-md motion-reduce:transform-none motion-reduce:transition-none">
               <div
-                className={cn("absolute inset-y-0 left-0 w-1", isIncoming ? "bg-emerald-500" : "bg-amber-500")}
+                className={cn(
+                  "absolute inset-y-0 left-0 w-1",
+                  isIncoming ? "bg-emerald-500" : "bg-amber-500"
+                )}
                 aria-hidden="true"
               />
               <Card.Content className="flex items-center gap-4 py-4 pl-5">
                 <span
-                  className={cn("grid size-11 shrink-0 place-items-center rounded-full", isIncoming ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400" : "bg-amber-500/10 text-amber-700 dark:text-amber-400")}
+                  className={cn(
+                    "grid size-11 shrink-0 place-items-center rounded-full",
+                    isIncoming
+                      ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                      : "bg-amber-500/10 text-amber-700 dark:text-amber-400"
+                  )}
                   aria-hidden="true"
                 >
                   <MovementIcon className="size-5" strokeWidth={2.25} />
@@ -59,10 +57,15 @@ export function TransactionList(props: TransactionListProps) {
                       {t(`movements.types.${movement.type}`)}
                     </Card.Title>
                     <p
-                      className={cn("font-heading text-base font-semibold tabular-nums", isIncoming ? "text-emerald-700 dark:text-emerald-400" : "text-foreground")}
+                      className={cn(
+                        "font-heading text-base font-semibold tabular-nums",
+                        isIncoming
+                          ? "text-emerald-700 dark:text-emerald-400"
+                          : "text-foreground"
+                      )}
                     >
                       {isIncoming ? "+" : "−"}{" "}
-                      <Money amount={Math.abs(amount)} />
+                      <Money amount={movement.amount} />
                     </p>
                   </div>
                   <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
