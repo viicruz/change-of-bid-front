@@ -422,5 +422,10 @@
       "en": "English",
       "pt-br": "Português (Brasil)"
     }
+  },
+  "components": {
+    "yugiohCard": {
+      "quantity": "Quantity"
+    }
   }
 }
