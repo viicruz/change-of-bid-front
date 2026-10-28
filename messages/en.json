@@ -245,6 +245,8 @@
       "placeBid": "Place bid",
       "placingBid": "Placing bid...",
       "auctioneerCannotBid": "Only a bidder can place a bid.",
+      "guestCannotBid": "Sign in to place a bid.",
+      "signInToBid": "Sign in",
       "bidError": "Unable to place the bid.",
       "bidErrors": {
         "NOT_BIDDER": "Only a bidder can place a bid.",

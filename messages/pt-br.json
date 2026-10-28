@@ -245,6 +245,8 @@
       "placeBid": "Fazer lance",
       "placingBid": "Fazendo lance...",
       "auctioneerCannotBid": "Apenas um arrematante pode fazer um lance.",
+      "guestCannotBid": "Entre para fazer um lance.",
+      "signInToBid": "Entrar",
       "bidError": "Não foi possível fazer o lance.",
       "bidErrors": {
         "NOT_BIDDER": "Apenas um arrematante pode fazer um lance.",
