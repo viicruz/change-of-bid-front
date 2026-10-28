@@ -71,7 +71,7 @@ export function DepositForm(props: DepositFormProps) {
   const errorCode = amountError ?? requestErrorCode
 
   return (
-    <Card.Root className="w-full max-w-lg">
+    <Card.Root className="w-full">
       <Card.Content>
         <form
           id="deposit-form"

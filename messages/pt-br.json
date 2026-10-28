@@ -61,6 +61,8 @@
       "depositError": "Não foi possível depositar.",
       "loading": "Carregando saldo.",
       "error": "Não foi possível carregar o saldo.",
+      "retry": "Tentar novamente",
+      "retrying": "Tentando novamente...",
       "totalBalance": "Saldo total",
       "availableBalance": "Saldo disponível",
       "committedBalance": "Saldo comprometido",

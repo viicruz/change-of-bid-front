@@ -33,7 +33,7 @@ export function TransactionList(props: TransactionListProps) {
   const t = useTranslations("pages./wallet")
 
   return (
-    <ul id="wallet-movements" className="flex w-full max-w-lg flex-col gap-3">
+    <ul id="wallet-movements" className="flex w-full flex-col gap-3">
       {props.movements.map((movement) => {
         const amount = signedMovementAmount(movement)
         const isIncoming = amount >= 0
