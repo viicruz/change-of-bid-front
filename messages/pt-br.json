@@ -232,11 +232,16 @@
       "endedAt": "Encerrado em",
       "winner": "Número do vencedor",
       "items": "Cartas do lote",
-      "quantity": "Quantidade",
       "print": "Imprimir comprovante",
       "share": "Compartilhar comprovante",
       "copied": "Link copiado.",
-      "shareError": "Não foi possível copiar o link."
+      "shareError": "Não foi possível copiar o link.",
+      "cardCount": "{count, plural, one {# carta} other {# cartas}}",
+      "summary": "Resumo do arremate",
+      "settled": "Arrematado",
+      "viewLot": "Ver lote",
+      "viewAudit": "Ver auditoria",
+      "browseAuctions": "Ver leilões"
     },
     "/auction/[id]/audit": {
       "title": "Auditoria",
@@ -253,9 +258,6 @@
       "endsAt": "Termina em",
       "endedAt": "Encerrado em",
       "participant": "Participante",
-      "bidAmount": "Valor",
-      "bidTime": "Horário",
-      "quantity": "Quantidade",
       "emptyBids": "Este lote não tem lances aceitos.",
       "tamperedWarning": "Os lances armazenados não conferem com a cadeia. Este registro não é confiável.",
       "verificationFailedWarning": "O servidor não conseguiu verificar a cadeia de lances. Não trate este registro como íntegro nem adulterado.",
@@ -269,7 +271,14 @@
         "INTACT": "Cadeia íntegra",
         "TAMPERED": "Cadeia adulterada",
         "VERIFICATION_FAILED": "Verificação falhou"
-      }
+      },
+      "pageTag": "Auditoria pública",
+      "backToLot": "Voltar ao lote",
+      "cards": "Cartas do lote",
+      "bidCount": "{count, plural, one {# lance} other {# lances}}",
+      "sequence": "Lance {number}",
+      "lastBid": "Último lance",
+      "browseAuctions": "Ver leilões"
     },
     "/auction/[id]": {
       "title": "Sala do lote",
@@ -326,7 +335,6 @@
       "lotCards": "Cartas do lote",
       "bidsLabel": "Lances",
       "whatsIn": "O que vem no lote",
-      "total": "Total",
       "timer": {
         "startsIn": "Começa em",
         "endsIn": "Termina em",
@@ -635,6 +643,11 @@
       "alertsSoon": "O alerta de lotes chega em breve.",
       "rights": "© {year} Change of Bid. Todos os direitos reservados.",
       "konami": "Yu-Gi-Oh! é marca registrada da Konami. O Change of Bid não é afiliado à Konami."
+    },
+    "lotItemList": {
+      "quantity": "Quantidade",
+      "total": "Total",
+      "cardCount": "{count, plural, one {# carta} other {# cartas}}"
     }
   }
 }

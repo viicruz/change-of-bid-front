@@ -183,6 +183,9 @@ describe("LotAudit", () => {
       expect(container.querySelector("#lot-audit-chain")?.textContent).toBe(
         "Chain intact"
       )
+      expect(
+        container.querySelector("#lot-audit-back")?.getAttribute("href")
+      ).toBe(`/auction/${lotId}`)
       expect(container.querySelector("#lot-audit-tampered")).toBeNull()
       expect(
         container.querySelector("#lot-audit-verification-failed")

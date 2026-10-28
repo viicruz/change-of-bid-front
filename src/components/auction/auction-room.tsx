@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form"
 import * as z from "zod"
 
 //* Components imports
+import { LotItemList } from "@/src/components/cards/lot-item-list"
 import { lotSectionAnchors } from "@/src/components/home/lot-section"
 import { ArrowRightIcon, LiveDot, Tag } from "@/src/components/ui/brand"
 import { Button, buttonVariants, press } from "@/src/components/ui/button"
@@ -91,8 +92,6 @@ const avatarTones = [
 type PublicLot = ShowLot["lot"]
 type PublicLotItem = PublicLot["items"][number]
 
-const cardTypeSchema = z.object({ humanReadableCardType: z.string().min(1) })
-
 function moneyToNumber(value: string) {
   return Number(value)
 }
@@ -116,12 +115,6 @@ function minimumBidCents(lot: PublicLot) {
 
 function itemsByPosition(items: PublicLot["items"]) {
   return [...items].sort((left, right) => left.position - right.position)
-}
-
-function cardType(item: PublicLotItem) {
-  const parsed = cardTypeSchema.safeParse(item.cardSnapshot)
-
-  return parsed.success ? parsed.data.humanReadableCardType : null
 }
 
 function isViewer(
@@ -360,7 +353,6 @@ function LotGallery(props: { items: PublicLotItem[] }) {
 
 function LotContents(props: { lot: PublicLot; items: PublicLotItem[] }) {
   const t = useTranslations("pages./auction/[id]")
-  const totalCards = props.items.reduce((sum, item) => sum + item.quantity, 0)
 
   return (
     <div className="flex flex-col gap-4">
@@ -373,51 +365,7 @@ function LotContents(props: { lot: PublicLot; items: PublicLotItem[] }) {
           {props.lot.description}
         </p>
       ) : null}
-      <div className="border-4 border-border bg-card">
-        <ul id="lot-items" className="m-0 grid list-none p-0">
-          {props.items.map((item) => {
-            const type = cardType(item)
-
-            return (
-              <li
-                key={item.id}
-                id={`lot-item-${item.id}`}
-                className="flex items-center gap-4 border-b-3 border-line-soft px-4 py-3"
-              >
-                <Image
-                  src={item.imagePath}
-                  alt=""
-                  width={imageWidth}
-                  height={imageHeight}
-                  sizes="48px"
-                  className="block h-auto w-12 border-2 border-black"
-                />
-                <div className="min-w-0 flex-1">
-                  <div className="font-heading text-base leading-[1.15] wrap-break-word">
-                    {item.cardName}
-                  </div>
-                  {type ? (
-                    <div className="mt-1 text-sm text-muted-foreground">
-                      {type}
-                    </div>
-                  ) : null}
-                </div>
-                <span
-                  id={`lot-item-quantity-${item.id}`}
-                  className="min-w-14 border-2 border-black bg-brand-ink px-3 py-1.5 text-center font-heading text-xl text-brand-yellow"
-                >
-                  <span className="sr-only">{t("quantity")}: </span>×
-                  {item.quantity}
-                </span>
-              </li>
-            )
-          })}
-        </ul>
-        <div className="flex items-center justify-between bg-brand-yellow px-4 py-3.5 font-heading text-base text-brand-ink">
-          <span>{t("total")}</span>
-          <span>{t("cardCount", { count: totalCards })}</span>
-        </div>
-      </div>
+      <LotItemList idPrefix="lot-item" items={props.items} />
     </div>
   )
 }

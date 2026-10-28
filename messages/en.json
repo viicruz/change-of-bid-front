@@ -232,11 +232,16 @@
       "endedAt": "Settled at",
       "winner": "Winner number",
       "items": "Cards in the lot",
-      "quantity": "Quantity",
       "print": "Print receipt",
       "share": "Share receipt",
       "copied": "Link copied.",
-      "shareError": "Could not copy the link."
+      "shareError": "Could not copy the link.",
+      "cardCount": "{count, plural, one {# card} other {# cards}}",
+      "summary": "Sale summary",
+      "settled": "Sold",
+      "viewLot": "View lot",
+      "viewAudit": "View audit",
+      "browseAuctions": "Browse auctions"
     },
     "/auction/[id]/audit": {
       "title": "Audit",
@@ -253,9 +258,6 @@
       "endsAt": "Ends at",
       "endedAt": "Ended at",
       "participant": "Participant",
-      "bidAmount": "Amount",
-      "bidTime": "Time",
-      "quantity": "Quantity",
       "emptyBids": "This lot has no accepted bids.",
       "tamperedWarning": "The stored bids do not match the chain. This record is not trustworthy.",
       "verificationFailedWarning": "The server could not verify the bid chain. Do not treat this record as intact or tampered.",
@@ -269,7 +271,14 @@
         "INTACT": "Chain intact",
         "TAMPERED": "Chain tampered",
         "VERIFICATION_FAILED": "Verification failed"
-      }
+      },
+      "pageTag": "Public audit",
+      "backToLot": "Back to lot",
+      "cards": "Cards in the lot",
+      "bidCount": "{count, plural, one {# bid} other {# bids}}",
+      "sequence": "Bid {number}",
+      "lastBid": "Last bid",
+      "browseAuctions": "Browse auctions"
     },
     "/auction/[id]": {
       "title": "Lot room",
@@ -326,7 +335,6 @@
       "lotCards": "Cards in this lot",
       "bidsLabel": "Bids",
       "whatsIn": "What's in the lot",
-      "total": "Total",
       "timer": {
         "startsIn": "Starts in",
         "endsIn": "Ends in",
@@ -635,6 +643,11 @@
       "alertsSoon": "Lot alerts are coming soon.",
       "rights": "© {year} Change of Bid. All rights reserved.",
       "konami": "Yu-Gi-Oh! is a trademark of Konami. Change of Bid is not affiliated with Konami."
+    },
+    "lotItemList": {
+      "quantity": "Quantity",
+      "total": "Total",
+      "cardCount": "{count, plural, one {# card} other {# cards}}"
     }
   }
 }

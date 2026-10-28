@@ -62,7 +62,7 @@ export async function Footer() {
   return (
     <footer
       aria-label={t("label")}
-      className="border-t-8 border-brand-red bg-brand-ink text-[#d9d4e0]"
+      className="border-t-8 border-brand-red bg-brand-ink text-[#d9d4e0] print:hidden"
     >
       <div className="mx-auto grid max-w-7xl grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-x-10 gap-y-12 px-[clamp(16px,4vw,48px)] pt-18 pb-10">
         <div className="flex flex-col gap-4.5">

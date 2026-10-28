@@ -151,7 +151,13 @@ describe("Receipt", () => {
       expect(
         container.querySelector("#receipt-ended-at")?.textContent
       ).toContain("2026")
-      expect(container.querySelector("#receipt-winner")?.textContent).toBe("7")
+      expect(container.querySelector("#receipt-winner")?.textContent).toBe("#7")
+      expect(
+        container.querySelector("#receipt-view-lot")?.getAttribute("href")
+      ).toBe(`/auction/${lotId}`)
+      expect(
+        container.querySelector("#receipt-view-audit")?.getAttribute("href")
+      ).toBe(`/auction/${lotId}/audit`)
       expect(
         container.querySelector("#receipt-print")?.getAttribute("type")
       ).toBe("button")
