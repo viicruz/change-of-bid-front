@@ -45,6 +45,16 @@ describe("toAuctioneerCard", () => {
     )
   })
 
+  it("keeps the attribute when the card has one", () => {
+    expect(toAuctioneerCard(card({ attribute: "LIGHT" })).attribute).toBe(
+      "LIGHT"
+    )
+  })
+
+  it("omits the attribute when the card has none", () => {
+    expect(toAuctioneerCard(card()).attribute).toBeUndefined()
+  })
+
   it("omits the image when the card has none", () => {
     const auctioneerCard = toAuctioneerCard(card({ card_images: [] }))
 

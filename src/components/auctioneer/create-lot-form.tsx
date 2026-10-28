@@ -2,14 +2,18 @@
 
 //* Libraries imports
 import { useTranslations } from "next-intl"
+import { GavelIcon } from "lucide-react"
 import { type ReactNode, type SubmitEvent } from "react"
-import { useFormContext } from "react-hook-form"
+import { useFormContext, type FieldErrors } from "react-hook-form"
 
 //* Components imports
 import { Button } from "@/src/components/ui/button"
 
 //* Hooks imports
 import { useErrorTranslations } from "@/src/hooks/commons/use-error-translations"
+
+//* Schema imports
+import type { Lot } from "@/src/schemas/lot"
 
 //* Local imports
 import { useCreateLotMutation } from "@/src/components/auctioneer/create-lot-provider"
@@ -19,8 +23,16 @@ import {
   type CreateLotFormValues,
 } from "@/src/components/auctioneer/create-lot-form-schema"
 import { ApiError } from "@/src/lib/api"
+import { cn } from "@/src/lib/utils"
 
 type CreateLotFormProps = {
+  className?: string
+  //* Runs when the submit stops on validation errors
+  onInvalid?: (errors: FieldErrors<CreateLotFormValues>) => void
+  //* Runs after the API stores the lot, before the form is cleared
+  onCreated?: (lot: Lot) => void
+  //* Runs when the API rejects the lot; its error shows by the submit button
+  onRejected?: () => void
   children: ReactNode
 }
 
@@ -32,17 +44,21 @@ export function CreateLotForm(props: CreateLotFormProps) {
     storeLot.reset()
     void form.handleSubmit((values) => {
       storeLot.mutate(toStoreLot(values), {
-        onSuccess: () => {
+        onSuccess: (lot) => {
+          props.onCreated?.(lot)
           form.reset(emptyCreateLotForm)
         },
+        onError: () => {
+          props.onRejected?.()
+        },
       })
-    })(event)
+    }, props.onInvalid)(event)
   }
 
   return (
     <form
       id="create-lot-form"
-      className="flex flex-1 flex-col"
+      className={cn("flex flex-1 flex-col", props.className)}
       noValidate
       onSubmit={onSubmit}
     >
@@ -63,12 +79,7 @@ export function CreateLotSubmit() {
         : null
 
   return (
-    <div className="flex flex-col gap-4">
-      {storeLot.isSuccess ? (
-        <p id="create-lot-success" role="status" className="text-sm">
-          {t("created")}
-        </p>
-      ) : null}
+    <div className="flex flex-col gap-3">
       {apiMessage ? (
         <p
           id="create-lot-error"
@@ -81,11 +92,20 @@ export function CreateLotSubmit() {
       <Button
         id="create-lot-submit"
         type="submit"
-        className="w-full"
+        size="lg"
+        //* Phones publish from the bar at the bottom (AuctioneerMobileBar)
+        className="w-full max-[760px]:hidden"
         disabled={storeLot.isPending}
       >
+        <GavelIcon data-icon="inline-start" aria-hidden="true" />
         {storeLot.isPending ? t("submitting") : t("submit")}
       </Button>
+      <p
+        id="create-lot-note"
+        className="text-center text-xs text-muted-foreground"
+      >
+        {t("createNote")}
+      </p>
     </div>
   )
 }

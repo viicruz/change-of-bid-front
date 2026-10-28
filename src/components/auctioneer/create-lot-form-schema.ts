@@ -1,4 +1,5 @@
 //* Libraries imports
+import type { FieldErrors } from "react-hook-form"
 import * as z from "zod"
 
 //* Hooks imports
@@ -7,9 +8,18 @@ import {
   type StoreLot,
 } from "@/src/hooks/lots/mutations/use-store-lot"
 
+//* Schema imports
+import { cardAttributeSchema } from "@/src/schemas/card"
+
+//* Lib imports
+import { cardTypes } from "@/src/lib/lots/mock-lots"
+
 const lotCardFieldSchema = z.object({
   cardId: z.number().int().positive(),
   name: z.string().min(1),
+  //* Kept for the lot rows only: the API takes card ids
+  cardType: z.enum(cardTypes),
+  attribute: cardAttributeSchema.optional(),
   imageUrl: z.string().optional(),
 })
 
@@ -33,13 +43,38 @@ export const createLotFormSchema = z
     }
 
     for (const issue of parsed.error.issues) {
+      const path = toFormPath(issue.path)
+
       context.addIssue({
         code: "custom",
-        path: toFormPath(issue.path),
-        message: issue.message,
+        path,
+        message: emptyDateMessage(values, path) ?? issue.message,
       })
     }
   })
+
+//* An empty date is a missing choice, not a malformed ISO string
+const emptyDateMessageCode = {
+  startsAt: "LOT_STARTS_AT_REQUIRED",
+  endsAt: "LOT_ENDS_AT_REQUIRED",
+} as const
+
+function emptyDateMessage(
+  values: { startsAt: string; endsAt: string },
+  path: readonly PropertyKey[]
+) {
+  const field = path[0]
+
+  if (field !== "startsAt" && field !== "endsAt") {
+    return undefined
+  }
+
+  if (values[field].trim().length > 0) {
+    return undefined
+  }
+
+  return emptyDateMessageCode[field]
+}
 
 export type CreateLotFormValues = z.infer<typeof createLotFormSchema>
 
@@ -91,4 +126,23 @@ function toFormPath(path: readonly PropertyKey[]): PropertyKey[] {
   }
 
   return ["cards", ...path.slice(1)]
+}
+
+//* The cards array error sits on the array itself or on its root
+export function readCardsError(
+  error: FieldErrors<CreateLotFormValues>["cards"]
+) {
+  if (!error) {
+    return undefined
+  }
+
+  if ("message" in error && typeof error.message === "string") {
+    return error.message
+  }
+
+  if ("root" in error && error.root && typeof error.root.message === "string") {
+    return error.root.message
+  }
+
+  return undefined
 }

@@ -1,24 +1,46 @@
 "use client"
 
 //* Libraries imports
+import { PlusIcon, XIcon } from "lucide-react"
 import { useTranslations } from "next-intl"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import { flushSync } from "react-dom"
+import type { FieldErrors } from "react-hook-form"
 
 //* Components imports
+import {
+  AuctioneerPaneHeader,
+  auctioneerPaneClassName,
+} from "@/src/components/auctioneer/auctioneer-pane"
+import { AuctioneerMobileBar } from "@/src/components/auctioneer/auctioneer-mobile-bar"
+import { AuctioneerSidebar } from "@/src/components/auctioneer/auctioneer-sidebar"
+import {
+  AuctioneerTabs,
+  type AuctioneerTab,
+} from "@/src/components/auctioneer/auctioneer-tabs"
 import { CardSearchPanel } from "@/src/components/auctioneer/card-search-panel"
 import {
   CreateLotForm,
   CreateLotSubmit,
 } from "@/src/components/auctioneer/create-lot-form"
-import { CreateLotProvider } from "@/src/components/auctioneer/create-lot-provider"
+import type { CreateLotFormValues } from "@/src/components/auctioneer/create-lot-form-schema"
+import {
+  CreateLotProvider,
+  useCreateLotMutation,
+  useLotCardFields,
+} from "@/src/components/auctioneer/create-lot-provider"
 import { LotCards } from "@/src/components/auctioneer/lot-cards"
 import { LotDetailsFields } from "@/src/components/auctioneer/lot-details-fields"
-import { AuctioneerSidebar } from "@/src/components/auctioneer/auctioneer-sidebar"
+import {
+  LotCreated,
+  LotCreatedDetails,
+} from "@/src/components/auctioneer/lot-created"
+import { LotErrorSummary } from "@/src/components/auctioneer/lot-error-summary"
+import { LotSummary } from "@/src/components/auctioneer/lot-summary"
 import { PrivateLotDetails } from "@/src/components/auctioneer/private-lot-details"
 import { Button } from "@/src/components/ui/button"
+import { Tag } from "@/src/components/ui/brand"
 import Card from "@/src/components/ui/card"
-import Drawer from "@/src/components/ui/drawer"
-import Sidebar from "@/src/components/ui/sidebar"
 
 //* Hooks imports
 import { useCancelLot } from "@/src/hooks/lots/mutations/use-cancel-lot"
@@ -27,10 +49,12 @@ import {
   type ShowPrivateLot,
 } from "@/src/hooks/lots/queries/use-show-private-lot"
 
+//* Schema imports
+import type { Lot, PrivateLotStatus } from "@/src/schemas/lot"
+
 //* Local imports
 import { ApiError } from "@/src/lib/api"
-
-const searchIdPrefix = "mobile-search-"
+import { cn } from "@/src/lib/utils"
 
 const cancelErrorMessageKey = {
   NOT_AUCTIONEER: "cancelErrors.NOT_AUCTIONEER",
@@ -167,103 +191,324 @@ function PrivateLotWorkspace(props: {
   )
 }
 
+//* Below 1180px the tabs pick which column shows (see AuctioneerTabs)
+const paneVisibility = {
+  lots: "max-[1180px]:col-span-full max-[1180px]:hidden max-[1180px]:group-data-[tab=lots]/auctioneer:flex",
+  cards:
+    "max-[1180px]:group-data-[tab=lots]/auctioneer:hidden max-[760px]:group-data-[tab=details]/auctioneer:hidden",
+  details:
+    "max-[1180px]:group-data-[tab=lots]/auctioneer:hidden max-[760px]:group-data-[tab=cards]/auctioneer:hidden",
+  lot: "col-[2/-1] max-[1180px]:col-span-full max-[1180px]:group-data-[tab=lots]/auctioneer:hidden",
+}
+
 export function AuctioneerPanel() {
+  return (
+    <CreateLotProvider>
+      <AuctioneerWorkspace />
+    </CreateLotProvider>
+  )
+}
+
+function AuctioneerHeading(props: { viewing: boolean }) {
   const t = useTranslations("pages./auctioneer")
-  const [searchOpen, setSearchOpen] = useState(false)
+
+  return (
+    <div className="flex flex-col gap-2.5">
+      <Tag tone="dark">{t("pageTag")}</Tag>
+      <h1
+        id="auctioneer-title"
+        className="font-heading text-[clamp(32px,4.4vw,56px)] leading-none font-normal"
+      >
+        {props.viewing ? t("viewHeading") : t("createHeading")}
+      </h1>
+      <p className="max-w-160 text-base text-muted-foreground">
+        {props.viewing ? t("viewSubtitle") : t("createSubtitle")}
+      </p>
+    </div>
+  )
+}
+
+function CreatedLotColumns(props: {
+  lot: Lot
+  onCreateAnother: () => void
+  onViewInList: (status: PrivateLotStatus) => void
+}) {
+  return (
+    <>
+      <section
+        id="auctioneer-lot-column"
+        aria-labelledby="create-lot-success-title"
+        className={cn("min-w-0", paneVisibility.cards)}
+      >
+        <LotCreated
+          lot={props.lot}
+          onCreateAnother={props.onCreateAnother}
+          onViewInList={props.onViewInList}
+        />
+      </section>
+      <section
+        id="auctioneer-details-column"
+        aria-labelledby="lot-details-title"
+        className={cn("min-w-0", paneVisibility.details)}
+      >
+        <LotCreatedDetails lot={props.lot} />
+      </section>
+    </>
+  )
+}
+
+function AddCardButton(props: { searchOpen: boolean; onToggle: () => void }) {
+  const t = useTranslations("pages./auctioneer")
+
+  return (
+    <Button
+      id="auctioneer-add-card"
+      type="button"
+      variant={props.searchOpen ? "outline" : "default"}
+      aria-expanded={props.searchOpen}
+      aria-controls={props.searchOpen ? "card-search-panel" : undefined}
+      onClick={props.onToggle}
+    >
+      {props.searchOpen ? (
+        <XIcon data-icon="inline-start" aria-hidden="true" />
+      ) : (
+        <PlusIcon data-icon="inline-start" aria-hidden="true" />
+      )}
+      {props.searchOpen ? t("closeCardSearch") : t("addCards")}
+    </Button>
+  )
+}
+
+function DraftLotColumns(props: {
+  searchOpen: boolean
+  onSearchOpen: () => void
+  onSearchToggle: () => void
+  onInvalid: (errors: FieldErrors<CreateLotFormValues>) => void
+  onCreated: (lot: Lot) => void
+  onRejected: () => void
+}) {
+  const t = useTranslations("pages./auctioneer")
+
+  return (
+    <>
+      <section
+        id="auctioneer-lot-column"
+        aria-labelledby="cards-in-lot-title"
+        className={cn("min-w-0", paneVisibility.cards)}
+      >
+        <LotCards
+          searchOpen={props.searchOpen}
+          emptyAction={
+            props.searchOpen ? null : (
+              <Button
+                id="auctioneer-empty-add-card"
+                type="button"
+                onClick={props.onSearchOpen}
+              >
+                {t("addCards")}
+              </Button>
+            )
+          }
+          action={
+            <AddCardButton
+              searchOpen={props.searchOpen}
+              onToggle={props.onSearchToggle}
+            />
+          }
+        >
+          {props.searchOpen ? (
+            <CardSearchPanel className="slide-in-from-top-1.5 animate-in shadow-brand-red duration-200 fade-in motion-reduce:animate-none" />
+          ) : null}
+        </LotCards>
+      </section>
+      <section
+        id="auctioneer-details-column"
+        aria-labelledby="lot-details-title"
+        className={cn("min-w-0", paneVisibility.details)}
+      >
+        <CreateLotForm
+          className={cn(
+            auctioneerPaneClassName,
+            "shadow-hard-8 shadow-brand-red"
+          )}
+          onInvalid={props.onInvalid}
+          onCreated={props.onCreated}
+          onRejected={props.onRejected}
+        >
+          <AuctioneerPaneHeader
+            titleId="lot-details-title"
+            title={t("lotDetails")}
+          />
+          <div className="flex flex-col gap-4.5 p-4.5">
+            <LotErrorSummary />
+            <LotDetailsFields />
+            <LotSummary />
+            <CreateLotSubmit />
+          </div>
+        </CreateLotForm>
+      </section>
+    </>
+  )
+}
+
+//* On a phone, show the column that holds the errors
+function tabForErrors(errors: FieldErrors<CreateLotFormValues>): AuctioneerTab {
+  const onlyCards = Object.keys(errors).every((name) => name === "cards")
+
+  return onlyCards ? "cards" : "details"
+}
+
+function lotCardCount(createdLot: Lot | null, draftCount: number) {
+  if (!createdLot) {
+    return draftCount
+  }
+
+  return createdLot.items.reduce((sum, item) => sum + item.quantity, 0)
+}
+
+function AuctioneerWorkspace() {
+  const storeLot = useCreateLotMutation()
+  const cards = useLotCardFields()
+  const [searchOpen, setSearchOpen] = useState(true)
   const [selectedLotId, setSelectedLotId] = useState<string | null>(null)
+  const [tab, setTab] = useState<AuctioneerTab>("cards")
+  const [lotStatus, setLotStatus] = useState<PrivateLotStatus | undefined>(
+    undefined
+  )
+  const [newLotId, setNewLotId] = useState<string | null>(null)
+  const viewing = selectedLotId !== null
+  //* Until "create another lot", the columns show the lot just published
+  const createdLot = storeLot.isSuccess ? storeLot.data : null
+  const cardCount = lotCardCount(createdLot, cards.fields.length)
   const privateLot = useShowPrivateLot({
     id: selectedLotId ?? "",
-    enabled: selectedLotId !== null,
+    enabled: viewing,
   })
+  //* "Create another lot" lands on the card search once the form is back
+  const focusSearchRef = useRef(false)
+
+  useEffect(() => {
+    if (createdLot === null && focusSearchRef.current) {
+      focusSearchRef.current = false
+      document.getElementById("card-search")?.focus()
+    }
+  }, [createdLot])
 
   function onSelectLot(lotId: string) {
     setSelectedLotId(lotId)
+    setTab("cards")
   }
 
-  function onCreateLot() {
+  //* The draft is the form, so the published lot makes way for it
+  function onOpenDraft() {
     setSelectedLotId(null)
+    setTab("cards")
+    storeLot.reset()
+  }
+
+  function onRejected() {
+    setTab("details")
+  }
+
+  function onCreated(lot: Lot) {
+    setNewLotId(lot.id)
+    setTab("cards")
+  }
+
+  function onCreateAnother() {
+    focusSearchRef.current = true
+    storeLot.reset()
+    setSearchOpen(true)
+    setTab("cards")
+  }
+
+  //* The list filters to where the lot now is; the focus goes to that filter
+  function onViewCreatedLot(status: PrivateLotStatus) {
+    flushSync(() => {
+      setLotStatus(status)
+      setTab("lots")
+    })
+    document.getElementById(`auctioneer-lot-filter-${status}`)?.focus()
+  }
+
+  function onSearchToggle() {
+    setSearchOpen((open) => !open)
+  }
+
+  function onInvalid(errors: FieldErrors<CreateLotFormValues>) {
+    setTab(tabForErrors(errors))
+  }
+
+  function onSearchOpen() {
+    setSearchOpen(true)
+  }
+
+  function renderColumns() {
+    if (viewing) {
+      return (
+        <div
+          id="auctioneer-lot-view"
+          className={cn("min-w-0", paneVisibility.lot)}
+        >
+          <PrivateLotWorkspace query={privateLot} />
+        </div>
+      )
+    }
+
+    if (createdLot) {
+      return (
+        <CreatedLotColumns
+          lot={createdLot}
+          onCreateAnother={onCreateAnother}
+          onViewInList={onViewCreatedLot}
+        />
+      )
+    }
+
+    return (
+      <DraftLotColumns
+        searchOpen={searchOpen}
+        onSearchOpen={onSearchOpen}
+        onSearchToggle={onSearchToggle}
+        onInvalid={onInvalid}
+        onCreated={onCreated}
+        onRejected={onRejected}
+      />
+    )
   }
 
   return (
-    <CreateLotProvider>
-      <Sidebar.Provider className="min-h-0 w-full">
-        <div
-          id="auctioneer-panel"
-          className="flex w-full flex-col gap-4 md:flex-row md:items-stretch"
-        >
-          <AuctioneerSidebar
-            selectedLotId={selectedLotId}
-            onSelectLot={onSelectLot}
-            onCreateLot={onCreateLot}
-          />
-          <div className="flex min-w-0 flex-1 flex-col gap-4">
-            <header className="flex items-center justify-end rounded-xl bg-card p-2 ring-1 ring-foreground/10 md:hidden">
-              <Sidebar.Trigger
-                id="auctioneer-sidebar-toggle"
-                type="button"
-                aria-label={t("toggleSidebar")}
-              />
-            </header>
-            {selectedLotId === null ? (
-              <div className="grid w-full gap-4 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-stretch">
-                <Card.Root id="auctioneer-lot-column" className="min-h-160">
-                  <CreateLotForm>
-                    <Card.Content className="flex flex-1 flex-col">
-                      <LotCards
-                        action={
-                          <div className="lg:hidden">
-                            <Drawer.Root
-                              open={searchOpen}
-                              onOpenChange={setSearchOpen}
-                            >
-                              <Drawer.Trigger
-                                render={
-                                  <Button
-                                    id="auctioneer-add-card"
-                                    type="button"
-                                    variant="outline"
-                                    className="w-full border-dashed"
-                                  />
-                                }
-                              >
-                                {t("addCard")}
-                              </Drawer.Trigger>
-                              <Drawer.Content>
-                                <Drawer.Header>
-                                  <Drawer.Title
-                                    id={`${searchIdPrefix}card-search-title`}
-                                  >
-                                    {t("cardSearchTitle")}
-                                  </Drawer.Title>
-                                </Drawer.Header>
-                                <div className="min-h-0 flex-1 overflow-y-auto p-4">
-                                  <CardSearchPanel
-                                    idPrefix={searchIdPrefix}
-                                    framed={false}
-                                  />
-                                </div>
-                              </Drawer.Content>
-                            </Drawer.Root>
-                          </div>
-                        }
-                      />
-                    </Card.Content>
-                    <Card.Footer className="flex-col items-stretch gap-4">
-                      <LotDetailsFields />
-                      <CreateLotSubmit />
-                    </Card.Footer>
-                  </CreateLotForm>
-                </Card.Root>
-                <div className="hidden h-full min-h-0 lg:block">
-                  <CardSearchPanel />
-                </div>
-              </div>
-            ) : (
-              <PrivateLotWorkspace query={privateLot} />
-            )}
-          </div>
-        </div>
-      </Sidebar.Provider>
-    </CreateLotProvider>
+    <div
+      id="auctioneer-panel"
+      data-tab={tab}
+      className="group/auctioneer flex flex-col gap-6"
+    >
+      <AuctioneerHeading viewing={viewing} />
+      <AuctioneerTabs
+        tab={tab}
+        viewing={viewing}
+        cardCount={cardCount}
+        onTabChange={setTab}
+      />
+      <div className="grid grid-cols-[300px_minmax(0,1fr)_380px] items-start gap-7 max-[1180px]:grid-cols-[minmax(0,1fr)_340px] max-[760px]:grid-cols-1 max-[760px]:gap-5">
+        <AuctioneerSidebar
+          selectedLotId={selectedLotId}
+          newLotId={newLotId}
+          status={lotStatus}
+          onStatusChange={setLotStatus}
+          onSelectLot={onSelectLot}
+          onOpenDraft={onOpenDraft}
+          className={paneVisibility.lots}
+        />
+        {renderColumns()}
+      </div>
+      {viewing ? null : (
+        <AuctioneerMobileBar
+          createdLot={createdLot}
+          cardCount={cardCount}
+          onCreateAnother={onCreateAnother}
+        />
+      )}
+    </div>
   )
 }
