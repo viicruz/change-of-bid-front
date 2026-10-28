@@ -70,14 +70,16 @@ if (!rootElement) {
 let root: Root | undefined
 
 window.mount = async ({ story, props, locale }) => {
+  // Playwright's mount fixture passes its second argument as story props.
+  const requestedLocale = locale ?? props?.locale
   const Story = await resolveStory(story)
 
   if (!Story) {
     throw new Error(`Unknown story: ${story}`)
   }
 
-  if (locale !== undefined && !isLocale(locale)) {
-    throw new Error(`Unknown locale: ${String(locale)}`)
+  if (requestedLocale !== undefined && !isLocale(requestedLocale)) {
+    throw new Error(`Unknown locale: ${String(requestedLocale)}`)
   }
 
   const activeRoot = (root ??= createRoot(rootElement))
@@ -85,7 +87,7 @@ window.mount = async ({ story, props, locale }) => {
   flushSync(() => {
     activeRoot.render(
       <StrictMode>
-        <ComponentProviders locale={locale}>
+        <ComponentProviders locale={requestedLocale}>
           <Story {...(props ?? {})} />
         </ComponentProviders>
       </StrictMode>
