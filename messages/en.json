@@ -47,6 +47,12 @@
       },
       "searchLabel": "Search lots",
       "searchPlaceholder": "Search by lot name",
+      "filtersLabel": "Filter lots",
+      "filters": {
+        "LIVE": "Live",
+        "SCHEDULED": "Upcoming",
+        "ENDED": "Ended"
+      },
       "loading": "Loading lots.",
       "error": "Could not load lots.",
       "empty": "No lots found.",
@@ -67,7 +73,13 @@
       "finalPrice": "Final price",
       "endedOn": "Ended {date}",
       "details": "See details",
-      "audit": "Audit"
+      "audit": "Audit",
+      "previous": "Previous",
+      "next": "Next",
+      "pagination": "{section} pages",
+      "goToPage": "Go to page {page}",
+      "currentPage": "Page {page}",
+      "morePages": "More pages"
     },
     "/sign-up": {
       "title": "Create an account",

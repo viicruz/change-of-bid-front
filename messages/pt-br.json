@@ -47,6 +47,12 @@
       },
       "searchLabel": "Buscar lotes",
       "searchPlaceholder": "Buscar pelo nome do lote",
+      "filtersLabel": "Filtrar lotes",
+      "filters": {
+        "LIVE": "Ao vivo",
+        "SCHEDULED": "Agendados",
+        "ENDED": "Encerrados"
+      },
       "loading": "Carregando lotes.",
       "error": "Não foi possível carregar os lotes.",
       "empty": "Nenhum lote encontrado.",
@@ -67,7 +73,13 @@
       "finalPrice": "Valor final",
       "endedOn": "Encerrado em {date}",
       "details": "Ver detalhes",
-      "audit": "Auditar"
+      "audit": "Auditar",
+      "previous": "Anterior",
+      "next": "Próxima",
+      "pagination": "Páginas de {section}",
+      "goToPage": "Ir para a página {page}",
+      "currentPage": "Página {page}",
+      "morePages": "Mais páginas"
     },
     "/sign-up": {
       "title": "Criar uma conta",
