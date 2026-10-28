@@ -6,6 +6,7 @@ import { useMemo } from "react";
 
 type MoneyProps = {
   amount: number | string
+  id?: string
   className?: string
 }
 
@@ -29,7 +30,7 @@ export function Money(props: MoneyProps) {
       : formatter.format(props.amount)
 
   return (
-    <span className={props.className}>
+    <span id={props.id} className={props.className}>
       <data value={props.amount}>{formattedAmount}</data>
     </span>
   )
