@@ -22,6 +22,20 @@ export function BalanceCard(props: ShowWallet) {
         <p id="wallet-balance" className="font-heading text-2xl">
           <Money amount={props.totalBalance} />
         </p>
+        <dl className="mt-4 grid gap-3 border-t pt-4 sm:grid-cols-2">
+          <div className="flex flex-col gap-1">
+            <dt className="text-muted-foreground">{t("availableBalance")}</dt>
+            <dd id="wallet-available-balance" className="font-medium">
+              <Money amount={props.availableBalance} />
+            </dd>
+          </div>
+          <div className="flex flex-col gap-1">
+            <dt className="text-muted-foreground">{t("committedBalance")}</dt>
+            <dd id="wallet-committed-balance" className="font-medium">
+              <Money amount={props.committedBalance} />
+            </dd>
+          </div>
+        </dl>
       </Card.Content>
     </Card.Root>
   )

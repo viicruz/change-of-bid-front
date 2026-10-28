@@ -62,6 +62,8 @@
       "loading": "Carregando saldo.",
       "error": "Não foi possível carregar o saldo.",
       "totalBalance": "Saldo total",
+      "availableBalance": "Saldo disponível",
+      "committedBalance": "Saldo comprometido",
       "historyTitle": "Histórico de transações",
       "movements": {
         "loading": "Carregando transações.",

@@ -62,6 +62,8 @@
       "loading": "Loading balance.",
       "error": "Could not load your balance.",
       "totalBalance": "Total balance",
+      "availableBalance": "Available balance",
+      "committedBalance": "Committed balance",
       "historyTitle": "Transaction history",
       "movements": {
         "loading": "Loading transactions.",
