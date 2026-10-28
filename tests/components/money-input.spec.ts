@@ -57,9 +57,9 @@ test("preserves the caret when editing and deleting in the middle", async ({
   const component = await mount("components/ui/money-input/Default")
   const input = component.getByRole("textbox")
   await input.fill("1234,56")
-  await input.press("Home")
-  await input.press("ArrowRight")
-  await input.press("ArrowRight")
+  await input.evaluate((element: HTMLInputElement) => {
+    element.setSelectionRange(4, 4)
+  })
   await input.pressSequentially("9")
   await expect(input).toHaveValue("R$ 19.234,56")
   await input.press("Backspace")
