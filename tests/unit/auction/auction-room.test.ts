@@ -199,7 +199,7 @@ describe("AuctionRoom", () => {
   }
 
   describe("when the public lot is live", () => {
-    it("shows the title, status, cards in position order, and bids in sequence order", async () => {
+    it("shows the title, status, cards in position order, and the newest bid first", async () => {
       vi.mocked(api.get).mockResolvedValue(publicLot())
 
       await renderRoom(lotId)
@@ -248,8 +248,8 @@ describe("AuctionRoom", () => {
           "#lot-item-quantity-a1b2c3d4-e5f6-7890-abcd-ef1234567890"
         )?.textContent
       ).toContain("1")
-      expect(container.innerHTML.indexOf("auction-bid-1")).toBeLessThan(
-        container.innerHTML.indexOf("auction-bid-2")
+      expect(container.innerHTML.indexOf("auction-bid-2")).toBeLessThan(
+        container.innerHTML.indexOf("auction-bid-1")
       )
       expect(api.get).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -593,9 +593,9 @@ describe("AuctionRoom", () => {
 
       await act(async () => {
         await vi.waitFor(() => {
-          expect(
-            container.querySelector("#auction-leadership")?.textContent
-          ).toBe("Bidder #4")
+          expect(container.querySelector("#lot-leader")?.textContent).toContain(
+            "Participant #4"
+          )
         })
       })
 
@@ -628,8 +628,8 @@ describe("AuctionRoom", () => {
       expect(
         container.querySelector("#current-bid-value")?.textContent
       ).toContain("20.00")
-      expect(container.querySelector("#auction-leadership")?.textContent).toBe(
-        "Bidder #8"
+      expect(container.querySelector("#lot-leader")?.textContent).toContain(
+        "Participant #8"
       )
       expect(
         container.querySelector("#viewer-participant")?.textContent
@@ -638,7 +638,7 @@ describe("AuctionRoom", () => {
         "20.00"
       )
       expect(container.querySelector("#auction-countdown")?.textContent).toBe(
-        "Ends in 02:00"
+        "Ending soon! 00:02:00"
       )
       expect(container.querySelector("#place-bid-error")).toBeNull()
     })
@@ -670,7 +670,7 @@ describe("AuctionRoom", () => {
         await vi.waitFor(() => {
           expect(
             container.querySelector("#auction-leadership")?.textContent
-          ).toBe("You are winning")
+          ).toBe("You're in the lead! Keep an eye on the clock.")
         })
       })
 
@@ -704,7 +704,7 @@ describe("AuctionRoom", () => {
         await vi.waitFor(() => {
           expect(
             container.querySelector("#auction-leadership")?.textContent
-          ).toBe("You were outbid")
+          ).toBe("You were outbid! Bid again to take the lead.")
         })
       })
 
@@ -797,7 +797,7 @@ describe("AuctionRoom", () => {
           await vi.waitFor(() => {
             expect(
               container.querySelector("#auction-countdown")?.textContent
-            ).toBe("Ends in 00:02")
+            ).toBe("Ending soon! 00:00:02")
           })
         })
 
@@ -808,7 +808,7 @@ describe("AuctionRoom", () => {
         })
 
         expect(container.querySelector("#auction-countdown")?.textContent).toBe(
-          "Ends in 00:00"
+          "Ended 00:00:00"
         )
         expect(vi.mocked(api.get).mock.calls.length).toBeGreaterThan(1)
       } finally {
@@ -840,7 +840,7 @@ describe("AuctionRoom", () => {
         })
 
         expect(container.querySelector("#auction-countdown")?.textContent).toBe(
-          "Starts in 01:05"
+          "Starts in 00:01:05"
         )
         expect(container.querySelector("#place-bid")).toBeNull()
       } finally {
