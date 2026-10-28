@@ -1,7 +1,8 @@
 "use client"
 
 //* Libraries imports
-import { useLocale } from "next-intl"
+import { useLocale } from "next-intl";
+import { useMemo } from "react";
 
 type MoneyProps = {
   amount: number | string
@@ -16,10 +17,10 @@ type MoneyProps = {
 
 export function Money(props: MoneyProps) {
   const locale = useLocale()
-  const formatter = new Intl.NumberFormat(locale, {
+  const formatter = useMemo(() => new Intl.NumberFormat(locale, {
     style: "currency",
     currency: "BRL",
-  })
+  }), [locale])
   // Intl.NumberFormat accepts decimal strings exactly; its TypeScript lib type
   // still only allows number and bigint, so preserve the string at runtime.
   const formattedAmount =
