@@ -47,6 +47,12 @@
       },
       "searchLabel": "Search lots",
       "searchPlaceholder": "Search by lot name",
+      "filtersLabel": "Filter lots",
+      "filters": {
+        "LIVE": "Live",
+        "SCHEDULED": "Upcoming",
+        "ENDED": "Ended"
+      },
       "loading": "Loading lots.",
       "error": "Could not load lots.",
       "empty": "No lots found.",

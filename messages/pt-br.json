@@ -47,6 +47,12 @@
       },
       "searchLabel": "Buscar lotes",
       "searchPlaceholder": "Buscar pelo nome do lote",
+      "filtersLabel": "Filtrar lotes",
+      "filters": {
+        "LIVE": "Ao vivo",
+        "SCHEDULED": "Agendados",
+        "ENDED": "Encerrados"
+      },
       "loading": "Carregando lotes.",
       "error": "Não foi possível carregar os lotes.",
       "empty": "Nenhum lote encontrado.",
