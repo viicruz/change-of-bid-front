@@ -67,7 +67,13 @@
       "finalPrice": "Final price",
       "endedOn": "Ended {date}",
       "details": "See details",
-      "audit": "Audit"
+      "audit": "Audit",
+      "previous": "Previous",
+      "next": "Next",
+      "pagination": "{section} pages",
+      "goToPage": "Go to page {page}",
+      "currentPage": "Page {page}",
+      "morePages": "More pages"
     },
     "/sign-up": {
       "title": "Create an account",

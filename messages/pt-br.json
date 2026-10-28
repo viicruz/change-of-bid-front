@@ -67,7 +67,13 @@
       "finalPrice": "Valor final",
       "endedOn": "Encerrado em {date}",
       "details": "Ver detalhes",
-      "audit": "Auditar"
+      "audit": "Auditar",
+      "previous": "Anterior",
+      "next": "Próxima",
+      "pagination": "Páginas de {section}",
+      "goToPage": "Ir para a página {page}",
+      "currentPage": "Página {page}",
+      "morePages": "Mais páginas"
     },
     "/sign-up": {
       "title": "Criar uma conta",
