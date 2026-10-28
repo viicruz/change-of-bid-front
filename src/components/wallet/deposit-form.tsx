@@ -3,13 +3,12 @@
 //* Libraries imports
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useTranslations } from "next-intl"
-import { type SubmitEvent } from "react"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 
 //* Components imports
 import { Button } from "@/src/components/ui/button"
 import Card from "@/src/components/ui/card"
-import { Input } from "@/src/components/ui/input"
+import { MoneyInput } from "@/src/components/ui/money-input"
 import { Label } from "@/src/components/ui/label"
 import { FormError } from "@/src/components/utils/form-error"
 
@@ -28,10 +27,6 @@ const knownDepositErrorCodes = new Set([
   "AMOUNT_OUT_OF_RANGE",
 ])
 
-type DepositFormProps = {
-  onDeposited: () => void
-}
-
 function readDepositErrorCode(error: unknown) {
   if (
     error instanceof ApiError &&
@@ -47,6 +42,10 @@ function readDepositErrorCode(error: unknown) {
   return "DEPOSIT_FAILED"
 }
 
+type DepositFormProps = {
+  onDeposited: () => void
+}
+
 export function DepositForm(props: DepositFormProps) {
   const t = useTranslations("pages./wallet")
   const storeDeposit = useStoreDeposit()
@@ -59,18 +58,15 @@ export function DepositForm(props: DepositFormProps) {
     ? readDepositErrorCode(storeDeposit.error)
     : null
 
-  function onSubmit(event: SubmitEvent<HTMLFormElement>) {
-    event.preventDefault()
-    storeDeposit.reset()
-    void form.handleSubmit((values) => {
-      storeDeposit.mutate(values, {
-        onSuccess: () => {
-          form.reset({ amount: "" })
-          props.onDeposited()
-        },
-      })
-    })(event)
-  }
+  const onSubmit = form.handleSubmit((data) => {
+    storeDeposit.reset();
+    storeDeposit.mutate(data, {
+      onSuccess: () => {
+        form.reset({ amount: "" })
+        props.onDeposited()
+      },
+    });
+  })
 
   const errorCode = amountError ?? requestErrorCode
 
@@ -86,19 +82,24 @@ export function DepositForm(props: DepositFormProps) {
           <p>{t("depositDescription")}</p>
           <div className="flex flex-col gap-2">
             <Label htmlFor="deposit-amount">{t("depositAmountLabel")}</Label>
-            <Input
-              id="deposit-amount"
-              type="text"
-              inputMode="decimal"
-              autoComplete="off"
-              aria-invalid={errorCode ? true : undefined}
-              aria-describedby={errorCode ? "deposit-error" : undefined}
-              disabled={storeDeposit.isPending}
-              {...form.register("amount", {
-                onChange: () => {
-                  if (storeDeposit.isError) storeDeposit.reset()
-                },
-              })}
+            <Controller
+              control={form.control}
+              name="amount"
+              render={({ field: { onChange, ...field } }) => (
+                <MoneyInput
+                  {...field}
+                  id="deposit-amount"
+                  autoComplete="off"
+                  aria-invalid={errorCode ? true : undefined}
+                  aria-describedby={errorCode ? "deposit-error" : undefined}
+                  disabled={storeDeposit.isPending}
+                  onValueChange={(value) => {
+                    onChange(value)
+                    // avoid re-fetching the wallet if the deposit fails
+                    if (storeDeposit.isError) storeDeposit.reset()
+                  }}
+                />
+              )}
             />
           </div>
           <FormError

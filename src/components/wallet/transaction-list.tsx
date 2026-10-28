@@ -1,7 +1,7 @@
 "use client"
 
 //* Libraries imports
-import { useFormatter, useTranslations } from "next-intl"
+import { useTranslations } from "next-intl"
 import { ArrowDownLeft, ArrowUpRight, Clock3 } from "lucide-react"
 
 //* Components imports
@@ -25,7 +25,11 @@ function signedMovementAmount(movement: WalletMovement) {
   return amount
 }
 
-export function TransactionList(props: { movements: WalletMovement[] }) {
+type TransactionListProps = {
+  movements: WalletMovement[];
+}
+
+export function TransactionList(props: TransactionListProps) {
   const t = useTranslations("pages./wallet")
 
   return (
