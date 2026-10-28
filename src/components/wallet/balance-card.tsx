@@ -14,7 +14,7 @@ export function BalanceCard(props: ShowWallet) {
   const t = useTranslations("pages./wallet")
 
   return (
-    <Card.Root className="w-full">
+    <Card.Root className="w-full h-48">
       <Card.Header>
         <Card.Title>{t("availableBalance")}</Card.Title>
       </Card.Header>

@@ -41,7 +41,7 @@ export function TransactionList(props: TransactionListProps) {
 
         return (
           <li key={movement.id} id={`wallet-movement-${movement.id}`}>
-            <Card.Root className="relative gap-0 border border-border/70 py-0 shadow-sm transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-md motion-reduce:transform-none motion-reduce:transition-none">
+            <Card.Root className="relative gap-0 border border-border/70 py-0 shadow-sm transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-md motion-reduce:transform-none motion-reduce:transition-none h-20">
               <div
                 className={cn("absolute inset-y-0 left-0 w-1", isIncoming ? "bg-emerald-500" : "bg-amber-500")}
                 aria-hidden="true"

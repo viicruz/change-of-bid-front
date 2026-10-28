@@ -22,28 +22,12 @@ const LIMIT_PER_PAGE = 5; // Limit of movements per page
 
 export function WalletSummary() {
   const t = useTranslations("pages./wallet");
-  const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
-  const safePage = Math.max(page, 1)
+  const [, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
   const walletQuery = useShowWallet();
-  const movementsQuery = useIndexWalletMovements({
-    page: safePage,
-    limit: LIMIT_PER_PAGE,
-  });
-
-  const total = movementsQuery.data?.total ?? 0;
-  const totalPages = Math.max(1, Math.ceil(total / LIMIT_PER_PAGE))
-  const showPagination = safePage > 1 || total > LIMIT_PER_PAGE;
 
   function onDeposited() {
     setPage(1)
   }
-
-  useEffect(() => {
-    if (!movementsQuery.isSuccess) return
-
-    const normalizedPage = Math.min(Math.max(page, 1), totalPages)
-    if (normalizedPage !== page) setPage(normalizedPage)
-  }, [movementsQuery.isSuccess, page, setPage, totalPages])
 
   return (
     <div className="grid w-full gap-6 lg:grid-cols-[minmax(18rem,0.85fr)_minmax(0,1.15fr)] lg:items-start">
@@ -58,7 +42,7 @@ export function WalletSummary() {
         ) : walletQuery.isPending ? (
           <>
             <p className="sr-only">{t("loading")}</p>
-            <Skeleton className="h-40 w-full" />
+            <Skeleton className="h-48 w-full" />
           </>
         ) : (
           <BalanceCard
@@ -69,40 +53,86 @@ export function WalletSummary() {
         )}
         <DepositForm onDeposited={onDeposited} />
       </div>
-      <section
-        className="flex min-w-0 flex-col items-center gap-3 lg:items-stretch"
-        aria-labelledby="wallet-history-title"
-      >
-        <h2
-          id="wallet-history-title"
-          className="font-heading text-lg font-medium"
-        >
-          {t("historyTitle")}
-        </h2>
-        {movementsQuery.isError ? (
-          <div id="wallet-movements-error" className="flex w-full flex-col items-center gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4 lg:items-start" role="alert">
-            <p>{t("movements.error")}</p>
-            <Button type="button" variant="outline" size="sm" onClick={() => movementsQuery.refetch()} disabled={movementsQuery.isFetching}>
-              {movementsQuery.isFetching ? t("retrying") : t("retry")}
-            </Button>
-          </div>
-        ) : movementsQuery.isPending ? (
-          <>
-            <p className="sr-only">{t("movements.loading")}</p>
-            <Skeleton className="h-24 w-full" />
-          </>
-        ) : movementsQuery.data.movements.length === 0 ? (
-          <p id="wallet-movements-empty">{t("movements.empty")}</p>
-        ) : (
-          <TransactionList movements={movementsQuery.data.movements} />
-        )}
-        {showPagination ? (
-          <WalletMovementsPagination
-            total={total}
-            limit={LIMIT_PER_PAGE}
-          />
-        ) : null}
-      </section>
+      <WalletMovementHistory />
     </div>
   )
+}
+
+function WalletMovementHistory() {
+  const t = useTranslations("pages./wallet");
+  const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
+  const safePage = Math.max(page, 1)
+  const movementsQuery = useIndexWalletMovements({
+    page: safePage,
+    limit: LIMIT_PER_PAGE,
+  });
+  const total = movementsQuery.data?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / LIMIT_PER_PAGE))
+  const showPagination = safePage > 1 || total > LIMIT_PER_PAGE;
+
+  useEffect(() => {
+    if (!movementsQuery.isSuccess) return
+
+    const normalizedPage = Math.min(Math.max(page, 1), totalPages)
+    if (normalizedPage !== page) setPage(normalizedPage)
+  }, [movementsQuery.isSuccess, page, setPage, totalPages])
+
+  return (
+    <section
+      className="flex min-w-0 flex-col items-center gap-3 lg:items-stretch"
+      aria-labelledby="wallet-history-title"
+    >
+      <h2
+        id="wallet-history-title"
+        className="font-heading text-lg font-medium"
+      >
+        {t("historyTitle")}
+      </h2>
+      <WalletMovementContent query={movementsQuery} t={t} />
+      {showPagination ? (
+        <WalletMovementsPagination total={total} limit={LIMIT_PER_PAGE} />
+      ) : null}
+    </section>
+  )
+}
+
+function WalletMovementContent({
+  query,
+  t,
+}: {
+  query: ReturnType<typeof useIndexWalletMovements>
+  t: ReturnType<typeof useTranslations<"pages./wallet">>
+}) {
+  if (query.isError) {
+    return (
+      <div id="wallet-movements-error" className="flex w-full flex-col items-center gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4 lg:items-start" role="alert">
+        <p>{t("movements.error")}</p>
+        <Button type="button" variant="outline" size="sm" onClick={() => query.refetch()} disabled={query.isFetching}>
+          {query.isFetching ? t("retrying") : t("retry")}
+        </Button>
+      </div>
+    )
+  }
+
+  if (query.isPending) {
+    return (
+      <>
+        <p className="sr-only">{t("movements.loading")}</p>
+        {
+          Array.from({ length: LIMIT_PER_PAGE }).map((_, index) => {
+            const key = `wallet-movement-skeleton-${index}`;
+            return (
+              <Skeleton key={key} className="h-20 w-full" />
+            );
+          })
+        }
+      </>
+    )
+  }
+
+  if (query.data.movements.length === 0) {
+    return <p id="wallet-movements-empty">{t("movements.empty")}</p>
+  }
+
+  return <TransactionList movements={query.data.movements} />
 }

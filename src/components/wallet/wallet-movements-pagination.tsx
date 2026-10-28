@@ -59,8 +59,11 @@ export function WalletMovementsPagination(props: WalletMovementsPaginationProps)
                 </Pagination.Item>
                 {items.map((item, index) => {
                     if (item === "ellipsis") {
+                        const previousPage = items[index - 1]
+                        const nextPage = items[index + 1]
+
                         return (
-                            <Pagination.Item key={`wallet-movements-ellipsis-${index}`}>
+                            <Pagination.Item key={`wallet-movements-ellipsis-${previousPage}-${nextPage}`}>
                                 <Pagination.Ellipsis label={t("movements.morePages")} />
                             </Pagination.Item>
                         )
