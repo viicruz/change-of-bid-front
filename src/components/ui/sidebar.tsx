@@ -4,7 +4,7 @@ import * as React from "react"
 import { mergeProps } from "@base-ui/react/merge-props"
 import { useRender } from "@base-ui/react/use-render"
 import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "cn"
+import { cn } from "@/src/lib/utils"
 
 import { useIsMobile } from "@/src/hooks/use-mobile"
 import { Button } from "@/src/components/ui/button"
@@ -748,4 +748,4 @@ const sidebar = {
   useSidebar: useSidebar,
 }
 
-export default sidebar;
+export default sidebar
