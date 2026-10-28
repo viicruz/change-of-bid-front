@@ -1,21 +1,19 @@
-//* Libraries imports
-import { getTranslations } from "next-intl/server"
-
 //* Components imports
+import { Footer } from "@/src/components/footer/footer"
+import { Hero } from "@/src/components/home/hero"
 import { LotShowcase } from "@/src/components/home/lot-showcase"
-import { ShowcaseCta } from "@/src/components/home/showcase-cta"
+import { Marquee } from "@/src/components/home/marquee"
 
-export default async function Page() {
-  const t = await getTranslations("pages./")
-
+export default function Page() {
   return (
-    <main className="flex flex-1 flex-col items-center gap-6 py-6">
-      <div className="w-full max-w-7xl">
-        <ShowcaseCta />
-      </div>
-      <div className="flex w-full max-w-3xl flex-col px-6">
+    <>
+      {/* Clips the tilted marquee, which is wider than the page */}
+      <main className="flex flex-1 flex-col overflow-x-clip">
+        <Hero />
+        <Marquee />
         <LotShowcase />
-      </div>
-    </main>
+      </main>
+      <Footer />
+    </>
   )
 }

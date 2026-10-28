@@ -1,46 +1,11 @@
 //* Libraries imports
 import type { ComponentProps, ReactNode } from "react"
 
+//* Components imports
+import { Tag } from "@/src/components/ui/brand"
+
 //* Lib imports
 import { cn } from "@/src/lib/utils"
-
-const tagTones = {
-  red: "bg-brand-red text-white",
-  yellow: "bg-brand-yellow text-brand-ink",
-  dark: "bg-brand-ink text-brand-yellow",
-  inverse: "bg-foreground text-background",
-}
-
-type TagProps = ComponentProps<"span"> & {
-  tone?: keyof typeof tagTones
-}
-
-/** Skewed (-10°) section/status tag. */
-export function Tag({ tone = "red", className, ...props }: TagProps) {
-  return (
-    <span
-      className={cn(
-        "flex -skew-x-10 items-center gap-2 self-start border-3 border-black px-3 py-1.5 font-heading text-[13px]",
-        tagTones[tone],
-        className
-      )}
-      {...props}
-    />
-  )
-}
-
-/** Red box that highlights one word of a title. */
-export function HighlightWord({ className, ...props }: ComponentProps<"span">) {
-  return (
-    <span
-      className={cn(
-        "inline-block -skew-x-8 border-4 border-black bg-brand-red px-3.5 text-white shadow-hard-6 shadow-brand-yellow",
-        className
-      )}
-      {...props}
-    />
-  )
-}
 
 export function Panel({ className, ...props }: ComponentProps<"div">) {
   return (
@@ -65,16 +30,6 @@ export function Eyebrow({ className, ...props }: ComponentProps<"strong">) {
 
 export function Code({ className, ...props }: ComponentProps<"code">) {
   return <code className={cn("ds-code", className)} {...props} />
-}
-
-export function LiveDot({ size = 8 }: { size?: number }) {
-  return (
-    <span
-      aria-hidden="true"
-      className="inline-block animate-live-pulse bg-white"
-      style={{ width: size, height: size }}
-    />
-  )
 }
 
 type DesignSectionProps = {

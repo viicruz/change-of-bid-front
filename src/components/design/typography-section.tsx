@@ -1,10 +1,7 @@
 //* Components imports
 import { typeScale } from "@/src/components/design/design-data"
-import {
-  Code,
-  DesignSection,
-  HighlightWord,
-} from "@/src/components/design/design-primitives"
+import { Code, DesignSection } from "@/src/components/design/design-primitives"
+import { HighlightWord } from "@/src/components/ui/brand"
 
 //* Lib imports
 import { cn } from "@/src/lib/utils"
