@@ -4,7 +4,7 @@
 import { useTranslations } from "next-intl"
 
 //* Components imports
-import { AuctioneerCardTile } from "@/src/components/auctioneer/auctioneer-card-tile"
+import { YugiohCard } from "@/src/components/cards/yugioh-card"
 import { Button } from "@/src/components/ui/button"
 
 type LotCardItemProps = {
@@ -17,11 +17,6 @@ type LotCardItemProps = {
 
 export function LotCardItem(props: LotCardItemProps) {
   const t = useTranslations("pages./auctioneer")
-  const card = {
-    id: String(props.cardId),
-    name: props.name,
-    ...(props.imageUrl ? { imageUrl: props.imageUrl } : {}),
-  }
 
   function onRemove() {
     props.onRemove(props.index)
@@ -29,7 +24,12 @@ export function LotCardItem(props: LotCardItemProps) {
 
   return (
     <div className="flex flex-col gap-2">
-      <AuctioneerCardTile card={card} idPrefix="lot-" />
+      <YugiohCard
+        id={`lot--auctioneer-card-${props.cardId}`}
+        name={props.name}
+        imageUrl={props.imageUrl}
+        size="sm"
+      />
       <Button
         id={`remove-lot-card-${props.cardId}`}
         type="button"

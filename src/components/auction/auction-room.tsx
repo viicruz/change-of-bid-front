@@ -2,13 +2,13 @@
 
 //* Libraries imports
 import { zodResolver } from "@hookform/resolvers/zod"
-import Image from "next/image"
 import { useFormatter, useTranslations } from "next-intl"
 import { type SubmitEvent } from "react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
 //* Components imports
+import { YugiohCard } from "@/src/components/cards/yugioh-card"
 import { Badge } from "@/src/components/ui/badge"
 import { Button } from "@/src/components/ui/button"
 import Card from "@/src/components/ui/card"
@@ -119,33 +119,18 @@ function ParticipantLine(props: {
 }
 
 function LotItemCard(props: { item: PublicLot["items"][number] }) {
-  const t = useTranslations("pages./auction/[id]")
   const item = props.item
 
   return (
     <li className="min-w-0">
-      <article
+      <YugiohCard
         id={`lot-item-${item.id}`}
-        className="group relative aspect-59/86 overflow-hidden rounded-lg bg-muted ring-1 ring-foreground/20 transition duration-200 hover:ring-foreground/60"
-      >
-        <Image
-          src={item.imagePath}
-          alt=""
-          width={421}
-          height={614}
-          sizes="(min-width: 1024px) 8rem, 30vw"
-          className="size-full object-cover transition duration-200 group-hover:scale-105"
-        />
-        <p className="sr-only">{item.cardName}</p>
-        <p
-          id={`lot-item-quantity-${item.id}`}
-          className="absolute right-1 bottom-1 rounded-md bg-black/80 px-1.5 py-0.5 text-xs font-medium text-white shadow-sm"
-        >
-          <span className="sr-only">{t("quantity")} </span>
-          <span aria-hidden="true">×</span>
-          {item.quantity}
-        </p>
-      </article>
+        name={item.cardName}
+        imageUrl={item.imagePath}
+        size="lg"
+        amount={item.quantity}
+        quantityId={`lot-item-quantity-${item.id}`}
+      />
     </li>
   )
 }

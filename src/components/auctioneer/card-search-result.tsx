@@ -4,7 +4,7 @@
 import { useTranslations } from "next-intl"
 
 //* Components imports
-import { AuctioneerCardTile } from "@/src/components/auctioneer/auctioneer-card-tile"
+import { YugiohCard } from "@/src/components/cards/yugioh-card"
 import { Button } from "@/src/components/ui/button"
 
 //* Hooks imports
@@ -43,7 +43,12 @@ export function CardSearchResult(props: CardSearchResultProps) {
         id={`${idPrefix}card-search-card-${props.card.id}`}
         className={isSelected ? "blur-[2px]" : undefined}
       >
-        <AuctioneerCardTile card={props.card} idPrefix={idPrefix} />
+        <YugiohCard
+          id={`${idPrefix}-auctioneer-card-${props.card.id}`}
+          name={props.card.name}
+          imageUrl={props.card.imageUrl}
+          size="sm"
+        />
       </div>
       <Button
         id={`${idPrefix}add-card-${props.card.id}`}
