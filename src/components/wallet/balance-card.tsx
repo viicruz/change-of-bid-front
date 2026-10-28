@@ -1,19 +1,17 @@
 "use client"
 
 //* Libraries imports
-import { useFormatter, useTranslations } from "next-intl"
+import { useTranslations } from "next-intl";
 
 //* Components imports
 import Card from "@/src/components/ui/card"
+import { Money } from "@/src/components/utils/money"
 
-const currencyFormat = {
-  style: "currency",
-  currency: "BRL",
-} as const
+//* Types imports
+import type { ShowWallet } from "@/src/hooks/wallets/queries/use-show-wallet";
 
-export function BalanceCard(props: { balance: number }) {
+export function BalanceCard(props: ShowWallet) {
   const t = useTranslations("pages./wallet")
-  const format = useFormatter()
 
   return (
     <Card.Root className="w-full max-w-lg">
@@ -22,7 +20,7 @@ export function BalanceCard(props: { balance: number }) {
       </Card.Header>
       <Card.Content>
         <p id="wallet-balance" className="font-heading text-2xl">
-          {format.number(props.balance, currencyFormat)}
+          <Money amount={props.totalBalance} />
         </p>
       </Card.Content>
     </Card.Root>

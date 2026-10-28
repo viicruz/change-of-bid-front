@@ -1,6 +1,6 @@
 //* Libraries imports
-import { getTranslations } from "next-intl/server"
-import type { Metadata } from "next"
+import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
 //* Components imports
 import { WalletSummary } from "@/src/components/wallet/wallet-summary"
