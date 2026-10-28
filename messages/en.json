@@ -375,6 +375,10 @@
       "submitting": "Signing in...",
       "unknownError": "Unable to sign in.",
       "signUpLink": "Create an account"
+    },
+    "/design": {
+      "title": "Design System",
+      "description": "Change of Bid colors, typography, components, icons, motion and voice."
     }
   },
   "schemas": {

@@ -375,6 +375,10 @@
       "submitting": "Entrando...",
       "unknownError": "Não foi possível entrar.",
       "signUpLink": "Criar uma conta"
+    },
+    "/design": {
+      "title": "Design System",
+      "description": "Cores, tipografia, componentes, ícones, animações e voz do Change of Bid."
     }
   },
   "schemas": {
