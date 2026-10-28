@@ -11,7 +11,7 @@ import * as z from "zod"
 //* Components imports
 import { YugiohCard } from "@/src/components/cards/yugioh-card"
 import { Badge } from "@/src/components/ui/badge"
-import { Button } from "@/src/components/ui/button"
+import { Button, buttonVariants } from "@/src/components/ui/button"
 import Card from "@/src/components/ui/card"
 import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
@@ -191,11 +191,18 @@ function readBidErrorCode(error: unknown) {
   return null
 }
 
-function AuctioneerBidLock() {
+type BidLockProps = {
+  id: string
+  message: string
+  actionHref?: string
+  actionLabel?: string
+}
+
+function BidLock(props: BidLockProps) {
   const t = useTranslations("pages./auction/[id]")
 
   return (
-    <div id="auctioneer-bid-lock" className="relative">
+    <div id={props.id} className="relative">
       <div
         aria-hidden="true"
         inert
@@ -211,9 +218,21 @@ function AuctioneerBidLock() {
       </div>
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/70 p-4 text-center">
         <LockIcon aria-hidden="true" className="size-6" />
-        <p id="auctioneer-bid-lock-message" className="text-sm font-medium">
-          {t("auctioneerCannotBid")}
+        <p id={`${props.id}-message`} className="text-sm font-medium">
+          {props.message}
         </p>
+        {props.actionHref && props.actionLabel ? (
+          <a
+            id={`${props.id}-action`}
+            href={props.actionHref}
+            className={buttonVariants({
+              size: "sm",
+              className: "no-underline",
+            })}
+          >
+            {props.actionLabel}
+          </a>
+        ) : null}
       </div>
     </div>
   )
@@ -340,7 +359,8 @@ function BidPanel(props: { room: ShowLot }) {
   const format = useFormatter()
   const session = useAuthSession()
   const parsedRole = userRoleSchema.safeParse(session.data?.user.role)
-  const isAuctioneer = parsedRole.success && parsedRole.data === "AUCTIONEER"
+  const isBidder = parsedRole.success && parsedRole.data === "BIDDER"
+  const isGuest = !session.isPending && session.data == null
   const lot = props.room.lot
   const viewerParticipantNo = props.room.viewerParticipantNo
   const viewerIsLeader =
@@ -391,8 +411,15 @@ function BidPanel(props: { room: ShowLot }) {
             viewerParticipantNo={viewerParticipantNo}
           />
         ) : null}
-        {canOfferBid && isAuctioneer ? <AuctioneerBidLock /> : null}
-        {canOfferBid && !isAuctioneer ? <PlaceBidForm lotId={lot.id} /> : null}
+        {canOfferBid && isBidder ? <PlaceBidForm lotId={lot.id} /> : null}
+        {canOfferBid && !isBidder ? (
+          <BidLock
+            id={isGuest ? "guest-bid-lock" : "auctioneer-bid-lock"}
+            message={isGuest ? t("guestCannotBid") : t("auctioneerCannotBid")}
+            actionHref={isGuest ? "/sign-in" : undefined}
+            actionLabel={isGuest ? t("signInToBid") : undefined}
+          />
+        ) : null}
       </Card.Content>
     </Card.Root>
   )

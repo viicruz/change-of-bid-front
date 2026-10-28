@@ -241,12 +241,13 @@ describe("AuctionRoom", () => {
       expect(
         container.querySelector("#viewer-participant")?.textContent
       ).toContain("6")
-      expect(container.querySelector("#place-bid")).toBeInstanceOf(
-        HTMLButtonElement
-      )
-      expect(container.querySelector("#place-bid")?.getAttribute("type")).toBe(
-        "submit"
-      )
+      expect(
+        container.querySelector("#guest-bid-lock-message")?.textContent
+      ).toBe("Sign in to place a bid.")
+      expect(
+        container.querySelector("#guest-bid-lock-action")?.getAttribute("href")
+      ).toBe("/sign-in")
+      expect(container.querySelector("#place-bid")).toBeNull()
 
       const list = container.querySelector("#lot-items")
       const items = container.querySelectorAll("#lot-items > li")
@@ -363,9 +364,7 @@ describe("AuctionRoom", () => {
         await vi.waitFor(() => {
           expect(
             container.querySelector("#auctioneer-bid-lock-message")?.textContent
-          ).toBe(
-            "Auctioneers can follow this lot, but only a bidder can place a bid."
-          )
+          ).toBe("Only a bidder can place a bid.")
         })
       })
 
@@ -398,6 +397,10 @@ describe("AuctionRoom", () => {
   })
 
   describe("when the viewer places a bid", () => {
+    beforeEach(() => {
+      authSession.data = { user: { role: "BIDDER" } }
+    })
+
     const storedBidResponse = {
       id: "7c9e6679-7425-40de-944b-e07fc1f90ae7",
       sequence: 3,
@@ -757,6 +760,7 @@ describe("AuctionRoom", () => {
     })
 
     it("says the viewer was outbid", async () => {
+      authSession.data = { user: { role: "BIDDER" } }
       vi.mocked(api.get).mockResolvedValue(
         publicLot({
           leaderParticipantNo: 4,
@@ -857,6 +861,8 @@ describe("AuctionRoom", () => {
 
   describe("when the countdown reaches a deadline", () => {
     it("counts the remaining live time and reads the lot again at the end", async () => {
+      //* A bidder keeps the bid form mounted, which flushes the countdown update
+      authSession.data = { user: { role: "BIDDER" } }
       vi.useFakeTimers()
       vi.setSystemTime(new Date("2026-10-27T14:59:58.000Z"))
 
