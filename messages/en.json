@@ -61,7 +61,11 @@
       "depositError": "Unable to deposit.",
       "loading": "Loading balance.",
       "error": "Could not load your balance.",
+      "retry": "Try again",
+      "retrying": "Trying again...",
       "totalBalance": "Total balance",
+      "availableBalance": "Available balance",
+      "committedBalance": "Committed balance",
       "historyTitle": "Transaction history",
       "movements": {
         "loading": "Loading transactions.",

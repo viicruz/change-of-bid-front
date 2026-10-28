@@ -110,8 +110,15 @@ async function mockStoreLot(
   handler: (route: Route) => Promise<void>
 ) {
   await page.route(storeLotEndpoint, async (route) => {
-    if (route.request().method() === "OPTIONS") {
+    const method = route.request().method()
+
+    if (method === "OPTIONS") {
       await route.fulfill({ status: 204, headers: corsHeaders })
+      return
+    }
+
+    if (method !== "POST") {
+      await route.fallback()
       return
     }
 
@@ -120,6 +127,14 @@ async function mockStoreLot(
 }
 
 async function openAuctioneer(page: Page) {
+  await page.route(storeLotEndpoint, async (route) => {
+    if (route.request().method() !== "GET") {
+      await route.fallback()
+      return
+    }
+
+    await fulfillJson(route, 200, { totalReceived: "0.00", lots: [] })
+  })
   await page.addInitScript((key) => {
     sessionStorage.setItem(key, "session-token")
   }, tokenKey)
@@ -139,7 +154,7 @@ async function fillLotDetails(page: Page) {
 }
 
 describe("create lot page", () => {
-  it("shows an empty lot form and hides the mocked lot list", async ({
+  it("shows an empty lot form and the empty mocked lot list", async ({
     page,
   }) => {
     await openAuctioneer(page)
@@ -148,8 +163,8 @@ describe("create lot page", () => {
       page.getByRole("heading", { name: "Painel do leiloeiro" })
     ).toBeVisible()
     await expect(page.locator("#create-lot")).toBeVisible()
-    await expect(page.locator("#auctioneer-lots")).toHaveCount(0)
-    await expect(page.locator("#auctioneer-lot-search")).toHaveCount(0)
+    await expect(page.locator("#auctioneer-lots-empty")).toBeVisible()
+    await expect(page.locator("#auctioneer-lot-search")).toBeVisible()
     await expect(page.locator("#cards-in-lot").locator("li")).toHaveCount(0)
     await expect(page.locator("#lot-title")).toHaveValue("")
     await expect(page.locator("#lot-ends-at")).toBeVisible()

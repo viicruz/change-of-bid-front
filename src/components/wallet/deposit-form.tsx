@@ -1,17 +1,17 @@
 "use client"
 
 //* Libraries imports
+import { zodResolver } from "@hookform/resolvers/zod"
 import { useTranslations } from "next-intl"
-import { useState, type ChangeEvent, type SubmitEvent } from "react"
+import { Controller, useForm } from "react-hook-form"
 
 //* Components imports
 import { Button } from "@/src/components/ui/button"
 import Card from "@/src/components/ui/card"
-import { Input } from "@/src/components/ui/input"
+import { MoneyInput } from "@/src/components/ui/money-input"
 import { Label } from "@/src/components/ui/label"
+import { FormError } from "@/src/components/utils/form-error"
 
-//* Hooks imports
-import { useErrorTranslations } from "@/src/hooks/commons/use-error-translations"
 import {
   storeDepositSchema,
   useStoreDeposit,
@@ -26,10 +26,6 @@ const knownDepositErrorCodes = new Set([
   "WALLET_NOT_FOUND",
   "AMOUNT_OUT_OF_RANGE",
 ])
-
-type DepositFormProps = {
-  onDeposited: () => void
-}
 
 function readDepositErrorCode(error: unknown) {
   if (
@@ -46,56 +42,36 @@ function readDepositErrorCode(error: unknown) {
   return "DEPOSIT_FAILED"
 }
 
+type DepositFormProps = {
+  onDeposited: () => void
+}
+
 export function DepositForm(props: DepositFormProps) {
   const t = useTranslations("pages./wallet")
-  const translateError = useErrorTranslations()
   const storeDeposit = useStoreDeposit()
-  const [amount, setAmount] = useState("")
-  const [amountError, setAmountError] = useState<string | null>(null)
+  const form = useForm({
+    resolver: zodResolver(storeDepositSchema),
+    defaultValues: { amount: "" },
+  })
+  const amountError = form.formState.errors.amount?.message
   const requestErrorCode = storeDeposit.isError
     ? readDepositErrorCode(storeDeposit.error)
     : null
-  const errorCode = amountError ?? requestErrorCode
 
-  function errorMessage(code: string) {
-    if (knownDepositErrorCodes.has(code)) {
-      return translateError(code)
-    }
-
-    return t("depositError")
-  }
-
-  function onAmountChange(event: ChangeEvent<HTMLInputElement>) {
-    setAmount(event.target.value)
-    setAmountError(null)
-
-    if (storeDeposit.isError) {
-      storeDeposit.reset()
-    }
-  }
-
-  function onSubmit(event: SubmitEvent<HTMLFormElement>) {
-    event.preventDefault()
-    storeDeposit.reset()
-
-    const parsed = storeDepositSchema.safeParse({ amount })
-
-    if (!parsed.success) {
-      setAmountError(parsed.error.issues[0]?.message ?? "INVALID_MONEY")
-      return
-    }
-
-    setAmountError(null)
-    storeDeposit.mutate(parsed.data, {
+  const onSubmit = form.handleSubmit((data) => {
+    storeDeposit.reset();
+    storeDeposit.mutate(data, {
       onSuccess: () => {
-        setAmount("")
+        form.reset({ amount: "" })
         props.onDeposited()
       },
-    })
-  }
+    });
+  })
+
+  const errorCode = amountError ?? requestErrorCode
 
   return (
-    <Card.Root className="w-full max-w-lg">
+    <Card.Root className="w-full">
       <Card.Content>
         <form
           id="deposit-form"
@@ -106,27 +82,37 @@ export function DepositForm(props: DepositFormProps) {
           <p>{t("depositDescription")}</p>
           <div className="flex flex-col gap-2">
             <Label htmlFor="deposit-amount">{t("depositAmountLabel")}</Label>
-            <Input
-              id="deposit-amount"
-              type="text"
-              inputMode="decimal"
-              autoComplete="off"
-              value={amount}
-              aria-invalid={errorCode ? true : undefined}
-              aria-describedby={errorCode ? "deposit-error" : undefined}
-              disabled={storeDeposit.isPending}
-              onChange={onAmountChange}
+            <Controller
+              control={form.control}
+              name="amount"
+              render={({ field: { onChange, ...field } }) => (
+                <MoneyInput
+                  {...field}
+                  id="deposit-amount"
+                  autoComplete="off"
+                  aria-invalid={errorCode ? true : undefined}
+                  aria-describedby={errorCode ? "deposit-error" : undefined}
+                  disabled={storeDeposit.isPending}
+                  onValueChange={(value) => {
+                    onChange(value)
+                    // avoid re-fetching the wallet if the deposit fails
+                    if (storeDeposit.isError) storeDeposit.reset()
+                  }}
+                />
+              )}
             />
           </div>
-          {errorCode ? (
-            <p
-              id="deposit-error"
-              role="alert"
-              className="text-sm text-destructive"
-            >
-              {errorMessage(errorCode)}
-            </p>
-          ) : null}
+          <FormError
+            id="deposit-error"
+            code={
+              errorCode && knownDepositErrorCodes.has(errorCode)
+                ? errorCode
+                : errorCode
+                  ? "00000_UNKNOWN_ERROR"
+                  : null
+            }
+            fallback={errorCode ? t("depositError") : undefined}
+          />
           <Button
             id="deposit-submit"
             type="submit"

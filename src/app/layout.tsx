@@ -1,7 +1,8 @@
 //* Libraries imports
-import { NextIntlClientProvider } from "next-intl"
-import { getLocale } from "next-intl/server"
-import { Geist_Mono, Merriweather, Roboto } from "next/font/google"
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale } from "next-intl/server";
+import { Geist_Mono, Merriweather, Roboto } from "next/font/google";
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
 //* Components imports
 import { Navbar } from "@/src/components/navbar/navbar"
@@ -46,14 +47,16 @@ export default async function RootLayout({
       )}
     >
       <body className="flex min-h-svh flex-col">
-        <NextIntlClientProvider locale={locale}>
-          <QueryProvider>
-            <ThemeProvider>
-              <Navbar />
-              {children}
-            </ThemeProvider>
-          </QueryProvider>
-        </NextIntlClientProvider>
+        <NuqsAdapter>
+          <NextIntlClientProvider locale={locale}>
+            <QueryProvider>
+              <ThemeProvider>
+                <Navbar />
+                {children}
+              </ThemeProvider>
+            </QueryProvider>
+          </NextIntlClientProvider>
+        </NuqsAdapter>
       </body>
     </html>
   )
