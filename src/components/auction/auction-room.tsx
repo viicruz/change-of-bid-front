@@ -2,6 +2,7 @@
 
 //* Libraries imports
 import { zodResolver } from "@hookform/resolvers/zod"
+import { LockIcon } from "lucide-react"
 import { useFormatter, useTranslations } from "next-intl"
 import { type SubmitEvent } from "react"
 import { useForm } from "react-hook-form"
@@ -16,6 +17,7 @@ import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
 
 //* Hooks imports
+import { useAuthSession } from "@/src/hooks/auth/use-auth-session"
 import { useErrorTranslations } from "@/src/hooks/commons/use-error-translations"
 import {
   storeBidSchema,
@@ -27,6 +29,9 @@ import {
   usePublicLotLive,
   type PublicLotLiveStatus,
 } from "@/src/hooks/lots/queries/use-public-lot-live"
+
+//* Schema imports
+import { userRoleSchema } from "@/src/schemas/user"
 
 //* Local imports
 import { ApiError } from "@/src/lib/api"
@@ -186,6 +191,34 @@ function readBidErrorCode(error: unknown) {
   return null
 }
 
+function AuctioneerBidLock() {
+  const t = useTranslations("pages./auction/[id]")
+
+  return (
+    <div id="auctioneer-bid-lock" className="relative">
+      <div
+        aria-hidden="true"
+        inert
+        className="pointer-events-none flex flex-col gap-4 blur-sm select-none"
+      >
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium">{t("bidValue")}</span>
+          <div className="h-13 border-3 border-input bg-field" />
+        </div>
+        <div className="flex h-13 items-center justify-center border-4 border-black bg-primary px-4 text-lg text-primary-foreground">
+          {t("placeBid")}
+        </div>
+      </div>
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/70 p-4 text-center">
+        <LockIcon aria-hidden="true" className="size-6" />
+        <p id="auctioneer-bid-lock-message" className="text-sm font-medium">
+          {t("auctioneerCannotBid")}
+        </p>
+      </div>
+    </div>
+  )
+}
+
 function PlaceBidForm(props: { lotId: string }) {
   const t = useTranslations("pages./auction/[id]")
   const translateError = useErrorTranslations()
@@ -305,11 +338,16 @@ function LeadershipLine(props: { room: ShowLot }) {
 function BidPanel(props: { room: ShowLot }) {
   const t = useTranslations("pages./auction/[id]")
   const format = useFormatter()
+  const session = useAuthSession()
+  const parsedRole = userRoleSchema.safeParse(session.data?.user.role)
+  const isAuctioneer = parsedRole.success && parsedRole.data === "AUCTIONEER"
   const lot = props.room.lot
   const viewerParticipantNo = props.room.viewerParticipantNo
   const viewerIsLeader =
     viewerParticipantNo !== null &&
     lot.leaderParticipantNo === viewerParticipantNo
+  const canOfferBid =
+    lot.status === "LIVE" && !viewerIsLeader && !session.isPending
 
   return (
     <Card.Root id="bid-panel">
@@ -353,9 +391,8 @@ function BidPanel(props: { room: ShowLot }) {
             viewerParticipantNo={viewerParticipantNo}
           />
         ) : null}
-        {lot.status === "LIVE" && !viewerIsLeader ? (
-          <PlaceBidForm lotId={lot.id} />
-        ) : null}
+        {canOfferBid && isAuctioneer ? <AuctioneerBidLock /> : null}
+        {canOfferBid && !isAuctioneer ? <PlaceBidForm lotId={lot.id} /> : null}
       </Card.Content>
     </Card.Root>
   )

@@ -8,7 +8,7 @@
         "titleB": "BID",
         "titleC": "TURN THE",
         "titleD": "TABLES.",
-        "description": "Meta staples, rarities and that one card missing from your deck — all in fast-paced auctions. Activate your trap card: one last-second bid changes the whole duel.",
+        "description": "Meta staples, rarities and that one card missing from your deck, all in fast-paced auctions. Activate your trap card: one last-second bid changes the whole duel.",
         "ctaLive": "See live lots",
         "ctaSignUp": "Sign up free",
         "stepsLabel": "How it works",
@@ -244,6 +244,7 @@
       "bidValue": "Bid value",
       "placeBid": "Place bid",
       "placingBid": "Placing bid...",
+      "auctioneerCannotBid": "Only a bidder can place a bid.",
       "bidError": "Unable to place the bid.",
       "bidErrors": {
         "NOT_BIDDER": "Only a bidder can place a bid.",

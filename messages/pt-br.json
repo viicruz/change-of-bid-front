@@ -8,7 +8,7 @@
         "titleB": "LANCE",
         "titleC": "VIRE O",
         "titleD": "JOGO.",
-        "description": "Staples do meta, raridades e aquela carta que falta no seu deck — tudo em leilões rápidos. Ative sua carta-armadilha: um lance no último segundo muda o duelo inteiro.",
+        "description": "Staples do meta, raridades e aquela carta que falta no seu deck, tudo em leilões rápidos. Ative sua carta-armadilha: um lance no último segundo muda o duelo inteiro.",
         "ctaLive": "Ver lotes ao vivo",
         "ctaSignUp": "Criar conta grátis",
         "stepsLabel": "Como funciona",
@@ -244,6 +244,7 @@
       "bidValue": "Valor do lance",
       "placeBid": "Fazer lance",
       "placingBid": "Fazendo lance...",
+      "auctioneerCannotBid": "Apenas um arrematante pode fazer um lance.",
       "bidError": "Não foi possível fazer o lance.",
       "bidErrors": {
         "NOT_BIDDER": "Apenas um arrematante pode fazer um lance.",

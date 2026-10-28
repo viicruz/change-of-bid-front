@@ -20,6 +20,18 @@ import enMessages from "@/messages/en.json"
 import { ApiError, api } from "@/src/lib/api"
 import { queryClient } from "@/src/lib/query-client"
 
+const authSession = vi.hoisted(() => ({
+  data: null as { user: { role: string } } | null,
+  isPending: false,
+  isRefetching: false,
+  error: null,
+  refetch: vi.fn(),
+}))
+
+vi.mock("@/src/hooks/auth/use-auth-session", () => ({
+  useAuthSession: () => authSession,
+}))
+
 vi.mock("next/image", () => ({
   default: (props: { alt: string; src: string }) =>
     createElement("img", { alt: props.alt, src: props.src }),
@@ -174,6 +186,8 @@ describe("AuctionRoom", () => {
   let root: Root
 
   beforeEach(() => {
+    authSession.data = null
+    authSession.isPending = false
     queryClient.clear()
     FakeSocket.instances = []
     vi.stubGlobal("WebSocket", FakeSocket)
@@ -315,6 +329,71 @@ describe("AuctionRoom", () => {
         "You"
       )
       expect(container.querySelector("#place-bid")).toBeNull()
+    })
+
+    it("keeps the bid form available for a bidder", async () => {
+      authSession.data = { user: { role: "BIDDER" } }
+      vi.mocked(api.get).mockResolvedValue(publicLot())
+
+      await renderRoom(lotId)
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(container.querySelector("#place-bid")).toBeInstanceOf(
+            HTMLButtonElement
+          )
+        })
+      })
+
+      expect(container.querySelector("#auctioneer-bid-lock")).toBeNull()
+      expect(container.querySelector("#bid-amount")).toBeInstanceOf(
+        HTMLInputElement
+      )
+    })
+  })
+
+  describe("when the signed-in user is an auctioneer", () => {
+    it("blocks the bid form on a live lot and explains why", async () => {
+      authSession.data = { user: { role: "AUCTIONEER" } }
+      vi.mocked(api.get).mockResolvedValue(publicLot())
+
+      await renderRoom(lotId)
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(
+            container.querySelector("#auctioneer-bid-lock-message")?.textContent
+          ).toBe(
+            "Auctioneers can follow this lot, but only a bidder can place a bid."
+          )
+        })
+      })
+
+      expect(container.querySelector("#auctioneer-bid-lock")).not.toBeNull()
+      expect(container.querySelector("#place-bid")).toBeNull()
+      expect(container.querySelector("#place-bid-form")).toBeNull()
+      expect(container.querySelector("#bid-amount")).toBeNull()
+      expect(
+        container.querySelector("#current-bid-value")?.textContent
+      ).toContain("15.00")
+      expect(container.querySelector("#bid-history")).not.toBeNull()
+    })
+
+    it("hides the bid form while the session is still loading", async () => {
+      authSession.isPending = true
+      authSession.data = { user: { role: "AUCTIONEER" } }
+      vi.mocked(api.get).mockResolvedValue(publicLot())
+
+      await renderRoom(lotId)
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(container.querySelector("#current-bid-value")).not.toBeNull()
+        })
+      })
+
+      expect(container.querySelector("#place-bid")).toBeNull()
+      expect(container.querySelector("#auctioneer-bid-lock")).toBeNull()
     })
   })
 
