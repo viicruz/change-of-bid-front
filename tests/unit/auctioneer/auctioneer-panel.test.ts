@@ -163,6 +163,15 @@ describe("AuctioneerPanel", () => {
 
     expect(container.querySelector("#create-lot-form")).not.toBeNull()
     expect(container.querySelector("#card-search-panel")).not.toBeNull()
+    expect(container.querySelector("#auctioneer-lots-total")?.textContent).toBe(
+      "1 lot"
+    )
+    expect(
+      container.querySelector("#auctioneer-lot-filter-LIVE")?.textContent
+    ).toBe("Live1")
+    expect(
+      container.querySelector("#auctioneer-lot-filter-ENDED")?.textContent
+    ).toBe("Closed0")
 
     act(() => {
       container

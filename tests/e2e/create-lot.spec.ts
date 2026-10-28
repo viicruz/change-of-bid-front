@@ -147,8 +147,8 @@ async function searchCardsByName(page: Page, inputId: string) {
 
 async function fillLotDetails(page: Page) {
   await page.locator("#lot-title").fill("Lote do dragão")
-  await page.locator("#lot-opening-bid").fill("10.00")
-  await page.locator("#lot-min-increment").fill("0.50")
+  await page.locator("#lot-opening-bid").fill("10,00")
+  await page.locator("#lot-min-increment").fill("0,50")
   await page.locator("#lot-starts-at").fill("2099-10-26T18:00")
   await page.locator("#lot-ends-at").fill("2099-10-28T18:00")
 }
@@ -160,7 +160,7 @@ describe("create lot page", () => {
     await openAuctioneer(page)
 
     await expect(
-      page.getByRole("heading", { name: "Painel do leiloeiro" })
+      page.getByRole("heading", { name: "Criar lote", level: 1 })
     ).toBeVisible()
     await expect(page.locator("#create-lot")).toBeVisible()
     await expect(page.locator("#auctioneer-lots-empty")).toBeVisible()
@@ -168,9 +168,10 @@ describe("create lot page", () => {
     await expect(page.locator("#cards-in-lot").locator("li")).toHaveCount(0)
     await expect(page.locator("#lot-title")).toHaveValue("")
     await expect(page.locator("#lot-ends-at")).toBeVisible()
+    await expect(page.locator("#auctioneer-mobile-bar")).toBeHidden()
   })
 
-  it("adds a searched card once, blurs it, and removes it from the lot", async ({
+  it("adds a searched card once, marks it as in the lot, and removes it", async ({
     page,
   }) => {
     await mockCardSearch(page)
@@ -187,9 +188,10 @@ describe("create lot page", () => {
     await expect(page.locator("#remove-lot-card-89631139")).toBeVisible()
     await expect(page.getByText("Blue-Eyes White Dragon").first()).toBeVisible()
     await expect(blueEyes).toBeDisabled()
-    await expect(blueEyesCard).toHaveCSS("filter", "blur(2px)")
+    await expect(blueEyesCard).toContainText("No lote")
     await expect(darkMagician).toBeEnabled()
     await expect(page.locator("#cards-in-lot").locator("li")).toHaveCount(1)
+    await expect(page.locator("#cards-in-lot-count")).toHaveText("1 carta")
 
     await blueEyes.click({ force: true })
     await expect(page.locator("#cards-in-lot").locator("li")).toHaveCount(1)
@@ -197,54 +199,87 @@ describe("create lot page", () => {
     await page.locator("#remove-lot-card-89631139").click()
 
     await expect(page.locator("#remove-lot-card-89631139")).toHaveCount(0)
+    await expect(page.locator("#cards-in-lot-empty")).toBeVisible()
     await expect(blueEyes).toBeEnabled()
-    await expect(blueEyesCard).toHaveCSS("filter", "none")
+    await expect(blueEyesCard).not.toContainText("No lote")
   })
 
-  it("adds and removes a card from the mobile search drawer", async ({
-    page,
-  }) => {
+  it("adds and removes a card from the search on a phone", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 })
     await mockCardSearch(page)
     await openAuctioneer(page)
 
+    await searchCardsByName(page, "#card-search")
+    await page.locator("#add-card-89631139").click()
+
+    await expect(page.locator("#add-card-89631139")).toBeDisabled()
+    await expect(page.locator("#card-search-card-89631139")).toContainText(
+      "No lote"
+    )
+
     await page.locator("#auctioneer-add-card").click()
-    await searchCardsByName(page, "#mobile-search-card-search")
-    await page.locator("#mobile-search-add-card-89631139").click()
-
-    await expect(
-      page.locator("#mobile-search-add-card-89631139")
-    ).toBeDisabled()
-    await expect(
-      page.locator("#mobile-search-card-search-card-89631139")
-    ).toHaveCSS("filter", "blur(2px)")
-
-    await page.keyboard.press("Escape")
+    await expect(page.locator("#card-search-panel")).toHaveCount(0)
     await page.locator("#remove-lot-card-89631139").click()
-    await page.locator("#auctioneer-add-card").click()
-    await searchCardsByName(page, "#mobile-search-card-search")
+    await page.locator("#auctioneer-empty-add-card").click()
+    await searchCardsByName(page, "#card-search")
 
-    await expect(page.locator("#mobile-search-add-card-89631139")).toBeEnabled()
-    await expect(
-      page.locator("#mobile-search-card-search-card-89631139")
-    ).toHaveCSS("filter", "none")
+    await expect(page.locator("#add-card-89631139")).toBeEnabled()
+    await expect(page.locator("#card-search-card-89631139")).not.toContainText(
+      "No lote"
+    )
   })
 
-  it("clears the form when the auctioneer starts a new lot", async ({
+  it("switches between my lots, cards and details with tabs on a phone", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await openAuctioneer(page)
+
+    await expect(page.locator("#auctioneer-sidebar")).toBeHidden()
+    await expect(page.locator("#cards-in-lot-title")).toBeVisible()
+    await expect(page.locator("#lot-title")).toBeHidden()
+
+    await page.locator("#auctioneer-tab-details").click()
+
+    await expect(page.locator("#lot-title")).toBeVisible()
+    await expect(page.locator("#cards-in-lot-title")).toBeHidden()
+
+    await page.locator("#auctioneer-tab-lots").click()
+
+    await expect(page.locator("#auctioneer-sidebar")).toBeVisible()
+    await expect(page.locator("#lot-title")).toBeHidden()
+    await expect(page.locator("#cards-in-lot-title")).toBeHidden()
+  })
+
+  it("keeps the draft on top of my lots while the auctioneer builds it", async ({
     page,
   }) => {
     await mockCardSearch(page)
     await openAuctioneer(page)
+
+    await expect(page.locator("#create-lot-title")).toHaveText(
+      "Lote sem título"
+    )
+    await expect(page.locator("#create-lot-meta")).toHaveText(
+      "Nenhuma carta ainda"
+    )
+
     await searchCardsByName(page, "#card-search")
     await page.locator("#add-card-89631139").click()
-    await expect(page.locator("#remove-lot-card-89631139")).toBeVisible()
     await page.locator("#lot-title").fill("Lote temporário")
+    await page.locator("#lot-opening-bid").fill("10,00")
+
+    await expect(page.locator("#create-lot-title")).toHaveText(
+      "Lote temporário"
+    )
+    await expect(page.locator("#create-lot-meta")).toHaveText(
+      "1 carta · R$ 10,00"
+    )
+
     await page.locator("#create-lot").click()
 
-    await expect(page.locator("#lot-title")).toHaveValue("")
-    await expect(page.locator("#remove-lot-card-89631139")).toHaveCount(0)
-    await expect(page.locator("#add-card-89631139")).toBeEnabled()
-    await expect(page.locator("#create-lot-success")).toHaveCount(0)
+    await expect(page.locator("#lot-title")).toHaveValue("Lote temporário")
+    await expect(page.locator("#remove-lot-card-89631139")).toBeVisible()
   })
 
   it("shows schema errors and does not create a lot when the form is empty", async ({
@@ -259,17 +294,106 @@ describe("create lot page", () => {
     await openAuctioneer(page)
     await page.locator("#create-lot-submit").click()
 
-    await expect(page.getByText("O título é obrigatório")).toBeVisible()
-    await expect(page.getByText("Adicione pelo menos uma carta.")).toBeVisible()
-    await expect(
-      page.getByText(
-        "Os valores em dinheiro devem ser maiores que zero e ter no máximo 2 casas decimais."
-      )
-    ).toHaveCount(2)
+    const moneyError =
+      "Os valores em dinheiro devem ser maiores que zero e ter no máximo 2 casas decimais."
+    const summary = page.locator("#lot-error-summary")
+
+    await expect(page.locator("#lot-title-error")).toHaveText(
+      "O título é obrigatório"
+    )
+    await expect(page.locator("#cards-in-lot-error")).toHaveText(
+      "Adicione pelo menos uma carta."
+    )
+    await expect(page.locator("#lot-opening-bid-error")).toHaveText(moneyError)
+    await expect(page.locator("#lot-min-increment-error")).toHaveText(
+      moneyError
+    )
+    await expect(summary).toContainText("Faltam 6 coisas para publicar o lote:")
+    await expect(summary).toContainText(
+      "Cartas: Adicione pelo menos uma carta."
+    )
+    await expect(summary).toContainText(`Lance inicial: ${moneyError}`)
     expect(requestCount).toBe(0)
   })
 
-  it("creates a lot and resets the form when the API accepts it", async ({
+  it("fills the increment and the schedule from the quick chips", async ({
+    page,
+  }) => {
+    await openAuctioneer(page)
+    await page.locator("#lot-opening-bid").fill("10,00")
+    await page.locator("#lot-quick-increment-5").click()
+    await page.locator("#lot-starts-at").fill("2099-10-26T18:00")
+    await page.locator("#lot-quick-duration-3").click()
+
+    await expect(page.locator("#lot-min-increment")).toHaveValue("5,00")
+    await expect(page.locator("#lot-quick-increment-5")).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    )
+    await expect(page.locator("#lot-ends-at")).toHaveValue("2099-10-29T18:00")
+    await expect(page.locator("#lot-summary-duration")).toHaveText("3d 0h")
+    await expect(page.locator("#lot-summary-opening-bid")).toHaveText(
+      "R$ 10,00"
+    )
+    await expect(page.locator("#lot-summary-increment")).toHaveText("R$ 5,00")
+  })
+
+  it("publishes from the bottom bar and opens the details with errors on a phone", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await openAuctioneer(page)
+
+    await expect(page.locator("#create-lot-submit")).toBeHidden()
+    await expect(page.locator("#auctioneer-mobile-bar-cards")).toHaveText(
+      "Nenhuma carta ainda"
+    )
+
+    await page.locator("#mobile-create-lot-submit").click()
+
+    await expect(page.locator("#auctioneer-tab-details")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    )
+    await expect(page.locator("#lot-error-summary")).toBeVisible()
+    await expect(page.locator("#auctioneer-tab-details-error")).toBeAttached()
+  })
+
+  it("starts another lot from the bottom bar after publishing on a phone", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await mockCardSearch(page)
+    await mockStoreLot(page, async (route) => {
+      await fulfillJson(route, 200, createdLot)
+    })
+    await openAuctioneer(page)
+    await searchCardsByName(page, "#card-search")
+    await page.locator("#add-card-89631139").click()
+    await page.locator("#auctioneer-tab-details").click()
+    await fillLotDetails(page)
+
+    await expect(page.locator("#auctioneer-mobile-bar-value")).toHaveText(
+      "R$ 10,00"
+    )
+    await expect(page.locator("#auctioneer-mobile-bar-cards")).toHaveText(
+      "1 carta"
+    )
+
+    await page.locator("#mobile-create-lot-submit").click()
+
+    await expect(page.locator("#create-lot-success")).toBeVisible()
+    await expect(page.locator("#auctioneer-tab-cards")).toContainText("1")
+
+    await page.locator("#mobile-create-another-lot").click()
+
+    await expect(page.locator("#create-lot-success")).toHaveCount(0)
+    await expect(page.locator("#auctioneer-mobile-bar-cards")).toHaveText(
+      "Nenhuma carta ainda"
+    )
+  })
+
+  it("shows the created lot and starts another one when the API accepts it", async ({
     page,
   }) => {
     let requestBody: unknown
@@ -287,10 +411,31 @@ describe("create lot page", () => {
     await fillLotDetails(page)
     await page.locator("#create-lot-submit").click()
 
-    await expect(page.locator("#create-lot-success")).toHaveText("Lote criado.")
+    await expect(page.locator("#create-lot-success-tag")).toHaveText(
+      "Lote criado!"
+    )
+    await expect(page.locator("#create-lot-success-title")).toHaveText(
+      "“Lote do dragão” está no campo"
+    )
+    await expect(page.locator("#create-lot-success-title")).toBeFocused()
+    await expect(page.locator("#create-lot-success-text")).toContainText(
+      "R$ 10,00"
+    )
+    await expect(page.locator("#created-lot-summary-cards")).toHaveText("1")
+    await expect(page.locator("#created-lot-summary-duration")).toHaveText(
+      "2d 0h"
+    )
+    await expect(page.locator("#lot-title")).toHaveCount(0)
+    await expect(page.locator("#create-lot-title")).toHaveText(
+      "Lote sem título"
+    )
+
+    await page.locator("#create-another-lot").click()
+
+    await expect(page.locator("#create-lot-success")).toHaveCount(0)
+    await expect(page.locator("#card-search")).toBeFocused()
     await expect(page.locator("#lot-title")).toHaveValue("")
     await expect(page.locator("#remove-lot-card-89631139")).toHaveCount(0)
-    await expect(page.locator("#add-card-89631139")).toBeEnabled()
     expect(authorization).toBe("Bearer session-token")
     expect(requestBody).toEqual({
       title: "Lote do dragão",
@@ -301,6 +446,26 @@ describe("create lot page", () => {
       endsAt: new Date("2099-10-28T18:00").toISOString(),
       cardIds: [89631139],
     })
+  })
+
+  it("filters my lots to the scheduled ones from the created lot", async ({
+    page,
+  }) => {
+    await mockCardSearch(page)
+    await mockStoreLot(page, async (route) => {
+      await fulfillJson(route, 200, createdLot)
+    })
+    await openAuctioneer(page)
+    await searchCardsByName(page, "#card-search")
+    await page.locator("#add-card-89631139").click()
+    await fillLotDetails(page)
+    await page.locator("#create-lot-submit").click()
+    await page.locator("#view-created-lot").click()
+
+    const scheduled = page.locator("#auctioneer-lot-filter-SCHEDULED")
+
+    await expect(scheduled).toHaveAttribute("aria-pressed", "true")
+    await expect(scheduled).toBeFocused()
   })
 
   it("shows the auctioneer error when the API rejects the lot", async ({

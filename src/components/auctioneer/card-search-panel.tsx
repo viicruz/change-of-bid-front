@@ -57,9 +57,12 @@ const loadingSkeletonCount = cardSearchPageSize
 const selectClassName =
   "h-8 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
 
+const resultsListClassName = "flex flex-col border-3 border-line-soft"
+const resultsRowClassName = "border-b-3 border-line-soft last:border-b-0"
+
 type CardSearchPanelProps = {
   idPrefix?: string
-  framed?: boolean
+  className?: string
 }
 
 type CardSearchDraft = {
@@ -105,7 +108,6 @@ function SearchSelect(props: SearchSelectProps) {
 export function CardSearchPanel(props: CardSearchPanelProps) {
   const t = useTranslations("pages./auctioneer")
   const idPrefix = props.idPrefix ?? ""
-  const framed = props.framed ?? true
   const titleId = `${idPrefix}card-search-title`
   const [fname, setFname] = useState("")
   const [cardType, setCardType] = useState("")
@@ -318,21 +320,10 @@ export function CardSearchPanel(props: CardSearchPanelProps) {
     </>
   )
 
-  if (!framed) {
-    return (
-      <div
-        id={`${idPrefix}card-search-panel`}
-        className="flex h-full max-h-160 min-h-0 flex-col gap-4"
-      >
-        {fields}
-      </div>
-    )
-  }
-
   return (
     <Card.Root
       id={`${idPrefix}card-search-panel`}
-      className="h-full max-h-160 min-h-0"
+      className={cn("h-full max-h-160 min-h-0", props.className)}
     >
       <Card.Header className="shrink-0">
         <Card.Title>
@@ -487,11 +478,14 @@ function CardSearchResults(props: CardSearchResultsProps) {
           id={`${props.idPrefix}card-search-results`}
           aria-labelledby={props.titleId}
           aria-busy="true"
-          className="grid grid-cols-2 gap-3"
+          className={resultsListClassName}
         >
           {Array.from({ length: loadingSkeletonCount }, (_, index) => (
-            <li key={`${props.idPrefix}card-search-skeleton-${index}`}>
-              <Skeleton className="aspect-3/4 w-full" />
+            <li
+              key={`${props.idPrefix}card-search-skeleton-${index}`}
+              className={resultsRowClassName}
+            >
+              <Skeleton className="h-16 w-full" />
             </li>
           ))}
         </ul>
@@ -515,10 +509,10 @@ function CardSearchResults(props: CardSearchResultsProps) {
       id={`${props.idPrefix}card-search-results`}
       aria-labelledby={props.titleId}
       aria-busy={props.isStale}
-      className={cn("grid grid-cols-2 gap-3", props.isStale && "opacity-70")}
+      className={cn(resultsListClassName, props.isStale && "opacity-70")}
     >
       {props.cards.map((card) => (
-        <li key={card.id}>
+        <li key={card.id} className={resultsRowClassName}>
           <CardSearchResult idPrefix={props.idPrefix} card={card} />
         </li>
       ))}
