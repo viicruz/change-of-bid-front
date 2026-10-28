@@ -3,10 +3,10 @@
 //* Libraries imports
 import { PrinterIcon, Share2Icon } from "lucide-react"
 import { useFormatter, useTranslations } from "next-intl"
-import Image from "next/image"
 import { useState } from "react"
 
 //* Components imports
+import { YugiohCard } from "@/src/components/cards/yugioh-card"
 import { Button } from "@/src/components/ui/button"
 import { Skeleton } from "@/src/components/ui/skeleton"
 
@@ -44,32 +44,19 @@ function isMissingReceipt(error: unknown) {
 }
 
 function ReceiptItem(props: { item: ReceiptData["items"][number] }) {
-  const t = useTranslations("pages./receipts/[shareToken]")
   const item = props.item
 
   return (
     <li className="min-w-0">
-      <article id={`receipt-item-${item.id}`} className="flex flex-col gap-2">
-        <div className="relative aspect-59/86 overflow-hidden rounded-lg bg-muted ring-1 ring-foreground/20">
-          <Image
-            src={item.imagePath}
-            alt=""
-            width={421}
-            height={614}
-            sizes="(min-width: 640px) 8rem, 40vw"
-            className="size-full object-cover"
-          />
-        </div>
-        <p id={`receipt-item-name-${item.id}`} className="text-sm font-medium">
-          {item.cardName}
-        </p>
-        <p
-          id={`receipt-item-quantity-${item.id}`}
-          className="text-sm text-muted-foreground"
-        >
-          <span>{t("quantity")}</span> {item.quantity}
-        </p>
-      </article>
+      <YugiohCard
+        id={`receipt-item-${item.id}`}
+        nameId={`receipt-item-name-${item.id}`}
+        quantityId={`receipt-item-quantity-${item.id}`}
+        name={item.cardName}
+        imageUrl={item.imagePath}
+        size="md"
+        amount={item.quantity}
+      />
     </li>
   )
 }

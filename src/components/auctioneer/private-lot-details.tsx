@@ -6,7 +6,7 @@ import { type ReactNode } from "react"
 
 //* Components imports
 import { auctioneerLotStatusLabelKey } from "@/src/components/auctioneer/auctioneer-lot-list"
-import { AuctioneerCardTile } from "@/src/components/auctioneer/auctioneer-card-tile"
+import { YugiohCard } from "@/src/components/cards/yugioh-card"
 import { Badge } from "@/src/components/ui/badge"
 import Card from "@/src/components/ui/card"
 
@@ -131,18 +131,14 @@ export function PrivateLotDetails(props: {
           >
             {items.map((item) => (
               <li key={item.id} className="flex flex-col gap-2">
-                <AuctioneerCardTile
-                  idPrefix="private-lot"
-                  card={{
-                    id: String(item.cardId),
-                    name: item.cardName,
-                    imageUrl: item.imagePath,
-                  }}
+                <YugiohCard
+                  id={`private-lot-auctioneer-card-${item.cardId}`}
+                  name={item.cardName}
+                  imageUrl={item.imagePath}
+                  size="sm"
+                  amount={item.quantity}
+                  quantityId={`private-lot-quantity-${item.id}`}
                 />
-                <p id={`private-lot-quantity-${item.id}`}>
-                  <span className="text-muted-foreground">{t("quantity")}</span>{" "}
-                  {item.quantity}
-                </p>
               </li>
             ))}
           </ul>
