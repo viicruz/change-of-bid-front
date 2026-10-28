@@ -20,5 +20,9 @@ export function Money(props: MoneyProps) {
     const parsedAmount = typeof props.amount === "string" ? parseFloat(props.amount) : props.amount;
     const formattedAmount = formatter.number(parsedAmount, { style: "currency", currency: "BRL" });
 
-    return <span className={props.className}>{formattedAmount}</span>
+    return (
+        <span className={props.className}>
+            <data value={parsedAmount}>{formattedAmount}</data>
+        </span>
+    );
 }
