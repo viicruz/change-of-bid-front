@@ -2,21 +2,13 @@
 
 //* Libraries imports
 import { useTheme } from "next-themes"
-import { useEffect, useState, useSyncExternalStore } from "react"
+import { useEffect, useState } from "react"
+
+//* Hooks imports
+import { useIsClient } from "@/src/hooks/use-is-client"
 
 //* Lib imports
 import { cn } from "@/src/lib/utils"
-
-const subscribeNoop = () => () => {}
-
-//* `resolvedTheme` is only known on the client, so wait for hydration
-function useIsClient() {
-  return useSyncExternalStore(
-    subscribeNoop,
-    () => true,
-    () => false
-  )
-}
 
 const themeOptions = [
   { value: "light", label: "Claro" },

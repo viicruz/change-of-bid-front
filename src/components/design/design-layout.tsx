@@ -4,7 +4,7 @@ import Link from "next/link"
 
 //* Components imports
 import { DesignThemeToggle } from "@/src/components/design/design-interactive"
-import { HighlightWord, Tag } from "@/src/components/design/design-primitives"
+import { HighlightWord, Tag } from "@/src/components/ui/brand"
 
 const sectionLinks = [
   { href: "#cores", label: "Cores" },
@@ -17,9 +17,9 @@ const sectionLinks = [
 ]
 
 export function DesignHeader() {
-  //* Sticks right below the app navbar (sticky, 57px tall) on large screens
+  //* Sticks right below the app navbar (sticky, 80px tall) once it fits one row
   return (
-    <header className="z-20 border-b-4 border-brand-red bg-header text-foreground lg:sticky lg:top-14">
+    <header className="z-20 border-b-4 border-brand-red bg-header text-foreground xl:sticky xl:top-20">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-[clamp(16px,4vw,48px)] py-2.5">
         <Link
           href="#top"

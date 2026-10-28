@@ -7,9 +7,9 @@ import { PopDemo, TimerDemo } from "@/src/components/design/design-interactive"
 import {
   Code,
   DesignSection,
-  LiveDot,
   Panel,
 } from "@/src/components/design/design-primitives"
+import { LiveDot } from "@/src/components/ui/brand"
 import { Button } from "@/src/components/ui/button"
 
 //* Lib imports

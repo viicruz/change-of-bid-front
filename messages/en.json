@@ -2,31 +2,73 @@
   "pages": {
     "/": {
       "title": "Lot showcase",
-      "ctaTitle": "Join the auction",
-      "ctaDescription": "Create an account to bid on Yu-Gi-Oh cards.",
-      "ctaButton": "Start bidding",
-      "searchLabel": "Search lots",
-      "searchPlaceholder": "Search by lot name",
-      "filtersLabel": "Filter by type",
-      "cardTypes": {
-        "monster": "Monster",
-        "spell": "Spell",
-        "trap": "Trap",
-        "extra": "Extra Deck"
+      "hero": {
+        "tag": "Yu-Gi-Oh! card auctions",
+        "titleA": "PLACE YOUR",
+        "titleB": "BID",
+        "titleC": "TURN THE",
+        "titleD": "TABLES.",
+        "description": "Meta staples, rarities and that one card missing from your deck — all in fast-paced auctions. Activate your trap card: one last-second bid changes the whole duel.",
+        "ctaLive": "See live lots",
+        "ctaSignUp": "Sign up free",
+        "stepsLabel": "How it works",
+        "steps": {
+          "pick": "Pick a lot",
+          "bid": "Place your bid",
+          "win": "Win it!"
+        },
+        "cardAlt": "Card {name}",
+        "logoAlt": "Change of Bid logo",
+        "stickerLabel": "New bid!",
+        "liveBadge": "Live"
+      },
+      "marquee": {
+        "bid": "Place your bid",
+        "win": "Win it",
+        "duel": "Duel",
+        "collect": "Collect"
       },
       "sections": {
-        "LIVE": "Live lots",
-        "SCHEDULED": "Scheduled lots",
-        "ENDED": "Closed lots"
+        "LIVE": {
+          "tag": "Happening now",
+          "title": "Live lots",
+          "description": "The clock is ticking. Blink and you lose the card."
+        },
+        "SCHEDULED": {
+          "tag": "Coming to the field",
+          "title": "Upcoming lots",
+          "description": "Get your deck ready: set a reminder and we'll ping you the moment bidding opens."
+        },
+        "ENDED": {
+          "tag": "Straight to the Graveyard",
+          "title": "Ended lots",
+          "description": "These have already been won. Check the final prices and calibrate your next bids."
+        }
       },
+      "searchLabel": "Search lots",
+      "searchPlaceholder": "Search by lot name",
       "loading": "Loading lots.",
       "error": "Could not load lots.",
       "empty": "No lots found.",
+      "cardAlt": "Card {name}",
+      "cardCount": "{count, plural, one {# card} other {# cards}}",
+      "liveBadge": "Live",
+      "scheduledBadge": "Upcoming",
       "currentBid": "Current bid",
-      "finalBid": "Final bid",
-      "endsAt": "Ends at",
-      "startsAt": "Starts at",
-      "endedAt": "Ended at",
+      "bidCount": "{count, plural, one {# bid} other {# bids}}",
+      "endsIn": "Ends in",
+      "endingSoon": "Ending soon!",
+      "closed": "Ended",
+      "placeBid": "Place bid",
+      "opensAt": "Opens",
+      "startingBid": "Starting bid",
+      "remind": "Notify me",
+      "reminded": "Reminder set!",
+      "sold": "Sold!",
+      "unsold": "No bids",
+      "finalPrice": "Final price",
+      "endedOn": "Ended {date}",
+      "details": "See details",
       "audit": "Audit"
     },
     "/sign-up": {
@@ -418,6 +460,15 @@
       "auctioneer": "Auctioneer",
       "signIn": "Sign in",
       "signUp": "Create account"
+    },
+    "sections": {
+      "live": "Live",
+      "scheduled": "Upcoming",
+      "ended": "Ended"
+    },
+    "theme": {
+      "toLight": "Switch to light theme",
+      "toDark": "Switch to dark theme"
     }
   },
   "localeSelect": {
@@ -425,11 +476,34 @@
     "locales": {
       "en": "English",
       "pt-br": "Português (Brasil)"
+    },
+    "short": {
+      "en": "EN",
+      "pt-br": "PT"
     }
   },
   "components": {
     "yugiohCard": {
       "quantity": "Quantity"
+    },
+    "footer": {
+      "label": "Footer",
+      "tagline": "Yu-Gi-Oh! card auctions made by duelists, for duelists.",
+      "auctions": "Auctions",
+      "sellCards": "Sell my cards",
+      "help": "Help",
+      "howItWorks": "How it works",
+      "faq": "FAQ",
+      "shipping": "Shipping & payment",
+      "contact": "Contact us",
+      "alerts": "Lot alerts",
+      "alertsDescription": "Get new lots before everyone else.",
+      "email": "Your email",
+      "emailPlaceholder": "duelist@email.com",
+      "subscribe": "Subscribe",
+      "alertsSoon": "Lot alerts are coming soon.",
+      "rights": "© {year} Change of Bid. All rights reserved.",
+      "konami": "Yu-Gi-Oh! is a trademark of Konami. Change of Bid is not affiliated with Konami."
     }
   }
 }

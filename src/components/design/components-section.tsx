@@ -13,11 +13,10 @@ import {
   Code,
   DesignSection,
   Eyebrow,
-  LiveDot,
   Panel,
-  Tag,
 } from "@/src/components/design/design-primitives"
 import { Badge } from "@/src/components/ui/badge"
+import { LiveDot, Tag } from "@/src/components/ui/brand"
 import { Button, buttonVariants } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"

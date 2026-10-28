@@ -3,11 +3,13 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/src/lib/utils"
 
 //* Design system press: hover lifts 3px, click sinks 2px toward the shadow
+//* No base border color: Tailwind sorts `border-transparent` after colors like
+//* `border-black`, so it would hide every variant's border
 const press =
   "transition-transform duration-[120ms] ease-out hover:-translate-x-[3px] hover:-translate-y-[3px] active:translate-x-[2px] active:translate-y-[2px] motion-reduce:transition-none"
 
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-none border-transparent font-heading font-normal whitespace-nowrap outline-none select-none focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-ring focus-visible:outline-solid disabled:pointer-events-none disabled:opacity-45 disabled:shadow-none aria-invalid:border-destructive data-disabled:pointer-events-none data-disabled:opacity-45 data-disabled:shadow-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5",
+  "group/button inline-flex shrink-0 items-center justify-center rounded-none font-heading font-normal whitespace-nowrap outline-none select-none focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-ring focus-visible:outline-solid disabled:pointer-events-none disabled:opacity-45 disabled:shadow-none aria-invalid:border-destructive data-disabled:pointer-events-none data-disabled:opacity-45 data-disabled:shadow-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5",
   {
     variants: {
       //* Variants set the shadow color; sizes set the shadow offset
@@ -58,10 +60,11 @@ const buttonVariants = cva(
         variant: ["outline", "destructive"],
         className: "shadow-none",
       },
-      //* Ghost and link stay flat: no border or shadow
+      //* Ghost and link stay flat: no border or shadow. The size's border
+      //* width can outlive `border-0`, so the color is cleared as well
       {
         variant: ["ghost", "link"],
-        className: "border-0 shadow-none",
+        className: "border-0 border-transparent shadow-none",
       },
       {
         variant: "ghost",
