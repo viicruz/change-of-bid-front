@@ -12,13 +12,13 @@ describe("DepositForm", () => {
       locale: "pt-br",
     })
 
-    await component.getByRole("button", { name: "Depositar" }).click()
+    await component.getByRole("button", { name: "Confirmar depósito" }).click()
 
     await expect(component.getByRole("alert")).toHaveText(
       "Os valores em dinheiro devem ser maiores que zero e ter no máximo 2 casas decimais."
     )
-    await expect(component.getByLabel("Valor")).toBeFocused()
-    await expect(component.getByLabel("Valor")).toHaveAttribute(
+    await expect(component.getByLabel("Valor", { exact: true })).toBeFocused()
+    await expect(component.getByLabel("Valor", { exact: true })).toHaveAttribute(
       "aria-invalid",
       "true"
     )
@@ -34,8 +34,8 @@ describe("DepositForm", () => {
       await route.abort()
     })
     const component = await mount("components/wallet/deposit-form/Default")
-    await component.getByLabel("Valor").fill("0")
-    await component.getByRole("button", { name: "Depositar" }).click()
+    await component.getByLabel("Valor", { exact: true }).fill("0")
+    await component.getByRole("button", { name: "Confirmar depósito" }).click()
     await expect(component.getByRole("alert")).toBeVisible()
     expect(requests).toEqual([])
   })
@@ -59,14 +59,14 @@ describe("DepositForm", () => {
       locale: "pt-br",
     })
 
-    await component.getByLabel("Valor").fill("12,50")
-    await component.getByRole("button", { name: "Depositar" }).click()
+    await component.getByLabel("Valor", { exact: true }).fill("12,50")
+    await component.getByRole("button", { name: "Confirmar depósito" }).click()
 
     await expect(component.getByRole("alert")).toHaveText(
       "O depósito ultrapassa o limite de saldo da carteira."
     )
 
-    await component.getByLabel("Valor").fill("10,00")
+    await component.getByLabel("Valor", { exact: true }).fill("10,00")
     await expect(component.getByRole("alert")).toHaveCount(0)
   })
 
@@ -95,7 +95,7 @@ describe("DepositForm", () => {
       const input = component.getByRole("textbox")
       await input.fill(amount)
       const request = page.waitForRequest("**/private/wallet/deposits")
-      await component.getByRole("button").click()
+      await component.locator("#deposit-submit").click()
       expect((await request).postDataJSON()).toEqual({ amount: "1234.56" })
       await expect(input).toHaveValue("")
     })

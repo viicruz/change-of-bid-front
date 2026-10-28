@@ -14,6 +14,8 @@ export type MoneyInputProps = Omit<
   value: string
   onValueChange: (value: string) => void
   locale?: string
+  /** Text drawn inside the field before the amount. Pass "" when the field has its own visual prefix. */
+  prefix?: string
 }
 
 /** BRL only. Values stay as decimal strings to preserve monetary precision. */
@@ -21,6 +23,7 @@ export function MoneyInput({
   value,
   onValueChange,
   locale,
+  prefix = "R$ ",
   ref,
   onPaste,
   onDrop,
@@ -45,7 +48,7 @@ export function MoneyInput({
       inputMode="decimal"
       value={value}
       valueIsNumericString
-      prefix="R$ "
+      prefix={prefix}
       thousandSeparator={group}
       decimalSeparator={decimal}
       allowedDecimalSeparators={[decimal]}

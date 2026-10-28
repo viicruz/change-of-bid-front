@@ -2,6 +2,7 @@
 
 //* Libraries imports
 import { NextIntlClientProvider } from "next-intl"
+import { NuqsTestingAdapter } from "nuqs/adapters/testing"
 import { act, createElement } from "react"
 import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
@@ -103,13 +104,28 @@ function SummaryHarness() {
     locale: "en",
     messages: enMessages,
     timeZone: "UTC",
-    children: createElement(QueryProvider, {
-      children: createElement(WalletSummary),
+    children: createElement(NuqsTestingAdapter, {
+      hasMemory: true,
+      children: createElement(QueryProvider, {
+        children: createElement(WalletSummary),
+      }),
     }),
   })
 }
 
+async function openDeposit(root: ParentNode) {
+  if (root.querySelector("#deposit-form")) return
+
+  await act(async () => {
+    root
+      .querySelector("#wallet-deposit-open")
+      ?.dispatchEvent(new MouseEvent("click", { bubbles: true }))
+  })
+}
+
 async function submitDeposit(root: ParentNode, value: string) {
+  await openDeposit(root)
+
   const amount = root.querySelector("#deposit-amount")
   const form = root.querySelector("#deposit-form")
 
@@ -203,12 +219,16 @@ describe("WalletSummary", () => {
       schema: expect.anything(),
       errorSchema: expect.anything(),
     })
-    expect(container.textContent).toContain("Bid hold")
-    expect(container.textContent).toContain("Deposit")
-    expect(container.textContent).toContain("-R$2.00")
-    expect(container.textContent).toContain("R$10.00")
+    expect(container.textContent).toContain("Bid on a lot")
+    expect(container.textContent).toContain("Wallet deposit")
+    expect(container.textContent).toContain("− R$2.00")
+    expect(container.textContent).toContain("+ R$2.00")
+    expect(container.textContent).toContain("+ R$10.00")
     expect(container.querySelector("#wallet-movements-pagination")).toBeNull()
-    expect(container.textContent).toContain("Deposit funds into your wallet.")
+    expect(container.querySelector("#wallet-deposit-open")).toBeInstanceOf(
+      HTMLButtonElement
+    )
+    expect(container.querySelector("#deposit-form")).toBeNull()
     expect(container.textContent).not.toContain("Initial deposit")
     expect(container.textContent).not.toContain("Artificial credit")
     expect(container.textContent).not.toContain("Development mode")
@@ -253,16 +273,16 @@ describe("WalletSummary", () => {
       await vi.waitFor(() => {
         expect(
           container.querySelector("#wallet-balance-error")?.textContent
-        ).toBe("Could not load your balance.")
+        ).toContain("Could not load your balance.")
       })
     })
 
     expect(container.querySelector("#wallet-balance")).toBeNull()
-    expect(container.querySelector("#deposit-form")).toBeInstanceOf(
-      HTMLFormElement
+    expect(container.querySelector("#wallet-deposit-open")).toBeInstanceOf(
+      HTMLButtonElement
     )
     expect(container.textContent).toContain("Transaction history")
-    expect(container.textContent).toContain("Bid hold")
+    expect(container.textContent).toContain("Bid on a lot")
   })
 
   it("shows a movements error when the movements request fails", async () => {
@@ -285,7 +305,7 @@ describe("WalletSummary", () => {
       await vi.waitFor(() => {
         expect(
           container.querySelector("#wallet-movements-error")?.textContent
-        ).toBe("Could not load your transactions.")
+        ).toContain("Could not load your transactions.")
       })
     })
 
@@ -311,7 +331,7 @@ describe("WalletSummary", () => {
     await act(async () => {
       await vi.waitFor(() => {
         expect(container.textContent).toContain("Loading balance.")
-        expect(container.textContent).toContain("Bid hold")
+        expect(container.textContent).toContain("Bid on a lot")
       })
     })
 
@@ -381,10 +401,10 @@ describe("WalletSummary", () => {
       schema: expect.anything(),
       errorSchema: expect.anything(),
     })
+    expect(container.querySelector("#deposit-form")).toBeNull()
     expect(
-      (container.querySelector("#deposit-amount") as HTMLInputElement).value
-    ).toBe("")
-    expect(container.textContent).toContain("Deposit")
+      container.querySelector("#wallet-deposit-success")?.textContent
+    ).toBe("Deposit of R$5.00 confirmed!")
     expect(container.textContent).not.toContain("Artificial credit")
   })
 
@@ -403,7 +423,7 @@ describe("WalletSummary", () => {
       })
     })
 
-    await submitDeposit(container, "01.50")
+    await submitDeposit(container, "0")
 
     expect(container.querySelector("#deposit-error")?.textContent).toBe(
       "Money values must be greater than zero and have at most 2 decimal places."
@@ -475,7 +495,7 @@ describe("WalletSummary", () => {
       await vi.waitFor(() => {
         expect(
           container.querySelector("#wallet-movements")?.textContent
-        ).toContain("Deposit")
+        ).toContain("Wallet deposit")
       })
     })
 
@@ -487,7 +507,7 @@ describe("WalletSummary", () => {
 
     await act(async () => {
       await vi.waitFor(() => {
-        expect(container.textContent).toContain("Hold released")
+        expect(container.textContent).toContain("Outbid — amount returned")
       })
     })
 
@@ -504,11 +524,11 @@ describe("WalletSummary", () => {
     })
 
     expect(container.querySelector("#wallet-movements")?.textContent).toContain(
-      "Deposit"
+      "Wallet deposit"
     )
     expect(
       container.querySelector("#wallet-movements")?.textContent
-    ).not.toContain("Hold released")
+    ).not.toContain("Outbid — amount returned")
     expect(container.querySelector("#wallet-balance")?.textContent).toBe(
       "R$12.50"
     )
@@ -531,7 +551,7 @@ describe("WalletSummary", () => {
       await vi.waitFor(() => {
         expect(
           container.querySelector("#wallet-movements")?.textContent
-        ).toContain("Deposit")
+        ).toContain("Wallet deposit")
       })
     })
 
@@ -554,13 +574,13 @@ describe("WalletSummary", () => {
 
     await act(async () => {
       await vi.waitFor(() => {
-        expect(container.textContent).toContain("Hold released")
+        expect(container.textContent).toContain("Outbid — amount returned")
       })
     })
 
     expect(
       container.querySelector("#wallet-movements")?.textContent
-    ).not.toContain("Deposit")
+    ).not.toContain("Wallet deposit")
     expect(
       container
         .querySelector("#wallet-movements-page-2")
@@ -634,7 +654,7 @@ describe("WalletSummary", () => {
 
     await act(async () => {
       await vi.waitFor(() => {
-        expect(container.textContent).toContain("Hold released")
+        expect(container.textContent).toContain("Outbid — amount returned")
       })
     })
 

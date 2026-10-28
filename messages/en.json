@@ -96,18 +96,45 @@
     "/wallet": {
       "title": "Wallet",
       "description": "See your balance and latest transactions.",
-      "depositDescription": "Deposit funds into your wallet.",
+      "pageTag": "Your duelist vault",
+      "subtitle": "Track your balance, how much is locked in bids and everything that came in and went out of your account.",
+      "deposit": "Deposit",
+      "depositTitle": "Deposit funds",
+      "depositPresets": "Quick amounts",
       "depositAmountLabel": "Amount",
-      "depositSubmit": "Deposit",
+      "depositSubmit": "Confirm deposit",
       "depositSubmitting": "Depositing...",
+      "depositCancel": "Cancel",
+      "depositSuccess": "Deposit of {amount} confirmed!",
       "depositError": "Unable to deposit.",
       "loading": "Loading balance.",
       "error": "Could not load your balance.",
       "retry": "Try again",
       "retrying": "Trying again...",
-      "totalBalance": "Total balance",
+      "balanceSummary": "Balance summary",
+      "balanceBar": "{available}% available, {committed}% locked in bids",
+      "balanceShare": "{label} · {percent}%",
       "availableBalance": "Available balance",
-      "committedBalance": "Committed balance",
+      "availableHint": "Free for new bids.",
+      "committedBalance": "Locked in bids",
+      "committedHint": "Comes back to you if you’re outbid.",
+      "totalBalance": "Total balance",
+      "totalHint": "Available + locked.",
+      "how": {
+        "title": "How your balance works",
+        "bid": {
+          "title": "You place a bid",
+          "description": "The amount leaves your available balance and is locked in the lot."
+        },
+        "outbid": {
+          "title": "Someone outbids you",
+          "description": "The amount returns to your available balance instantly."
+        },
+        "win": {
+          "title": "You win the lot",
+          "description": "The locked amount leaves your wallet and goes to the auctioneer’s."
+        }
+      },
       "historyTitle": "Transaction history",
       "movements": {
         "loading": "Loading transactions.",
@@ -121,10 +148,25 @@
         "morePages": "More pages",
         "types": {
           "DEPOSIT": "Deposit",
-          "HOLD": "Bid hold",
-          "RELEASE": "Hold released",
-          "SETTLEMENT_DEBIT": "Settlement charge",
-          "SETTLEMENT_CREDIT": "Settlement credit"
+          "HOLD": "Bid",
+          "RELEASE": "Refund",
+          "SETTLEMENT_DEBIT": "Win",
+          "SETTLEMENT_CREDIT": "Sale"
+        },
+        "viewLot": "View lot",
+        "columns": {
+          "date": "Date",
+          "description": "Description",
+          "type": "Type",
+          "available": "Available",
+          "committed": "Locked"
+        },
+        "descriptions": {
+          "DEPOSIT": "Wallet deposit",
+          "HOLD": "Bid on a lot",
+          "RELEASE": "Outbid — amount returned",
+          "SETTLEMENT_DEBIT": "Win paid to the auctioneer",
+          "SETTLEMENT_CREDIT": "Lot sale received"
         }
       }
     },
