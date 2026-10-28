@@ -2,11 +2,19 @@
 
 //* Libraries imports
 import { useTranslations } from "next-intl"
-import type { ReactNode } from "react"
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type MouseEvent,
+  type ReactNode,
+} from "react"
 
 //* Components imports
 import { LotCard } from "@/src/components/home/lot-card"
 import { LiveDot, SectionHeading, Tag } from "@/src/components/ui/brand"
+import Pagination from "@/src/components/ui/pagination"
 import { Skeleton } from "@/src/components/ui/skeleton"
 
 //* Hooks imports
@@ -16,9 +24,17 @@ import { useIndexLots } from "@/src/hooks/lots/queries/use-index-lots"
 import type { PublicLotStatus } from "@/src/schemas/lot"
 
 //* Lib imports
+import {
+  getPaginationPageItems,
+  type PaginationPageItem,
+} from "@/src/lib/pagination"
 import { cn } from "@/src/lib/utils"
 
 const loadingSkeletonCount = 4
+const lotPageSize = 8
+//* useLayoutEffect warns during server render, where effects do not run
+const useClientLayoutEffect =
+  typeof window === "undefined" ? useEffect : useLayoutEffect
 
 //* Anchors used by the navbar and the hero CTA
 export const lotSectionAnchors = {
@@ -66,16 +82,51 @@ export function LotSection(props: {
     q: props.query,
     status: props.status,
   })
+  const pageKey = `${props.status}\0${props.query}`
+  const [pageState, setPageState] = useState({
+    pageKey,
+    page: 1,
+  })
+  const page = pageState.pageKey === pageKey ? pageState.page : 1
   const lots = lotsQuery.data?.lots ?? []
+  const pageCount = Math.max(1, Math.ceil(lots.length / lotPageSize))
+  const currentPage = Math.min(page, pageCount)
+  const pageStart = (currentPage - 1) * lotPageSize
+  const pageLots = lots.slice(pageStart, pageStart + lotPageSize)
+  const showPagination = lots.length > lotPageSize
   const styles = sectionStyles[props.status]
   const headingId = `lot-section-${props.status}`
+  const sectionRef = useRef<HTMLElement>(null)
+  const pageScrollRef = useRef<number | null>(null)
+
+  useClientLayoutEffect(() => {
+    if (pageScrollRef.current !== currentPage) {
+      return
+    }
+
+    pageScrollRef.current = null
+    sectionRef.current?.scrollIntoView({ block: "start" })
+  }, [currentPage])
+
+  function onPageChange(nextPage: number) {
+    if (nextPage === currentPage || nextPage < 1 || nextPage > pageCount) {
+      return
+    }
+
+    pageScrollRef.current = nextPage
+    setPageState({
+      pageKey,
+      page: nextPage,
+    })
+  }
 
   return (
     <section
+      ref={sectionRef}
       id={lotSectionAnchors[props.status]}
       aria-labelledby={headingId}
       className={cn(
-        "scroll-mt-20 py-[clamp(72px,8vw,112px)]",
+        "scroll-mt-20 py-[clamp(72px,8vw,112px)] [overflow-anchor:none]",
         styles.section
       )}
     >
@@ -128,15 +179,156 @@ export function LotSection(props: {
             {t("empty")}
           </p>
         ) : (
-          <ul aria-labelledby={headingId} className={gridClassName}>
-            {lots.map((lot) => (
-              <li key={lot.id}>
-                <LotCard lot={lot} />
-              </li>
-            ))}
-          </ul>
+          <>
+            <ul
+              id={`lot-section-${props.status}-list`}
+              aria-labelledby={headingId}
+              className={gridClassName}
+            >
+              {pageLots.map((lot) => (
+                <li key={lot.id}>
+                  <LotCard lot={lot} />
+                </li>
+              ))}
+            </ul>
+            {showPagination ? (
+              <LotSectionPagination
+                status={props.status}
+                sectionTitle={t(`sections.${props.status}.title`)}
+                page={currentPage}
+                pageCount={pageCount}
+                onPageChange={onPageChange}
+              />
+            ) : null}
+          </>
         )}
       </div>
     </section>
+  )
+}
+
+type LotSectionPaginationProps = {
+  status: PublicLotStatus
+  sectionTitle: string
+  page: number
+  pageCount: number
+  onPageChange: (page: number) => void
+}
+
+function paginationEntryKey(
+  item: PaginationPageItem,
+  previousItem: PaginationPageItem | undefined
+) {
+  if (item !== "ellipsis") {
+    return String(item)
+  }
+
+  if (previousItem === 1) {
+    return "ellipsis-after-first"
+  }
+
+  return "ellipsis-before-last"
+}
+
+function getPaginationEntries(page: number, pageCount: number) {
+  const items = getPaginationPageItems(page, pageCount)
+  let previousItem: PaginationPageItem | undefined
+
+  return items.map((item) => {
+    const key = paginationEntryKey(item, previousItem)
+
+    previousItem = item
+
+    return {
+      item,
+      key,
+    }
+  })
+}
+
+function LotSectionPagination(props: LotSectionPaginationProps) {
+  const t = useTranslations("pages./")
+  const entries = getPaginationEntries(props.page, props.pageCount)
+  const idPrefix = `lot-section-${props.status}`
+
+  function onPrevious() {
+    props.onPageChange(props.page - 1)
+  }
+
+  function onNext() {
+    props.onPageChange(props.page + 1)
+  }
+
+  function onPageClick(event: MouseEvent<HTMLButtonElement>) {
+    const nextPage = Number(event.currentTarget.dataset.page)
+
+    if (!Number.isInteger(nextPage)) {
+      return
+    }
+
+    props.onPageChange(nextPage)
+  }
+
+  return (
+    <Pagination.Root
+      id={`${idPrefix}-pagination`}
+      aria-label={t("pagination", { section: props.sectionTitle })}
+      className="pt-10"
+    >
+      <Pagination.Content className="flex-wrap justify-center">
+        <Pagination.Item>
+          <Pagination.Previous
+            id={`${idPrefix}-previous`}
+            type="button"
+            size="icon"
+            text={t("previous")}
+            aria-label={t("previous")}
+            disabled={props.page <= 1}
+            className="px-0! **:data-[slot=pagination-label]:sr-only"
+            onClick={onPrevious}
+          />
+        </Pagination.Item>
+        {entries.map((entry) => {
+          if (entry.item === "ellipsis") {
+            return (
+              <Pagination.Item key={entry.key}>
+                <Pagination.Ellipsis label={t("morePages")} />
+              </Pagination.Item>
+            )
+          }
+
+          return (
+            <Pagination.Item key={entry.key}>
+              <Pagination.Link
+                id={`${idPrefix}-page-${entry.item}`}
+                type="button"
+                isActive={entry.item === props.page}
+                data-page={entry.item}
+                aria-label={
+                  entry.item === props.page
+                    ? t("currentPage", { page: String(entry.item) })
+                    : t("goToPage", { page: String(entry.item) })
+                }
+                onClick={onPageClick}
+              >
+                {entry.item}
+              </Pagination.Link>
+            </Pagination.Item>
+          )
+        })}
+        <Pagination.Item>
+          <Pagination.Next
+            id={`${idPrefix}-next`}
+            type="button"
+            size="icon"
+            text={t("next")}
+            aria-label={t("next")}
+            disabled={props.page >= props.pageCount}
+            className="px-0! **:data-[slot=pagination-label]:sr-only"
+            onClick={onNext}
+          />
+        </Pagination.Item>
+      </Pagination.Content>
+    </Pagination.Root>
   )
 }
