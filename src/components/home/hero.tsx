@@ -1,16 +1,10 @@
 //* Libraries imports
 import { getFormatter, getTranslations } from "next-intl/server"
 import Image from "next/image"
-import Link from "next/link"
 
 //* Components imports
-import {
-  ArrowRightIcon,
-  HighlightWord,
-  LiveDot,
-  Tag,
-} from "@/src/components/ui/brand"
-import { buttonVariants } from "@/src/components/ui/button"
+import { HeroActions } from "@/src/components/home/hero-actions"
+import { HighlightWord, LiveDot, Tag } from "@/src/components/ui/brand"
 
 //* Lib imports
 import { cn } from "@/src/lib/utils"
@@ -55,27 +49,7 @@ export async function Hero() {
           <p className="m-0 max-w-140 text-[clamp(17px,1.6vw,20px)] leading-normal text-muted-foreground">
             {t("description")}
           </p>
-          <div className="flex flex-wrap gap-4">
-            <Link
-              id="hero-live-link"
-              href="#live"
-              className={buttonVariants({ size: "lg", className: "text-xl" })}
-            >
-              {t("ctaLive")}
-              <ArrowRightIcon />
-            </Link>
-            <Link
-              id="hero-sign-up-link"
-              href="/sign-up"
-              className={buttonVariants({
-                variant: "outline",
-                size: "lg",
-                className: "text-xl",
-              })}
-            >
-              {t("ctaSignUp")}
-            </Link>
-          </div>
+          <HeroActions />
           <ol
             aria-label={t("stepsLabel")}
             className="mt-2 flex list-none flex-wrap gap-x-7 gap-y-3 p-0 text-[15px] font-bold uppercase"

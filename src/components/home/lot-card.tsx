@@ -140,6 +140,7 @@ function ClockIcon() {
   return (
     <svg
       aria-hidden="true"
+      className="shrink-0"
       width="16"
       height="16"
       viewBox="0 0 24 24"
@@ -193,13 +194,13 @@ function LotTimer(props: { endsAt: Date }) {
   return (
     <div
       className={cn(
-        "flex items-center gap-2 border-2 border-black px-3 py-2 text-[13px] font-bold tracking-[0.5px] uppercase",
+        "flex min-w-0 items-center gap-1 border-2 border-black px-2 py-2 text-[13px] font-bold tracking-[0.5px] uppercase",
         urgent ? "bg-brand-red text-white" : "bg-brand-ink text-brand-yellow"
       )}
     >
       <ClockIcon />
       <span className="whitespace-nowrap">{label()}</span>
-      <span className="ml-auto font-heading text-base whitespace-nowrap tabular-nums">
+      <span className="ml-auto font-heading text-[13px] leading-none tracking-normal whitespace-nowrap tabular-nums">
         {formatCountdown(remainingMs)}
       </span>
     </div>
@@ -254,8 +255,6 @@ function LiveLotCard(props: { lot: IndexLot }) {
 function ScheduledLotCard(props: { lot: IndexLot }) {
   const t = useTranslations("pages./")
   const format = useFormatter()
-  //* No reminders API yet: the toggle only lives in this page
-  const [reminded, setReminded] = useState(false)
 
   return (
     <article className="lift flex h-full flex-col border-4 border-black bg-card text-card-foreground shadow-hard-8 shadow-brand-ink">
@@ -292,18 +291,6 @@ function ScheduledLotCard(props: { lot: IndexLot }) {
             </div>
           </div>
         </div>
-        <Button
-          id={`lot-remind-${props.lot.id}`}
-          type="button"
-          variant="dark"
-          size="sm"
-          aria-pressed={reminded}
-          className="mt-auto h-auto w-full gap-2.5 py-3.5 text-base"
-          onClick={() => setReminded((current) => !current)}
-        >
-          <BellIcon />
-          {reminded ? t("reminded") : t("remind")}
-        </Button>
       </div>
     </article>
   )
