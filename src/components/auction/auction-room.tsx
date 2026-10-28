@@ -2,6 +2,7 @@
 
 //* Libraries imports
 import { zodResolver } from "@hookform/resolvers/zod"
+import { LockIcon } from "lucide-react"
 import { useFormatter, useTranslations } from "next-intl"
 import Image from "next/image"
 import Link from "next/link"
@@ -12,11 +13,12 @@ import * as z from "zod"
 //* Components imports
 import { lotSectionAnchors } from "@/src/components/home/lot-section"
 import { ArrowRightIcon, LiveDot, Tag } from "@/src/components/ui/brand"
-import { Button, press } from "@/src/components/ui/button"
+import { Button, buttonVariants, press } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
 
 //* Hooks imports
+import { useAuthSession } from "@/src/hooks/auth/use-auth-session"
 import { useErrorTranslations } from "@/src/hooks/commons/use-error-translations"
 import {
   storeBidSchema,
@@ -29,6 +31,9 @@ import {
   type PublicLotLiveStatus,
 } from "@/src/hooks/lots/queries/use-public-lot-live"
 import { useNow } from "@/src/hooks/use-now"
+
+//* Schema imports
+import { userRoleSchema } from "@/src/schemas/user"
 
 //* Local imports
 import { ApiError } from "@/src/lib/api"
@@ -453,6 +458,53 @@ function readBidErrorCode(error: unknown) {
   return null
 }
 
+type BidLockProps = {
+  id: string
+  message: string
+  actionHref?: string
+  actionLabel?: string
+}
+
+function BidLock(props: BidLockProps) {
+  const t = useTranslations("pages./auction/[id]")
+
+  return (
+    <div id={props.id} className="relative">
+      <div
+        aria-hidden="true"
+        inert
+        className="pointer-events-none flex flex-col gap-4 blur-sm select-none"
+      >
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium">{t("yourBid")}</span>
+          <div className="h-13 border-3 border-input bg-field" />
+        </div>
+        <div className="flex h-13 items-center justify-center border-4 border-black bg-primary px-4 text-lg text-primary-foreground">
+          {t("placeBid")}
+        </div>
+      </div>
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/70 p-4 text-center">
+        <LockIcon aria-hidden="true" className="size-6" />
+        <p id={`${props.id}-message`} className="text-sm font-medium">
+          {props.message}
+        </p>
+        {props.actionHref && props.actionLabel ? (
+          <a
+            id={`${props.id}-action`}
+            href={props.actionHref}
+            className={buttonVariants({
+              size: "sm",
+              className: "no-underline",
+            })}
+          >
+            {props.actionLabel}
+          </a>
+        ) : null}
+      </div>
+    </div>
+  )
+}
+
 function PlaceBidForm(props: { lot: PublicLot }) {
   const t = useTranslations("pages./auction/[id]")
   const format = useFormatter()
@@ -760,11 +812,17 @@ function LotOutcome(props: { room: ShowLot }) {
 function BidPanel(props: { room: ShowLot }) {
   const t = useTranslations("pages./auction/[id]")
   const format = useFormatter()
+  const session = useAuthSession()
+  const parsedRole = userRoleSchema.safeParse(session.data?.user.role)
+  const isBidder = parsedRole.success && parsedRole.data === "BIDDER"
+  const isGuest = !session.isPending && session.data == null
   const participantName = useParticipantName()
   const lot = props.room.lot
   const viewerParticipantNo = props.room.viewerParticipantNo
   const viewerIsLeader = isViewer(lot.leaderParticipantNo, viewerParticipantNo)
   const open = lot.status === "SCHEDULED" || lot.status === "LIVE"
+  const canOfferBid =
+    lot.status === "LIVE" && !viewerIsLeader && !session.isPending
 
   return (
     <div
@@ -836,8 +894,14 @@ function BidPanel(props: { room: ShowLot }) {
         ) : null}
         <LeadershipBanner room={props.room} />
         <LotOutcome room={props.room} />
-        {lot.status === "LIVE" && !viewerIsLeader ? (
-          <PlaceBidForm lot={lot} />
+        {canOfferBid && isBidder ? <PlaceBidForm lot={lot} /> : null}
+        {canOfferBid && !isBidder ? (
+          <BidLock
+            id={isGuest ? "guest-bid-lock" : "auctioneer-bid-lock"}
+            message={isGuest ? t("guestCannotBid") : t("auctioneerCannotBid")}
+            actionHref={isGuest ? "/sign-in" : undefined}
+            actionLabel={isGuest ? t("signInToBid") : undefined}
+          />
         ) : null}
       </div>
     </div>
