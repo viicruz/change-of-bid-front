@@ -2,7 +2,7 @@
 
 //* Libraries imports
 import { zodResolver } from "@hookform/resolvers/zod"
-import { cn } from "cn"
+import { cn } from "@/src/lib/utils"
 import { Gavel, HandCoins, type LucideIcon } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useRouter } from "next/navigation"

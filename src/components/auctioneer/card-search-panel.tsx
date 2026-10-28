@@ -1,7 +1,7 @@
 "use client"
 
 //* Libraries imports
-import { cn } from "cn"
+import { cn } from "@/src/lib/utils"
 import { useTranslations } from "next-intl"
 import {
   useRef,

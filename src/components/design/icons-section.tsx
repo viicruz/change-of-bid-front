@@ -21,7 +21,7 @@ export function IconsSection() {
         {catalogIcons.map((name) => (
           <li
             key={name}
-            className="flex flex-col items-center gap-2.5 border-3 border-(--field-edge) bg-(--surface) px-2 py-4"
+            className="flex flex-col items-center gap-2.5 border-3 border-input bg-card px-2 py-4"
           >
             <DesignIcon name={name} size={32} />
             <span className="text-xs font-bold">{name}</span>

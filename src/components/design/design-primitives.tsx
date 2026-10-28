@@ -5,10 +5,10 @@ import type { ComponentProps, ReactNode } from "react"
 import { cn } from "@/src/lib/utils"
 
 const tagTones = {
-  red: "bg-(--cob-red) text-white",
-  yellow: "bg-(--cob-yellow) text-(--cob-tinta)",
-  dark: "bg-(--cob-tinta) text-(--cob-yellow)",
-  inverse: "bg-(--text) text-(--bg)",
+  red: "bg-brand-red text-white",
+  yellow: "bg-brand-yellow text-brand-ink",
+  dark: "bg-brand-ink text-brand-yellow",
+  inverse: "bg-foreground text-background",
 }
 
 type TagProps = ComponentProps<"span"> & {
@@ -20,7 +20,7 @@ export function Tag({ tone = "red", className, ...props }: TagProps) {
   return (
     <span
       className={cn(
-        "cob-display flex -skew-x-10 items-center gap-2 self-start border-3 border-black px-3 py-1.5 text-[13px]",
+        "flex -skew-x-10 items-center gap-2 self-start border-3 border-black px-3 py-1.5 font-heading text-[13px]",
         tagTones[tone],
         className
       )}
@@ -34,7 +34,7 @@ export function HighlightWord({ className, ...props }: ComponentProps<"span">) {
   return (
     <span
       className={cn(
-        "inline-block -skew-x-8 border-4 border-black bg-(--cob-red) px-3.5 text-white shadow-[6px_6px_0_var(--cob-yellow)]",
+        "inline-block -skew-x-8 border-4 border-black bg-brand-red px-3.5 text-white shadow-hard-6 shadow-brand-yellow",
         className
       )}
       {...props}
@@ -45,7 +45,7 @@ export function HighlightWord({ className, ...props }: ComponentProps<"span">) {
 export function Panel({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
-      className={cn("border-4 border-(--ink) bg-(--surface)", className)}
+      className={cn("border-4 border-border bg-card", className)}
       {...props}
     />
   )
@@ -55,7 +55,7 @@ export function Eyebrow({ className, ...props }: ComponentProps<"strong">) {
   return (
     <strong
       className={cn(
-        "text-[13px] font-bold tracking-[1px] text-(--muted) uppercase",
+        "text-[13px] font-bold tracking-[1px] text-muted-foreground uppercase",
         className
       )}
       {...props}
@@ -71,7 +71,7 @@ export function LiveDot({ size = 8 }: { size?: number }) {
   return (
     <span
       aria-hidden="true"
-      className="cob-dot inline-block bg-white"
+      className="inline-block animate-live-pulse bg-white"
       style={{ width: size, height: size }}
     />
   )
@@ -99,7 +99,7 @@ export function DesignSection({
       id={id}
       aria-labelledby={`${id}-title`}
       className={cn(
-        "flex scroll-mt-16 flex-col gap-8 border-t-4 border-(--ink) py-14 lg:scroll-mt-36",
+        "flex scroll-mt-16 flex-col gap-8 border-t-4 border-border py-14 lg:scroll-mt-36",
         className
       )}
     >
@@ -107,11 +107,11 @@ export function DesignSection({
         <Tag className="px-2.5 py-1">{number}</Tag>
         <h2
           id={`${id}-title`}
-          className="cob-display m-0 text-[clamp(36px,4.4vw,56px)] leading-none"
+          className="m-0 font-heading text-[clamp(36px,4.4vw,56px)] leading-none"
         >
           {title}
         </h2>
-        <p className="m-0 max-w-[680px] text-[17px] text-(--muted)">
+        <p className="m-0 max-w-[680px] text-[17px] text-muted-foreground">
           {description}
         </p>
       </div>
@@ -122,6 +122,6 @@ export function DesignSection({
 
 export function SubHeading({ className, ...props }: ComponentProps<"h3">) {
   return (
-    <h3 className={cn("cob-display m-0 text-[22px]", className)} {...props} />
+    <h3 className={cn("m-0 font-heading text-[22px]", className)} {...props} />
   )
 }

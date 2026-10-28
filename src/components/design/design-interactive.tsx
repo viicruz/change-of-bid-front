@@ -43,10 +43,8 @@ export function DesignThemeToggle() {
             aria-pressed={pressed}
             onClick={() => setTheme(option.value)}
             className={cn(
-              "cob-display h-[38px] px-3 text-xs",
-              pressed
-                ? "bg-(--cob-red) text-white"
-                : "bg-(--head-bg) text-(--head-text)"
+              "h-[38px] px-3 font-heading text-xs",
+              pressed ? "bg-brand-red text-white" : "bg-header text-foreground"
             )}
           >
             {option.label}
@@ -79,17 +77,17 @@ export function ChoiceTiles() {
             className={cn(
               "flex flex-col gap-2 border-3 p-3.5 text-left",
               on
-                ? "border-black bg-(--cob-tinta) text-(--cob-yellow) shadow-[5px_5px_0_var(--cob-red)]"
-                : "border-(--field-edge) bg-(--surface) text-(--text) shadow-[3px_3px_0_var(--shadow)]"
+                ? "border-black bg-brand-ink text-brand-yellow shadow-hard-5 shadow-brand-red"
+                : "border-input bg-card text-foreground shadow-hard-3"
             )}
           >
             <span className="flex w-full justify-between">
-              <span className="cob-display text-base">{tile.label}</span>
+              <span className="font-heading text-base">{tile.label}</span>
               <span
                 aria-hidden="true"
                 className={cn(
                   "block size-5 border-3 border-current",
-                  on ? "bg-(--cob-red)" : "bg-transparent"
+                  on ? "bg-brand-red" : "bg-transparent"
                 )}
               />
             </span>
@@ -130,10 +128,8 @@ export function SegmentedAndChips() {
               aria-pressed={on}
               onClick={() => setSegment(item.value)}
               className={cn(
-                "cob-display h-[38px] min-w-11 px-3 text-[13px]",
-                on
-                  ? "bg-(--cob-red) text-white"
-                  : "bg-(--surface) text-(--text)"
+                "h-[38px] min-w-11 px-3 font-heading text-[13px]",
+                on ? "bg-brand-red text-white" : "bg-card text-foreground"
               )}
             >
               {item.label}
@@ -154,8 +150,8 @@ export function SegmentedAndChips() {
               className={cn(
                 "min-h-10 border-3 px-3.5 py-1.5 text-sm font-bold uppercase",
                 on
-                  ? "border-black bg-(--cob-red) text-white"
-                  : "border-(--field-edge) bg-(--surface) text-(--text)"
+                  ? "border-black bg-brand-red text-white"
+                  : "border-input bg-card text-foreground"
               )}
             >
               {item.label}
@@ -176,14 +172,14 @@ export function PopDemo() {
       <span
         key={replays}
         role="status"
-        className="cob-pop -rotate-1 border-3 border-black bg-(--cob-yellow) px-3 py-2 font-bold text-(--cob-tinta)"
+        className="-rotate-1 animate-pop border-3 border-black bg-brand-yellow px-3 py-2 font-bold text-brand-ink"
       >
         Lance confirmado!
       </span>
       <button
         type="button"
         onClick={() => setReplays((count) => count + 1)}
-        className="min-h-8 text-sm font-bold text-(--red-text) underline"
+        className="min-h-8 text-sm font-bold text-red-text underline"
       >
         Repetir
       </button>
@@ -210,13 +206,11 @@ export function TimerDemo() {
     <span
       className={cn(
         "flex w-full items-center gap-2 border-2 border-black px-3 py-2.5 text-[13px] font-bold uppercase",
-        urgent
-          ? "bg-(--cob-red) text-white"
-          : "bg-(--cob-tinta) text-(--cob-yellow)"
+        urgent ? "bg-brand-red text-white" : "bg-brand-ink text-brand-yellow"
       )}
     >
       {urgent ? "Acabando!" : "Termina em"}
-      <span className="cob-display ml-auto text-lg tabular-nums">
+      <span className="ml-auto font-heading text-lg tabular-nums">
         00:00:{String(left).padStart(2, "0")}
       </span>
     </span>

@@ -300,11 +300,11 @@ export const borderWidths = [
 ]
 
 export const shadows = [
-  { name: "3px", css: "3px 3px 0 var(--cob-red)" },
-  { name: "4px", css: "4px 4px 0 var(--cob-red)" },
-  { name: "6px", css: "6px 6px 0 var(--cob-yellow)" },
-  { name: "8px", css: "8px 8px 0 var(--shadow)" },
-  { name: "12px", css: "12px 12px 0 var(--cob-red)" },
+  { name: "3px", css: "3px 3px 0 var(--brand-red)" },
+  { name: "4px", css: "4px 4px 0 var(--brand-red)" },
+  { name: "6px", css: "6px 6px 0 var(--brand-yellow)" },
+  { name: "8px", css: "8px 8px 0 var(--shadow-color)" },
+  { name: "12px", css: "12px 12px 0 var(--brand-red)" },
 ]
 
 export const spacingScale = [
@@ -325,26 +325,31 @@ export const spacingScale = [
 export const buttonVariantsTable = [
   {
     variant: "Primário",
+    prop: 'variant="default"',
     use: "A ação principal da tela: Dar lance, Criar conta, Entrar.",
     rule: "Um por bloco. Texto Bungee ≥ 18px (contraste AA grande).",
   },
   {
     variant: "Secundário",
+    prop: 'variant="secondary"',
     use: "Ação de destaque fora do fluxo: Criar conta no header.",
     rule: "Sombra vermelha. Texto sempre quase-preto.",
   },
   {
     variant: "Escuro",
+    prop: 'variant="dark"',
     use: "Ações em cards sobre fundo amarelo: Me avise.",
     rule: "Vira amarelo quando ativo (toggle).",
   },
   {
     variant: "Contorno",
+    prop: 'variant="outline"',
     use: "Alternativa ao primário: Criar conta grátis, Sacar, Ver detalhes.",
     rule: "Usa --edge; sem sombra.",
   },
   {
     variant: "Link",
+    prop: 'variant="link"',
     use: "Ações terciárias: Esqueci minha senha, Voltar.",
     rule: "Sublinhado, --red-text, área ≥ 44px.",
   },
@@ -355,50 +360,43 @@ export const motionTable = [
     name: "Pulso ao vivo",
     duration: "1.1s",
     ease: "ease-in-out · infinito",
-    className: ".cob-dot",
+    className: "animate-live-pulse",
     where: 'Selos e links "Ao vivo"',
   },
   {
     name: "Faixa",
     duration: "30s",
     ease: "linear · infinito",
-    className: ".cob-marquee",
+    className: "animate-marquee",
     where: "Faixa amarela da LP",
   },
   {
     name: "Levantar card",
     duration: ".16s",
     ease: "ease",
-    className: ".cob-lift",
+    className: "lift",
     where: "Cards de lote (hover)",
   },
   {
     name: "Apertar botão",
     duration: ".12s",
     ease: "ease",
-    className: ".cob-btn",
+    className: "<Button>",
     where: "Botões e links-botão",
   },
   {
     name: "Foco de campo",
     duration: ".12s",
     ease: "ease",
-    className: ".cob-input",
+    className: "<Input>",
     where: "Inputs (sombra amarela)",
   },
   {
     name: "Pop",
     duration: ".25s",
     ease: "ease-out",
-    className: ".cob-pop",
+    className: "animate-pop",
     where: "Confirmações e avisos de sucesso",
-  },
-  {
-    name: "Troca de tema",
-    duration: ".2s",
-    ease: "ease",
-    className: ".cob-root",
-    where: "Fundo e texto ao alternar tema",
   },
   {
     name: "Cronômetro",

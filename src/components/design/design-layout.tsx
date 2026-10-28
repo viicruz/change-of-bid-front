@@ -1,6 +1,6 @@
 //* Libraries imports
-import Image from "next/image";
-import Link from "next/link";
+import Image from "next/image"
+import Link from "next/link"
 
 //* Components imports
 import { DesignThemeToggle } from "@/src/components/design/design-interactive"
@@ -19,11 +19,11 @@ const sectionLinks = [
 export function DesignHeader() {
   //* Sticks right below the app navbar (sticky, 57px tall) on large screens
   return (
-    <header className="z-20 border-b-4 border-(--cob-red) bg-(--head-bg) text-(--head-text) lg:sticky lg:top-14">
+    <header className="z-20 border-b-4 border-brand-red bg-header text-foreground lg:sticky lg:top-14">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-[clamp(16px,4vw,48px)] py-2.5">
         <Link
           href="#top"
-          className="flex items-center gap-3 text-(--head-text) no-underline"
+          className="flex items-center gap-3 text-foreground no-underline"
         >
           <Image
             src="/design/logo.png"
@@ -33,11 +33,11 @@ export function DesignHeader() {
             className="block size-14"
             priority
           />
-          <span className="cob-display text-[22px] leading-none">
-            CHANGE <span className="text-(--yellow-text)">OF</span>{" "}
-            <span className="text-(--cob-red)">BID</span>
+          <span className="font-heading text-[22px] leading-none">
+            CHANGE <span className="text-yellow-text">OF</span>{" "}
+            <span className="text-brand-red">BID</span>
           </span>
-          <span className="cob-display border-3 border-black bg-(--cob-tinta) px-2 py-1 text-xs text-(--cob-yellow)">
+          <span className="border-3 border-black bg-brand-ink px-2 py-1 font-heading text-xs text-brand-yellow">
             Design System
           </span>
         </Link>
@@ -49,7 +49,7 @@ export function DesignHeader() {
             <Link
               key={link.href}
               href={link.href}
-              className="flex min-h-11 items-center text-(--head-text) no-underline hover:text-(--red-text)"
+              className="flex min-h-11 items-center text-foreground no-underline hover:text-red-text"
             >
               {link.label}
             </Link>
@@ -88,10 +88,10 @@ export function DesignIntro() {
         <Tag tone="yellow" className="text-sm">
           v1.0 · Out 2026
         </Tag>
-        <h1 className="cob-display m-0 text-[clamp(44px,6vw,84px)] leading-[0.98]">
+        <h1 className="m-0 font-heading text-[clamp(44px,6vw,84px)] leading-[0.98]">
           O DECK DE <HighlightWord>DESIGN</HighlightWord>
         </h1>
-        <p className="m-0 max-w-[640px] text-[19px] leading-[1.55] text-(--muted)">
+        <p className="m-0 max-w-[640px] text-[19px] leading-[1.55] text-muted-foreground">
           Tudo o que monta a cara do Change of Bid: cores, tipografia, forma,
           componentes, ícones, movimento e voz. Use esta página como referência
           ao criar telas novas — se algo não está aqui, provavelmente ainda não
@@ -103,15 +103,15 @@ export function DesignIntro() {
           <div
             key={principle.title}
             className={
-              "border-4 border-(--ink) bg-(--surface) p-4 " +
+              "border-4 border-border bg-card p-4 " +
               (principle.shadow === "red"
-                ? "shadow-[6px_6px_0_var(--cob-red)]"
-                : "shadow-[6px_6px_0_var(--shadow)]") +
+                ? "shadow-hard-6 shadow-brand-red"
+                : "shadow-hard-6") +
               (principle.tilted ? " -rotate-[1.5deg]" : "")
             }
           >
-            <div className="cob-display text-base">{principle.title}</div>
-            <div className="mt-1.5 text-sm text-(--muted)">
+            <div className="font-heading text-base">{principle.title}</div>
+            <div className="mt-1.5 text-sm text-muted-foreground">
               {principle.description}
             </div>
           </div>
@@ -123,7 +123,7 @@ export function DesignIntro() {
 
 export function DesignFooter() {
   return (
-    <footer className="border-t-8 border-(--cob-red) bg-(--cob-tinta) text-[#A9A2B3]">
+    <footer className="border-t-8 border-brand-red bg-brand-ink text-[#A9A2B3]">
       <div className="mx-auto flex max-w-[1280px] flex-wrap justify-between gap-3 px-[clamp(16px,4vw,48px)] py-[22px] text-[13px]">
         <span>Change of Bid · Design System v1.0</span>
         <span>

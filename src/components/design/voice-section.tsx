@@ -11,15 +11,15 @@ const voiceColumns = [
     title: "Assim",
     icon: "check",
     items: voiceDo,
-    tone: "bg-(--cob-yellow) text-(--cob-tinta)",
-    shadow: "shadow-[8px_8px_0_var(--cob-yellow)]",
+    tone: "bg-brand-yellow text-brand-ink",
+    shadow: "shadow-hard-8 shadow-brand-yellow",
   },
   {
     title: "Não assim",
     icon: "fechar",
     items: voiceDont,
-    tone: "bg-(--cob-red) text-white",
-    shadow: "shadow-[8px_8px_0_var(--cob-red)]",
+    tone: "bg-brand-red text-white",
+    shadow: "shadow-hard-8 shadow-brand-red",
   },
 ] as const
 
@@ -36,14 +36,11 @@ export function VoiceSection() {
         {voiceColumns.map((column) => (
           <div
             key={column.title}
-            className={cn(
-              "border-4 border-black bg-(--surface)",
-              column.shadow
-            )}
+            className={cn("border-4 border-black bg-card", column.shadow)}
           >
             <div
               className={cn(
-                "cob-display flex items-center gap-2 border-b-4 border-black px-4 py-2.5 text-base",
+                "flex items-center gap-2 border-b-4 border-black px-4 py-2.5 font-heading text-base",
                 column.tone
               )}
             >

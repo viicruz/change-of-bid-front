@@ -38,20 +38,20 @@ export function ColorsSection() {
         {brandColors.map((color) => (
           <div
             key={color.hex}
-            className="border-4 border-black bg-(--surface) shadow-[8px_8px_0_var(--shadow)]"
+            className="border-4 border-black bg-card shadow-hard-8"
           >
             <div
-              className="cob-display flex h-[150px] items-end border-b-4 border-black p-3 text-[28px]"
+              className="flex h-[150px] items-end border-b-4 border-black p-3 font-heading text-[28px]"
               style={{ background: color.hex, color: color.on }}
             >
               {color.short}
             </div>
             <div className="flex flex-col gap-1.5 p-3.5">
               <div className="flex items-baseline justify-between gap-2">
-                <strong className="cob-display text-base">{color.name}</strong>
+                <strong className="font-heading text-base">{color.name}</strong>
                 <Code>{color.hex}</Code>
               </div>
-              <div className="text-sm leading-[1.45] text-(--muted)">
+              <div className="text-sm leading-[1.45] text-muted-foreground">
                 {color.use}
               </div>
             </div>
@@ -62,14 +62,14 @@ export function ColorsSection() {
       <SubHeading>Apoio</SubHeading>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-4">
         {supportColors.map((color) => (
-          <div key={color.hex} className="border-3 border-black bg-(--surface)">
+          <div key={color.hex} className="border-3 border-black bg-card">
             <div
               className="h-16 border-b-3 border-black"
               style={{ background: color.hex }}
             />
             <div className="flex flex-col gap-1 p-2.5">
               <Code className="self-start">{color.hex}</Code>
-              <div className="text-[13px] leading-[1.4] text-(--muted)">
+              <div className="text-[13px] leading-[1.4] text-muted-foreground">
                 {color.use}
               </div>
             </div>
@@ -79,12 +79,12 @@ export function ColorsSection() {
 
       <div className="flex flex-col gap-3">
         <SubHeading>Tokens de tema</SubHeading>
-        <p className="m-0 max-w-[720px] text-[15px] text-(--muted)">
+        <p className="m-0 max-w-[720px] text-[15px] text-muted-foreground">
           As telas nunca usam hex direto para superfícies e textos: usam
           variáveis CSS que mudam com o tema. Cores de marca (vermelho, amarelo,
           contorno preto) ficam fixas nos dois temas.
         </p>
-        <div className="overflow-x-auto border-4 border-(--ink) bg-(--surface) shadow-[8px_8px_0_var(--shadow)]">
+        <div className="overflow-x-auto border-4 border-border bg-card shadow-hard-8">
           <table className="ds-table">
             <thead>
               <tr>
@@ -106,7 +106,7 @@ export function ColorsSection() {
                   <td>
                     <Swatch color={token.dark} />
                   </td>
-                  <td className="text-sm text-(--muted)">{token.use}</td>
+                  <td className="text-sm text-muted-foreground">{token.use}</td>
                 </tr>
               ))}
             </tbody>
@@ -116,7 +116,7 @@ export function ColorsSection() {
 
       <div className="flex flex-col gap-3">
         <SubHeading>Contraste (calculado)</SubHeading>
-        <p className="m-0 max-w-[720px] text-[15px] text-(--muted)">
+        <p className="m-0 max-w-[720px] text-[15px] text-muted-foreground">
           Combinações usadas nas telas e a razão de contraste WCAG. &quot;AA
           grande&quot; só vale para texto a partir de 18px bold (ou 24px
           regular) — é por isso que todo botão vermelho usa Bungee 18px+.
@@ -125,20 +125,20 @@ export function ColorsSection() {
           {contrastPairs.map((pair) => (
             <div
               key={`${pair.fg}-${pair.bg}`}
-              className="flex flex-col border-3 border-black bg-(--surface)"
+              className="flex flex-col border-3 border-black bg-card"
             >
               <div
-                className="cob-display border-b-3 border-black p-4 text-xl"
+                className="border-b-3 border-black p-4 font-heading text-xl"
                 style={{ background: pair.bg, color: pair.fg }}
               >
                 Aa Lance
               </div>
               <div className="flex items-center justify-between gap-2 px-3 py-2.5">
-                <div className="text-[13px] leading-[1.35] text-(--muted)">
+                <div className="text-[13px] leading-[1.35] text-muted-foreground">
                   {pair.use}
                 </div>
                 <div className="flex-none text-right">
-                  <div className="cob-display text-base">{pair.ratio}</div>
+                  <div className="font-heading text-base">{pair.ratio}</div>
                   <span
                     className="border-2 border-black px-1.5 py-0.5 text-[11px] font-bold uppercase"
                     style={{ background: pair.badge.bg, color: pair.badge.fg }}

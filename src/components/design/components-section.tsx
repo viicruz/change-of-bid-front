@@ -1,5 +1,4 @@
 //* Libraries imports
-import { cva, type VariantProps } from "class-variance-authority"
 import Image from "next/image"
 import type { ReactNode } from "react"
 
@@ -18,60 +17,37 @@ import {
   Panel,
   Tag,
 } from "@/src/components/design/design-primitives"
+import { Badge } from "@/src/components/ui/badge"
+import { Button, buttonVariants } from "@/src/components/ui/button"
+import { Input } from "@/src/components/ui/input"
+import { Label } from "@/src/components/ui/label"
 
 //* Lib imports
 import { cn } from "@/src/lib/utils"
 
-const cobButtonVariants = cva("cob-display rounded-none", {
-  variants: {
-    variant: {
-      primary:
-        "border-black bg-(--cob-red) text-white shadow-[6px_6px_0_var(--cob-yellow)]",
-      secondary:
-        "border-black bg-(--cob-yellow) text-(--cob-tinta) shadow-[6px_6px_0_var(--cob-red)]",
-      dark: "border-black bg-(--cob-tinta) text-(--cob-yellow) shadow-[6px_6px_0_var(--cob-red)]",
-      outline: "border-(--edge) bg-transparent text-(--edge)",
-    },
-    size: {
-      lg: "border-4 px-7 py-[18px] text-[22px]",
-      md: "border-4 px-[22px] py-3.5 text-lg",
-      sm: "border-3 px-[18px] py-3 text-[15px] shadow-[4px_4px_0_var(--cob-red)]",
-      state: "border-4 px-[18px] py-3 text-base",
-    },
-  },
-  defaultVariants: { variant: "primary", size: "md" },
-})
-
-//* Size and variant both set a shadow, so merge them to keep the last one
-function cobButton(
-  props?: VariantProps<typeof cobButtonVariants>,
-  className?: string
-) {
-  return cn(cobButtonVariants(props), className)
-}
-
 function SubTitle({ children }: { children: ReactNode }) {
-  return <h3 className="cob-display m-0 text-2xl">{children}</h3>
+  return <h3 className="m-0 font-heading text-2xl">{children}</h3>
 }
 
 function Labeled({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="flex flex-col items-start gap-2.5">
       {children}
-      <span className="text-xs text-(--muted)">{label}</span>
+      <span className="text-xs text-muted-foreground">{label}</span>
     </div>
   )
 }
 
 const fieldLabel = "text-sm font-bold tracking-[1px] uppercase"
 const fieldBox =
-  "flex min-h-[52px] w-full items-center border-3 bg-(--input-bg) px-3.5 py-3 text-base text-(--text)"
+  "flex min-h-13 w-full items-center border-3 bg-field px-3.5 py-3 text-base text-foreground"
 
+//* Pinned states: static copies of the real button with the state forced
 const buttonStates = [
   { label: "Normal", className: "" },
   {
     label: "Hover · sobe −3px",
-    className: "translate-x-[-3px] translate-y-[-3px]",
+    className: "-translate-x-[3px] -translate-y-[3px]",
   },
   {
     label: "Pressionado · desce 2px",
@@ -79,7 +55,7 @@ const buttonStates = [
   },
   {
     label: "Foco (teclado)",
-    className: "outline-3 outline-offset-3 outline-(--cob-yellow)",
+    className: "outline-3 outline-offset-3 outline-ring outline-solid",
   },
   { label: "Desabilitado · sem sombra", className: "opacity-45 shadow-none" },
 ]
@@ -90,33 +66,11 @@ function Buttons() {
       <SubTitle>Botões</SubTitle>
       <Panel className="flex flex-col gap-[26px] p-6">
         <div className="flex flex-wrap items-center gap-[22px]">
-          <button type="button" className={cobButton({}, "cob-btn")}>
-            Primário
-          </button>
-          <button
-            type="button"
-            className={cobButton({ variant: "secondary" }, "cob-btn")}
-          >
-            Secundário
-          </button>
-          <button
-            type="button"
-            className={cobButton({ variant: "dark" }, "cob-btn")}
-          >
-            Escuro
-          </button>
-          <button
-            type="button"
-            className={cobButton({ variant: "outline" }, "cob-btn")}
-          >
-            Contorno
-          </button>
-          <button
-            type="button"
-            className="min-h-11 text-[15px] font-bold text-(--red-text) underline"
-          >
-            Link
-          </button>
+          <Button>Primário</Button>
+          <Button variant="secondary">Secundário</Button>
+          <Button variant="dark">Escuro</Button>
+          <Button variant="outline">Contorno</Button>
+          <Button variant="link">Link</Button>
         </div>
 
         <div className="overflow-x-auto">
@@ -133,9 +87,12 @@ function Buttons() {
                 <tr key={row.variant}>
                   <td>
                     <strong>{row.variant}</strong>
+                    <div>
+                      <Code>{row.prop}</Code>
+                    </div>
                   </td>
-                  <td className="text-(--muted)">{row.use}</td>
-                  <td className="text-(--muted)">{row.rule}</td>
+                  <td className="text-muted-foreground">{row.use}</td>
+                  <td className="text-muted-foreground">{row.rule}</td>
                 </tr>
               ))}
             </tbody>
@@ -150,7 +107,13 @@ function Buttons() {
                 key={state.label}
                 className="flex flex-col items-start gap-2.5"
               >
-                <span className={cobButton({ size: "state" }, state.className)}>
+                <span
+                  className={cn(
+                    buttonVariants({ size: "sm" }),
+                    "border-4 shadow-hard-6",
+                    state.className
+                  )}
+                >
                   Lance
                 </span>
                 <span className="text-xs font-bold">{state.label}</span>
@@ -162,19 +125,15 @@ function Buttons() {
         <div className="flex flex-col gap-3">
           <Eyebrow>Tamanhos</Eyebrow>
           <div className="flex flex-wrap items-end gap-[22px]">
-            <span className={cobButton({ size: "lg" })}>GG · 22px</span>
-            <span className={cobButton({ size: "md" })}>M · 18px</span>
-            <span className={cobButton({ variant: "secondary", size: "sm" })}>
-              P · 15px
-            </span>
-            <button
-              type="button"
-              aria-label="Alternar tema"
-              className="cob-btn inline-flex size-11 items-center justify-center border-3 border-black bg-(--cob-yellow) text-(--cob-tinta)"
-            >
-              <DesignIcon name="sol" size={20} />
-            </button>
-            <span className="text-xs font-bold text-(--muted)">
+            <Button size="lg">GG · lg · 22px</Button>
+            <Button>M · default · 18px</Button>
+            <Button variant="secondary" size="sm">
+              P · sm · 15px
+            </Button>
+            <Button variant="secondary" size="icon" aria-label="Alternar tema">
+              <DesignIcon name="sol" />
+            </Button>
+            <span className="text-xs font-bold text-muted-foreground">
               ← só ícone: 44×44, sempre com aria-label
             </span>
           </div>
@@ -205,34 +164,30 @@ function Badges() {
           <Tag tone="inverse">Encerrado</Tag>
         </Labeled>
         <Labeled label="Badge pequeno">
-          <span className="cob-display border-2 border-black bg-(--cob-yellow) px-2 py-0.5 text-[11px] text-(--cob-tinta)">
-            Na frente
-          </span>
+          <Badge variant="secondary">Na frente</Badge>
         </Labeled>
         <Labeled label="Badge em lista">
-          <span className="cob-display bg-(--cob-red) px-1.5 py-0.5 text-[11px] text-white">
-            Maior lance
-          </span>
+          <Badge>Maior lance</Badge>
         </Labeled>
         <Labeled label="Quantidade">
-          <span className="cob-display border-3 border-black bg-(--cob-yellow) px-[7px] py-0.5 text-[13px] text-(--cob-tinta)">
+          <span className="border-3 border-black bg-brand-yellow px-[7px] py-0.5 font-heading text-[13px] text-brand-ink">
             ×3
           </span>
         </Labeled>
         <div className="flex flex-col items-start gap-3.5 px-2.5 py-1.5">
-          <span className="cob-display -rotate-14 border-5 border-(--cob-red) bg-white px-3.5 py-1.5 text-xl text-(--cob-red) shadow-[5px_5px_0_#000] outline-3 outline-black">
+          <span className="-rotate-14 border-5 border-brand-red bg-white px-3.5 py-1.5 font-heading text-xl text-brand-red shadow-hard-5 shadow-black outline-3 outline-black">
             Arrematado!
           </span>
-          <span className="text-xs text-(--muted)">
+          <span className="text-xs text-muted-foreground">
             Carimbo · só sobre imagem
           </span>
         </div>
         <Labeled label="Adesivo · hero">
-          <span className="-rotate-6 border-4 border-black bg-(--cob-yellow) px-3 py-2 text-(--cob-tinta) shadow-[5px_5px_0_#000]">
+          <span className="-rotate-6 border-4 border-black bg-brand-yellow px-3 py-2 text-brand-ink shadow-hard-5 shadow-black">
             <span className="block text-[11px] font-bold tracking-[1px] uppercase">
               Novo lance!
             </span>
-            <span className="cob-display text-lg">+ R$ 10,00</span>
+            <span className="font-heading text-lg">+ R$ 10,00</span>
           </span>
         </Labeled>
       </Panel>
@@ -246,16 +201,13 @@ function FormFields() {
       <SubTitle>Campos de formulário</SubTitle>
       <Panel className="grid grid-cols-[repeat(auto-fit,minmax(min(260px,100%),1fr))] gap-7 p-6">
         <div className="flex flex-col gap-2">
-          <label htmlFor="ds-input-default" className={fieldLabel}>
-            Padrão
-          </label>
-          <input
+          <Label htmlFor="ds-input-default">Padrão</Label>
+          <Input
             id="ds-input-default"
             type="text"
             placeholder="Clique para ver o foco"
-            className={cn("cob-input", fieldBox, "border-(--field-edge)")}
           />
-          <span className="text-xs text-(--muted)">
+          <span className="text-xs text-muted-foreground">
             Foco: sombra amarela 5px, sem outline.
           </span>
         </div>
@@ -264,7 +216,7 @@ function FormFields() {
           <span
             className={cn(
               fieldBox,
-              "border-(--field-edge) shadow-[5px_5px_0_var(--cob-yellow)]"
+              "border-input shadow-hard-5 shadow-brand-yellow"
             )}
           >
             duelista@email.com
@@ -272,43 +224,36 @@ function FormFields() {
         </div>
         <div className="flex flex-col gap-2">
           <span className={fieldLabel}>Com erro</span>
-          <span className={cn(fieldBox, "border-(--cob-red)")}>duelista@</span>
-          <span className="text-sm font-bold text-(--red-text)">
+          <span className={cn(fieldBox, "border-brand-red")}>duelista@</span>
+          <span className="text-sm font-bold text-red-text">
             Esse e-mail não parece válido.
           </span>
         </div>
         <div className="flex flex-col gap-2">
-          <label htmlFor="ds-input-money" className={fieldLabel}>
-            Com prefixo (valor)
-          </label>
+          <Label htmlFor="ds-input-money">Com prefixo (valor)</Label>
           <div className="flex">
             <span
               aria-hidden="true"
-              className="cob-display flex items-center border-3 border-r-0 border-(--field-edge) bg-(--cob-tinta) px-3.5 text-lg text-(--cob-yellow)"
+              className="flex items-center border-3 border-r-0 border-input bg-brand-ink px-3.5 font-heading text-lg text-brand-yellow"
             >
               R$
             </span>
-            <input
+            <Input
               id="ds-input-money"
               type="text"
               inputMode="decimal"
               placeholder="250"
-              className="cob-input cob-display min-h-14 min-w-0 flex-1 border-3 border-(--field-edge) bg-(--input-bg) px-3.5 py-3 text-[22px] text-(--text)"
+              className="h-14 flex-1 font-heading text-[22px]"
             />
           </div>
         </div>
         <div className="flex flex-col gap-2">
           <span className={fieldLabel}>Com ação (senha)</span>
           <div className="flex">
-            <span
-              className={cn(
-                fieldBox,
-                "flex-1 border-r-0 border-(--field-edge)"
-              )}
-            >
+            <span className={cn(fieldBox, "flex-1 border-r-0 border-input")}>
               ••••••••
             </span>
-            <span className="flex w-[52px] flex-none items-center justify-center border-3 border-(--field-edge) bg-(--cob-tinta) text-(--cob-yellow)">
+            <span className="flex w-[52px] flex-none items-center justify-center border-3 border-input bg-brand-ink text-brand-yellow">
               <DesignIcon name="olho" size={20} />
             </span>
           </div>
@@ -316,13 +261,13 @@ function FormFields() {
         <div className="flex flex-col gap-3">
           <span className={fieldLabel}>Checkbox</span>
           <span className="flex items-center gap-2.5 font-semibold">
-            <span className="flex size-6 items-center justify-center border-3 border-(--field-edge) bg-(--cob-yellow) text-(--cob-tinta)">
+            <span className="flex size-6 items-center justify-center border-3 border-input bg-brand-yellow text-brand-ink">
               <DesignIcon name="check" size={14} strokeWidth={4} />
             </span>
             Marcado
           </span>
           <span className="flex items-center gap-2.5 font-semibold">
-            <span className="size-6 border-3 border-(--field-edge) bg-(--input-bg)" />
+            <span className="size-6 border-3 border-input bg-field" />
             Desmarcado
           </span>
         </div>
@@ -336,7 +281,7 @@ function FormFields() {
         <Panel className="flex flex-col gap-3.5 p-6">
           <Eyebrow>Segmentado e chips de filtro</Eyebrow>
           <SegmentedAndChips />
-          <span className="text-xs text-(--muted)">
+          <span className="text-xs text-muted-foreground">
             Selecionado = vermelho com texto branco. Use{" "}
             <Code>aria-pressed</Code>.
           </span>
@@ -354,14 +299,14 @@ function LotCards() {
       <SubTitle>Cards de lote</SubTitle>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-8">
         <div className="flex flex-col gap-2.5">
-          <article className="cob-lift border-4 border-(--ink) bg-(--surface) shadow-[8px_8px_0_var(--cob-red)]">
+          <article className="lift border-4 border-border bg-card shadow-hard-8 shadow-brand-red">
             <div
               className={cn(
                 cardStage,
-                "border-(--ink) bg-[repeating-linear-gradient(-45deg,rgba(246,186,4,0.10)_0_2px,transparent_2px_14px),var(--cob-stage)]"
+                "border-border bg-[repeating-linear-gradient(-45deg,rgba(246,186,4,0.10)_0_2px,transparent_2px_14px),var(--stage)]"
               )}
             >
-              <span className="cob-display absolute top-0 left-0 flex items-center gap-1.5 border-r-3 border-b-3 border-black bg-(--cob-red) px-2 py-1 text-[11px] text-white">
+              <span className="absolute top-0 left-0 flex items-center gap-1.5 border-r-3 border-b-3 border-black bg-brand-red px-2 py-1 font-heading text-[11px] text-white">
                 <LiveDot size={6} />
                 Ao vivo
               </span>
@@ -375,30 +320,30 @@ function LotCards() {
               />
             </div>
             <div className="flex flex-col gap-2 p-3.5">
-              <strong className="cob-display text-[15px]">
+              <strong className="font-heading text-[15px]">
                 Magnum the Reliever
               </strong>
-              <span className="cob-display text-xl">R$ 189,90</span>
-              <span className="flex justify-between border-2 border-black bg-(--cob-red) px-2.5 py-1.5 text-xs font-bold text-white uppercase">
-                Acabando! <span className="cob-display">00:04:18</span>
+              <span className="font-heading text-xl">R$ 189,90</span>
+              <span className="flex justify-between border-2 border-black bg-brand-red px-2.5 py-1.5 text-xs font-bold text-white uppercase">
+                Acabando! <span className="font-heading">00:04:18</span>
               </span>
             </div>
           </article>
-          <span className="text-[13px] text-(--muted)">
-            <strong className="text-(--text)">Ao vivo</strong> · sombra
+          <span className="text-[13px] text-muted-foreground">
+            <strong className="text-foreground">Ao vivo</strong> · sombra
             vermelha, selo pulsante, cronômetro.
           </span>
         </div>
 
         <div className="flex flex-col gap-2.5">
-          <article className="cob-lift border-4 border-black bg-(--surface) shadow-[8px_8px_0_var(--cob-tinta)]">
+          <article className="lift border-4 border-black bg-card shadow-hard-8 shadow-brand-ink">
             <div
               className={cn(
                 cardStage,
-                "border-black bg-[repeating-linear-gradient(-45deg,rgba(248,13,23,0.12)_0_2px,transparent_2px_14px),var(--cob-stage)]"
+                "border-black bg-[repeating-linear-gradient(-45deg,rgba(248,13,23,0.12)_0_2px,transparent_2px_14px),var(--stage)]"
               )}
             >
-              <span className="cob-display absolute top-0 left-0 border-r-3 border-b-3 border-black bg-(--cob-yellow) px-2 py-1 text-[11px] text-(--cob-tinta)">
+              <span className="absolute top-0 left-0 border-r-3 border-b-3 border-black bg-brand-yellow px-2 py-1 font-heading text-[11px] text-brand-ink">
                 Agendado
               </span>
               <Image
@@ -411,29 +356,29 @@ function LotCards() {
               />
             </div>
             <div className="flex flex-col gap-2 p-3.5">
-              <strong className="cob-display text-[15px]">
+              <strong className="font-heading text-[15px]">
                 Parallel Teleport
               </strong>
-              <span className="cob-display flex border-3 border-(--field-edge) text-xs">
-                <span className="flex-1 bg-(--cob-tinta) px-2 py-1.5 text-(--cob-yellow)">
+              <span className="flex border-3 border-input font-heading text-xs">
+                <span className="flex-1 bg-brand-ink px-2 py-1.5 text-brand-yellow">
                   30 OUT · 20H
                 </span>
                 <span className="flex-1 px-2 py-1.5">R$ 15,00</span>
               </span>
             </div>
           </article>
-          <span className="text-[13px] text-(--muted)">
-            <strong className="text-(--text)">Agendado</strong> · vive sobre a
+          <span className="text-[13px] text-muted-foreground">
+            <strong className="text-foreground">Agendado</strong> · vive sobre a
             faixa amarela, sombra preta fixa.
           </span>
         </div>
 
         <div className="flex flex-col gap-2.5">
-          <article className="border-4 border-(--ink) bg-(--surface) shadow-[8px_8px_0_var(--shadow)]">
+          <article className="border-4 border-border bg-card shadow-hard-8">
             <div
               className={cn(
                 cardStage,
-                "overflow-hidden border-(--ink) bg-(--cob-stage-closed)"
+                "overflow-hidden border-border bg-stage-closed"
               )}
             >
               <Image
@@ -444,21 +389,21 @@ function LotCards() {
                 sizes="(max-width: 640px) 100vw, 360px"
                 className="block h-auto w-full opacity-75 contrast-90 grayscale-[0.85]"
               />
-              <span className="cob-display absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-14 border-4 border-(--cob-red) bg-white px-2.5 py-1 text-base whitespace-nowrap text-(--cob-red) outline-3 outline-black">
+              <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-14 border-4 border-brand-red bg-white px-2.5 py-1 font-heading text-base whitespace-nowrap text-brand-red outline-3 outline-black">
                 Arrematado!
               </span>
             </div>
             <div className="flex flex-col gap-2 p-3.5">
-              <strong className="cob-display text-[15px]">
+              <strong className="font-heading text-[15px]">
                 Performapal Sky Pupil
               </strong>
-              <span className="cob-display text-xl text-(--red-text)">
+              <span className="font-heading text-xl text-red-text">
                 R$ 12,00
               </span>
             </div>
           </article>
-          <span className="text-[13px] text-(--muted)">
-            <strong className="text-(--text)">Encerrado</strong> · imagem em
+          <span className="text-[13px] text-muted-foreground">
+            <strong className="text-foreground">Encerrado</strong> · imagem em
             cinza, carimbo, sem hover.
           </span>
         </div>
@@ -474,32 +419,32 @@ function Feedback() {
       <div className="grid grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] gap-7">
         <Panel className="flex flex-col gap-3.5 p-5">
           <Eyebrow>Cronômetro</Eyebrow>
-          <span className="flex items-center gap-2 border-2 border-black bg-(--cob-tinta) px-3 py-2 text-[13px] font-bold text-(--cob-yellow) uppercase">
+          <span className="flex items-center gap-2 border-2 border-black bg-brand-ink px-3 py-2 text-[13px] font-bold text-brand-yellow uppercase">
             Termina em
-            <span className="cob-display ml-auto text-base tabular-nums">
+            <span className="ml-auto font-heading text-base tabular-nums">
               01:12:00
             </span>
           </span>
-          <span className="flex items-center gap-2 border-2 border-black bg-(--cob-red) px-3 py-2 text-[13px] font-bold text-white uppercase">
+          <span className="flex items-center gap-2 border-2 border-black bg-brand-red px-3 py-2 text-[13px] font-bold text-white uppercase">
             Acabando!
-            <span className="cob-display ml-auto text-base tabular-nums">
+            <span className="ml-auto font-heading text-base tabular-nums">
               00:04:18
             </span>
           </span>
-          <span className="text-xs text-(--muted)">
+          <span className="text-xs text-muted-foreground">
             Fica vermelho abaixo de 10 min (cards) ou 5 min (lote).
           </span>
         </Panel>
         <Panel className="flex flex-col gap-3.5 p-5">
           <Eyebrow>Confirmação</Eyebrow>
-          <span className="flex -rotate-1 items-center gap-2.5 border-3 border-black bg-(--cob-yellow) px-3.5 py-3 font-bold text-(--cob-tinta)">
+          <span className="flex -rotate-1 items-center gap-2.5 border-3 border-black bg-brand-yellow px-3.5 py-3 font-bold text-brand-ink">
             <DesignIcon name="check" size={20} />
             Você está na frente!
           </span>
-          <span className="text-sm font-bold text-(--red-text)">
+          <span className="text-sm font-bold text-red-text">
             O lance mínimo agora é R$ 250,00.
           </span>
-          <span className="text-xs text-(--muted)">
+          <span className="text-xs text-muted-foreground">
             Sucesso: faixa amarela torta + <Code>role=&quot;status&quot;</Code>.
             Erro: texto vermelho sob o campo +{" "}
             <Code>role=&quot;alert&quot;</Code>.
@@ -507,24 +452,24 @@ function Feedback() {
         </Panel>
         <Panel className="flex flex-col gap-3.5 p-5">
           <Eyebrow>Blocos de valor</Eyebrow>
-          <div className="border-4 border-black bg-(--cob-yellow) p-3.5 text-(--cob-tinta) shadow-[6px_6px_0_var(--cob-red)]">
+          <div className="border-4 border-black bg-brand-yellow p-3.5 text-brand-ink shadow-hard-6 shadow-brand-red">
             <div className="text-xs font-bold tracking-[1px] uppercase">
               Saldo disponível
             </div>
-            <div className="cob-display text-[28px]">R$ 300,00</div>
+            <div className="font-heading text-[28px]">R$ 300,00</div>
           </div>
-          <div className="flex border-3 border-(--field-edge)">
+          <div className="flex border-3 border-input">
             <div className="flex-1 px-2.5 py-2">
-              <div className="text-[11px] font-bold text-(--muted) uppercase">
+              <div className="text-[11px] font-bold text-muted-foreground uppercase">
                 Acréscimo
               </div>
-              <div className="cob-display">R$ 5,00</div>
+              <div className="font-heading">R$ 5,00</div>
             </div>
-            <div className="flex-1 border-l-3 border-(--field-edge) bg-(--cob-tinta) px-2.5 py-2 text-(--cob-yellow)">
+            <div className="flex-1 border-l-3 border-input bg-brand-ink px-2.5 py-2 text-brand-yellow">
               <div className="text-[11px] font-bold text-white uppercase">
                 Mínimo
               </div>
-              <div className="cob-display">R$ 250,00</div>
+              <div className="font-heading">R$ 250,00</div>
             </div>
           </div>
         </Panel>

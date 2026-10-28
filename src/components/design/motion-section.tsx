@@ -10,6 +10,7 @@ import {
   LiveDot,
   Panel,
 } from "@/src/components/design/design-primitives"
+import { Button } from "@/src/components/ui/button"
 
 //* Lib imports
 import { cn } from "@/src/lib/utils"
@@ -33,15 +34,15 @@ function MotionCard({
     <Panel className="flex flex-col">
       <div
         className={cn(
-          "flex h-[140px] items-center justify-center border-b-4 border-(--ink) bg-(--surface-2)",
+          "flex h-[140px] items-center justify-center border-b-4 border-border bg-muted",
           stageClassName
         )}
       >
         {children}
       </div>
       <div className="flex flex-col gap-1.5 p-3.5">
-        <strong className="cob-display text-base">{title}</strong>
-        <span className="text-[13px] text-(--muted)">{description}</span>
+        <strong className="font-heading text-base">{title}</strong>
+        <span className="text-[13px] text-muted-foreground">{description}</span>
         <Code className="self-start">{spec}</Code>
       </div>
     </Panel>
@@ -72,7 +73,7 @@ export function MotionSection() {
           description="Ponto de “ao vivo”. Escala 1 → 0,6 e opacidade 1 → 0,3."
           spec="1.1s ease-in-out infinite"
         >
-          <span className="cob-display flex items-center gap-2.5 border-3 border-black bg-(--cob-red) px-3.5 py-2 text-base text-white">
+          <span className="flex items-center gap-2.5 border-3 border-black bg-brand-red px-3.5 py-2 font-heading text-base text-white">
             <LiveDot size={12} />
             Ao vivo
           </span>
@@ -86,9 +87,9 @@ export function MotionSection() {
         >
           <div
             aria-hidden="true"
-            className="-ml-[10%] w-[120%] -rotate-[1.5deg] overflow-hidden border-y-3 border-black bg-(--cob-yellow) py-2"
+            className="-ml-[10%] w-[120%] -rotate-[1.5deg] overflow-hidden border-y-3 border-black bg-brand-yellow py-2"
           >
-            <div className="cob-marquee-fast cob-display flex w-max text-lg whitespace-nowrap text-(--cob-tinta)">
+            <div className="flex w-max animate-marquee-fast font-heading text-lg whitespace-nowrap text-brand-ink">
               {marqueeItems.map((word, index) => (
                 <span
                   // biome-ignore lint/suspicious/noArrayIndexKey: static, repeated words
@@ -96,7 +97,7 @@ export function MotionSection() {
                   className="flex items-center gap-4 pr-4"
                 >
                   {word}
-                  <span className="inline-block size-2.5 rotate-45 border-2 border-black bg-(--cob-red)" />
+                  <span className="inline-block size-2.5 rotate-45 border-2 border-black bg-brand-red" />
                 </span>
               ))}
             </div>
@@ -108,7 +109,7 @@ export function MotionSection() {
           description="Hover em cards: sobe −4px e gira −0,6°, como carta saindo da mão."
           spec=".16s ease · translate(-4px,-4px)"
         >
-          <div className="cob-lift cob-display flex h-20 w-[150px] items-center justify-center border-4 border-(--ink) bg-(--surface) text-center text-[13px] shadow-[6px_6px_0_var(--cob-red)]">
+          <div className="flex h-20 w-[150px] lift items-center justify-center border-4 border-border bg-card text-center font-heading text-[13px] shadow-hard-6 shadow-brand-red">
             Passe o
             <br />
             mouse
@@ -120,12 +121,9 @@ export function MotionSection() {
           description="Hover sobe −3px, clique afunda 2px em direção à sombra."
           spec=".12s ease"
         >
-          <button
-            type="button"
-            className="cob-btn cob-display border-4 border-black bg-(--cob-red) px-[18px] py-3 text-base text-white shadow-[6px_6px_0_var(--cob-yellow)]"
-          >
+          <Button size="sm" className="border-4 text-base">
             Clique em mim
-          </button>
+          </Button>
         </MotionCard>
 
         <MotionCard
@@ -147,7 +145,7 @@ export function MotionSection() {
         </MotionCard>
       </div>
 
-      <div className="overflow-x-auto border-4 border-(--ink) bg-(--surface) shadow-[8px_8px_0_var(--shadow)]">
+      <div className="overflow-x-auto border-4 border-border bg-card shadow-hard-8">
         <table className="ds-table">
           <thead>
             <tr>
@@ -169,7 +167,9 @@ export function MotionSection() {
                 <td>
                   <Code>{motion.className}</Code>
                 </td>
-                <td className="text-sm text-(--muted)">{motion.where}</td>
+                <td className="text-sm text-muted-foreground">
+                  {motion.where}
+                </td>
               </tr>
             ))}
           </tbody>
