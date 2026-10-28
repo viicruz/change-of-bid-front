@@ -357,7 +357,7 @@ export function Navbar() {
   const guest = !session.isPending && session.data == null
 
   return (
-    <header className="sticky top-0 z-40 border-b-4 border-brand-red bg-header text-foreground">
+    <header className="sticky top-0 z-40 border-b-4 border-brand-red bg-header text-foreground print:hidden">
       <nav
         aria-label={t("label")}
         className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-8 gap-y-3 px-[clamp(16px,4vw,48px)] py-2.5"
