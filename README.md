@@ -18,6 +18,8 @@ O nome foi inspirado na carta **Change of Heart**. A paleta foi pensada nas core
 - npm
 - O [backend](https://github.com/viicruz/change-of-bid-back) em execução para criar uma conta ou entrar
 
+
+
 ## Instalação e execução
 
 ```bash
@@ -35,6 +37,25 @@ NEXT_PUBLIC_BACKEND_URL=http://localhost:3001
 ```
 
 Altere esse valor se o backend não estiver na porta `3001`.
+
+## Docker
+
+O Compose deste repositório sobe só o frontend. Postgres e a API ficam no [change-of-bid-back](https://github.com/viicruz/change-of-bid-back): suba aquele projeto primeiro (no README dele tem as explicações de como rodar) e deixe a API em `http://localhost:3001`. Sem isso a vitrine abre, mas lotes, login e lances não funcionam.
+
+Requisito: Docker Compose v2 no **Linux**. O serviço usa `network_mode: host` para que `localhost:3001` seja a API no navegador e no container (o Next faz rewrite de `/backend` para a API). Em macOS e Windows esse modo não se comporta igual.
+
+```bash
+cp example.env .env
+docker compose up -d --build
+```
+
+A vitrine fica em [http://localhost:3000](http://localhost:3000). `NEXT_PUBLIC_BACKEND_URL` entra na imagem no build (padrão `http://localhost:3001`). Se alterar o `.env`, rode de novo o `up --build`.
+
+```bash
+docker compose down
+```
+
+
 
 ## Contas
 
@@ -59,6 +80,8 @@ npm run build
 npm start
 ```
 
+
+
 ## Pesquisa de cartas
 
 No painel do leiloeiro, a busca consulta o catálogo em inglês. Digite o nome da carta em inglês, mesmo com a interface em português.
@@ -71,6 +94,8 @@ Alguns nomes para testar:
 - `Red-Eyes Black Dragon`
 - `Pot of Greed`
 - `Mirror Force`
+
+
 
 ## Rotas
 

@@ -18,8 +18,12 @@ import { WalletMovementsPagination } from "@/src/components/wallet/wallet-moveme
 import { Button } from "@/src/components/ui/button"
 
 //* Hooks imports
+import { useAuthSession } from "@/src/hooks/auth/use-auth-session"
 import { useIndexWalletMovements } from "@/src/hooks/wallets/queries/use-index-wallet-movements"
 import { useShowWallet } from "@/src/hooks/wallets/queries/use-show-wallet"
+
+//* Schema imports
+import { userRoleSchema } from "@/src/schemas/user"
 
 const LIMIT_PER_PAGE = 5; // Limit of movements per page
 
@@ -27,11 +31,24 @@ const LIMIT_PER_PAGE = 5; // Limit of movements per page
 const errorBox =
   "flex w-full flex-col items-start gap-3 border-4 border-border bg-card p-[22px] font-semibold text-red-text shadow-hard-8 shadow-brand-red"
 
+function useShowBidderWallet() {
+  const session = useAuthSession()
+
+  if (session.isPending || session.data == null) {
+    return false
+  }
+
+  const parsedRole = userRoleSchema.safeParse(session.data.user.role)
+
+  return parsedRole.success && parsedRole.data === "BIDDER"
+}
+
 export function WalletSummary() {
   const t = useTranslations("pages./wallet");
   const format = useFormatter();
   const [, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
   const walletQuery = useShowWallet();
+  const showBidderWallet = useShowBidderWallet()
   const [isDepositOpen, setIsDepositOpen] = useState(false)
   const [depositedAmount, setDepositedAmount] = useState<string | null>(null)
 
@@ -62,16 +79,18 @@ export function WalletSummary() {
             {t("subtitle")}
           </p>
         </div>
-        <Button
-          id="wallet-deposit-open"
-          type="button"
-          aria-expanded={isDepositOpen}
-          aria-controls={isDepositOpen ? "deposit-form" : undefined}
-          onClick={onDepositOpen}
-        >
-          <PlusIcon aria-hidden="true" strokeWidth={3} strokeLinecap="square" />
-          {t("deposit")}
-        </Button>
+        {showBidderWallet ? (
+          <Button
+            id="wallet-deposit-open"
+            type="button"
+            aria-expanded={isDepositOpen}
+            aria-controls={isDepositOpen ? "deposit-form" : undefined}
+            onClick={onDepositOpen}
+          >
+            <PlusIcon aria-hidden="true" strokeWidth={3} strokeLinecap="square" />
+            {t("deposit")}
+          </Button>
+        ) : null}
       </div>
 
       {depositedAmount ? (
@@ -90,7 +109,7 @@ export function WalletSummary() {
         </p>
       ) : null}
 
-      {isDepositOpen ? (
+      {showBidderWallet && isDepositOpen ? (
         <div className="-mt-4">
           <DepositForm
             availableBalance={walletQuery.data?.availableBalance}
@@ -115,7 +134,7 @@ export function WalletSummary() {
           <>
             <p className="sr-only">{t("loading")}</p>
             <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-7">
-              {Array.from({ length: 3 }).map((_, index) => {
+              {Array.from({ length: showBidderWallet ? 3 : 2 }).map((_, index) => {
                 const key = `wallet-balance-skeleton-${index}`;
                 return <Skeleton key={key} className="h-38 w-full" />
               })}
@@ -128,11 +147,13 @@ export function WalletSummary() {
               totalBalance={walletQuery.data.totalBalance}
               committedBalance={walletQuery.data.committedBalance}
               availableBalance={walletQuery.data.availableBalance}
+              showCommittedBalance={showBidderWallet}
             />
             <BalanceBar
               totalBalance={walletQuery.data.totalBalance}
               committedBalance={walletQuery.data.committedBalance}
               availableBalance={walletQuery.data.availableBalance}
+              showCommittedBalance={showBidderWallet}
             />
           </>
         )}

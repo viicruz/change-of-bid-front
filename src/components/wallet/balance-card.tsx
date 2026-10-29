@@ -54,7 +54,15 @@ function BalanceTile(props: BalanceTileProps) {
   )
 }
 
-export function BalanceCards(props: ShowWallet) {
+type BalanceCardsProps = ShowWallet & {
+  showCommittedBalance: boolean
+}
+
+type BalanceBarProps = ShowWallet & {
+  showCommittedBalance: boolean
+}
+
+export function BalanceCards(props: BalanceCardsProps) {
   const t = useTranslations("pages./wallet")
 
   return (
@@ -71,24 +79,26 @@ export function BalanceCards(props: ShowWallet) {
         value={<Money id="wallet-available-balance" fit className={fitBox} amount={props.availableBalance} />}
         hint={t("availableHint")}
       />
-      <BalanceTile
-        className="border-border bg-card text-card-foreground"
-        labelClassName="text-muted-foreground"
-        hintClassName="text-muted-foreground"
-        label={
-          <>
-            <span aria-hidden="true" className={cn("inline-block size-4 border-3 border-black", committedStripes)} />
-            {t("committedBalance")}
-          </>
-        }
-        value={
-          <>
-            <LockIcon aria-hidden="true" className="size-7.5 shrink-0 text-brand-red" strokeWidth={3} strokeLinecap="square" />
-            <Money id="wallet-committed-balance" fit className={fitBox} amount={props.committedBalance} />
-          </>
-        }
-        hint={t("committedHint")}
-      />
+      {props.showCommittedBalance ? (
+        <BalanceTile
+          className="border-border bg-card text-card-foreground"
+          labelClassName="text-muted-foreground"
+          hintClassName="text-muted-foreground"
+          label={
+            <>
+              <span aria-hidden="true" className={cn("inline-block size-4 border-3 border-black", committedStripes)} />
+              {t("committedBalance")}
+            </>
+          }
+          value={
+            <>
+              <LockIcon aria-hidden="true" className="size-7.5 shrink-0 text-brand-red" strokeWidth={3} strokeLinecap="square" />
+              <Money id="wallet-committed-balance" fit className={fitBox} amount={props.committedBalance} />
+            </>
+          }
+          hint={t("committedHint")}
+        />
+      ) : null}
       <BalanceTile
         className="bg-brand-ink text-white shadow-brand-yellow"
         labelClassName="text-[#D9D4E0]"
@@ -101,35 +111,45 @@ export function BalanceCards(props: ShowWallet) {
   )
 }
 
-export function BalanceBar(props: ShowWallet) {
+export function BalanceBar(props: BalanceBarProps) {
   const t = useTranslations("pages./wallet")
   const total = Number(props.totalBalance)
   const availablePercent =
     total > 0 ? Math.round((Number(props.availableBalance) / total) * 100) : 100
-  const committedPercent = 100 - availablePercent
+  const committedPercent = props.showCommittedBalance ? 100 - availablePercent : 0
+  const shownAvailablePercent = props.showCommittedBalance ? availablePercent : 100
 
   return (
     <div className="flex flex-col gap-2.5">
       <div
         id="wallet-balance-bar"
         role="img"
-        aria-label={t("balanceBar", {
-          available: String(availablePercent),
-          committed: String(committedPercent),
-        })}
+        aria-label={
+          props.showCommittedBalance
+            ? t("balanceBar", {
+                available: String(shownAvailablePercent),
+                committed: String(committedPercent),
+              })
+            : t("balanceShare", {
+                label: t("availableBalance"),
+                percent: String(shownAvailablePercent),
+              })
+        }
         className="flex h-7 border-4 border-border bg-muted"
       >
         <span
           className={cn(
             "block bg-brand-yellow",
-            committedPercent > 0 && availablePercent > 0 && "border-r-4 border-black"
+            committedPercent > 0 && shownAvailablePercent > 0 && "border-r-4 border-black"
           )}
-          style={{ width: `${availablePercent}%` }}
+          style={{ width: `${shownAvailablePercent}%` }}
         />
-        <span
-          className="block bg-[repeating-linear-gradient(-45deg,var(--color-brand-red)_0_6px,var(--color-brand-red-dark)_6px_12px)]"
-          style={{ width: `${committedPercent}%` }}
-        />
+        {props.showCommittedBalance ? (
+          <span
+            className="block bg-[repeating-linear-gradient(-45deg,var(--color-brand-red)_0_6px,var(--color-brand-red-dark)_6px_12px)]"
+            style={{ width: `${committedPercent}%` }}
+          />
+        ) : null}
       </div>
       <div
         aria-hidden="true"
@@ -139,16 +159,18 @@ export function BalanceBar(props: ShowWallet) {
           <span className="inline-block size-3.5 border-2 border-black bg-brand-yellow" />
           {t("balanceShare", {
             label: t("availableBalance"),
-            percent: String(availablePercent),
+            percent: String(shownAvailablePercent),
           })}
         </span>
-        <span className="flex items-center gap-2">
-          <span className="inline-block size-3.5 border-2 border-black bg-brand-red" />
-          {t("balanceShare", {
-            label: t("committedBalance"),
-            percent: String(committedPercent),
-          })}
-        </span>
+        {props.showCommittedBalance ? (
+          <span className="flex items-center gap-2">
+            <span className="inline-block size-3.5 border-2 border-black bg-brand-red" />
+            {t("balanceShare", {
+              label: t("committedBalance"),
+              percent: String(committedPercent),
+            })}
+          </span>
+        ) : null}
       </div>
     </div>
   )
