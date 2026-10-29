@@ -76,7 +76,7 @@ export function useIndexParticipations(props: IndexParticipationsInput = {}) {
     queryKey: [QUERY_KEYS.PARTICIPATIONS.ALL],
     queryFn: indexParticipations,
     enabled,
-    staleTime: 1000 * 60 * 10, // 10 minutes
+    staleTime: 1000 * 60 * 2, // 2 minutes
     retry: (failureCount, error) => {
       if (error instanceof ApiSchemaError) {
         return false
