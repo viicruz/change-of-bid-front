@@ -126,7 +126,7 @@ function AuctioneerLotListItem(props: {
         data-active={props.selected ? "" : undefined}
         aria-current={props.selected ? "true" : undefined}
         className={cn(
-          "flex w-full items-center gap-3 px-3.5 py-3 text-left outline-none hover:bg-muted focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-ring data-active:bg-muted",
+          "flex w-full flex-wrap items-center gap-3 px-3.5 py-3 text-left outline-none hover:bg-muted focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-ring data-active:bg-muted",
           props.isNew && "bg-mine-row"
         )}
         onClick={onSelect}
@@ -137,7 +137,8 @@ function AuctioneerLotListItem(props: {
           size="xs"
           className={closed ? "grayscale-80" : undefined}
         />
-        <span className="flex min-w-0 flex-1 flex-col gap-1">
+        {/* Big amounts drop under the lot instead of squeezing its title */}
+        <span className="flex min-w-0 grow basis-32 flex-col gap-1">
           <span className="flex flex-wrap items-center gap-1.5">
             <Badge
               id={`auctioneer-lot-status-${lot.id}`}
@@ -162,7 +163,7 @@ function AuctioneerLotListItem(props: {
             {t("cardsCount", { count: cardCount })} · {when}
           </span>
         </span>
-        <span className="shrink-0 text-right">
+        <span className="ml-auto shrink-0 text-right">
           <span className="block text-[10px] font-bold text-muted-foreground uppercase">
             {t(value.labelKey)}
           </span>

@@ -17,6 +17,7 @@ import { ArrowRightIcon, LiveDot, Tag } from "@/src/components/ui/brand"
 import { Button, buttonVariants, press } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
+import { FitAmount } from "@/src/components/utils/money"
 
 //* Hooks imports
 import { useAuthSession } from "@/src/hooks/auth/use-auth-session"
@@ -482,6 +483,10 @@ function PlaceBidForm(props: { lot: PublicLot }) {
   const quickBids = quickBidSteps.map(
     (step) => minimumCents + incrementCents * (step - 1)
   )
+  //* From R$ 10.000,00 up three amounts no longer fit side by side, so each takes a row
+  const stackQuickBids = quickBids.some(
+    (cents) => format.number(cents / 100, currencyFormat).length > 11
+  )
 
   function pickQuickBid(cents: number) {
     storeBid.reset()
@@ -518,7 +523,12 @@ function PlaceBidForm(props: { lot: PublicLot }) {
         <legend className="mb-2 p-0 text-[13px] font-bold tracking-[1px] uppercase">
           {t("quickBid")}
         </legend>
-        <div className="grid grid-cols-3 gap-2.5">
+        <div
+          className={cn(
+            "grid gap-2.5",
+            stackQuickBids ? "grid-cols-1" : "grid-cols-3"
+          )}
+        >
           {quickBids.map((cents) => {
             const deltaCents = cents - baseCents
 
@@ -530,16 +540,23 @@ function PlaceBidForm(props: { lot: PublicLot }) {
                 onClick={() => pickQuickBid(cents)}
                 className={cn(
                   press,
-                  "flex min-h-14 flex-col items-center gap-0.5 rounded-none border-3 border-input bg-card px-1.5 py-2 text-foreground shadow-hard-3 disabled:pointer-events-none disabled:opacity-45"
+                  "@container flex min-w-0 items-center gap-0.5 rounded-none border-3 border-input bg-card text-foreground shadow-hard-3 disabled:pointer-events-none disabled:opacity-45",
+                  stackQuickBids
+                    ? "min-h-11 justify-between gap-3 px-3.5 py-2"
+                    : "min-h-14 flex-col px-1.5 py-2"
                 )}
               >
                 <span className="font-heading text-[15px] text-red-text">
-                  {deltaCents === 0
-                    ? t("quickBidMinimum")
-                    : `+ ${format.number(deltaCents / 100, incrementFormat)}`}
+                  <FitAmount>
+                    {deltaCents === 0
+                      ? t("quickBidMinimum")
+                      : `+ ${format.number(deltaCents / 100, incrementFormat)}`}
+                  </FitAmount>
                 </span>
                 <span className="text-[13px] font-bold">
-                  {format.number(cents / 100, currencyFormat)}
+                  <FitAmount>
+                    {format.number(cents / 100, currencyFormat)}
+                  </FitAmount>
                 </span>
               </button>
             )
@@ -779,7 +796,7 @@ function BidPanel(props: { room: ShowLot }) {
     >
       <LotTimerBar room={props.room} />
       <div className="flex flex-col gap-5 p-5.5">
-        <div>
+        <div className="@container">
           <h2
             id="current-bid-title"
             className="m-0 text-[13px] font-bold tracking-[1px] text-muted-foreground uppercase"
@@ -795,9 +812,13 @@ function BidPanel(props: { room: ShowLot }) {
                 : "text-[clamp(36px,4vw,48px)]"
             )}
           >
-            {lot.currentBid === null
-              ? t("noCurrentBid")
-              : format.number(moneyToNumber(lot.currentBid), currencyFormat)}
+            {lot.currentBid === null ? (
+              t("noCurrentBid")
+            ) : (
+              <FitAmount>
+                {format.number(moneyToNumber(lot.currentBid), currencyFormat)}
+              </FitAmount>
+            )}
           </p>
           {lot.leaderParticipantNo !== null ? (
             <p
@@ -825,14 +846,14 @@ function BidPanel(props: { room: ShowLot }) {
           ) : null}
         </div>
         {open ? (
-          <div className="flex border-3 border-input">
-            <div className="flex-1 px-3 py-2.5">
+          <div className="flex flex-wrap gap-0.75 border-3 border-input bg-input">
+            <div className="min-w-fit flex-1 bg-card px-3 py-2.5">
               <SmallLabel>{t("minimumIncrement")}</SmallLabel>
               <div className="font-heading text-lg">
                 {format.number(moneyToNumber(lot.minIncrement), currencyFormat)}
               </div>
             </div>
-            <div className="flex-1 border-l-3 border-input bg-brand-ink px-3 py-2.5 text-brand-yellow">
+            <div className="min-w-fit flex-1 bg-brand-ink px-3 py-2.5 text-brand-yellow">
               <SmallLabel className="text-white">{t("minimumBid")}</SmallLabel>
               <div id="minimum-bid-value" className="font-heading text-lg">
                 {format.number(minimumBidCents(lot) / 100, currencyFormat)}

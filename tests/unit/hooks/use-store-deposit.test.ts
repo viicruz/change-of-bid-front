@@ -86,7 +86,8 @@ describe("storeDepositSchema", () => {
       "2",
       "2.5",
       "2.50",
-      "9999999999999999.99",
+      "1000000",
+      "1000000.00",
     ]) {
       expect(storeDepositSchema.parse({ amount }).amount).toBe(amount)
     }
@@ -120,7 +121,21 @@ describe("storeDepositSchema", () => {
       expect(result.success).toBe(false)
 
       if (!result.success) {
-        expect(issueMessages(result.error, "amount")).toContain("INVALID_MONEY")
+        expect(issueMessages(result.error, "amount")).toEqual(["INVALID_MONEY"])
+      }
+    }
+  })
+
+  it("rejects an amount above BRL 1000000.00", () => {
+    for (const amount of ["1000000.01", "1000001", "9999999999999999.99"]) {
+      const result = storeDepositSchema.safeParse({ amount })
+
+      expect(result.success).toBe(false)
+
+      if (!result.success) {
+        expect(issueMessages(result.error, "amount")).toEqual([
+          "MONEY_ABOVE_LIMIT",
+        ])
       }
     }
   })

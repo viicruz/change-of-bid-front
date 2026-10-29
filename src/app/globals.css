@@ -272,6 +272,13 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Amounts stay on one line and shrink below the inherited size only when wider than
+   the nearest @container. --fit-chars is the text length: Bungee glyphs are ~0.62em wide */
+@utility amount-fit {
+  font-size: min(1em, 100cqi / (var(--fit-chars) * 0.62));
+  white-space: nowrap;
+}
+
 @utility type-label {
   font-size: 13px;
   font-weight: 700;

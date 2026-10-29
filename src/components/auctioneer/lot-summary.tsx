@@ -24,14 +24,12 @@ function SummaryCell(props: {
   label: string
   value: string
   highlight?: boolean
-  className?: string
 }) {
   return (
     <div
       className={cn(
-        "border-input px-3 py-2.5",
-        props.highlight && "bg-brand-ink text-brand-yellow",
-        props.className
+        "min-w-fit grow basis-[40%] bg-card px-3 py-2.5",
+        props.highlight && "bg-brand-ink text-brand-yellow"
       )}
     >
       <dt
@@ -88,30 +86,28 @@ export function LotSummaryGrid(props: LotSummaryGridProps) {
     return t("durationValueHours", { hours, minutes })
   }
 
+  //* Two cells a row; a cell takes the whole row when its amount doesn't fit in half
   return (
     <dl
       id={props.idPrefix}
       aria-label={t("summaryLabel")}
-      className="grid grid-cols-2 border-3 border-input"
+      className="flex flex-wrap gap-0.75 border-3 border-input bg-input"
     >
       <SummaryCell
         id={`${props.idPrefix}-cards`}
         label={t("summaryCards")}
         value={String(props.cardCount)}
-        className="border-r-3 border-b-3"
       />
       <SummaryCell
         id={`${props.idPrefix}-duration`}
         label={t("summaryDuration")}
         value={durationLabel()}
-        className="border-b-3"
       />
       <SummaryCell
         id={`${props.idPrefix}-opening-bid`}
         label={t("minimalValue")}
         value={money(props.openingBid)}
         highlight
-        className="border-r-3"
       />
       <SummaryCell
         id={`${props.idPrefix}-increment`}

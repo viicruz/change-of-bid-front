@@ -187,6 +187,31 @@ describe("storeLotSchema", () => {
     }
   })
 
+  it("accepts money up to BRL 1000000.00", () => {
+    const parsed = storeLotSchema.parse(
+      validStoreLot({ openingBid: "1000000.00", minIncrement: "1000000" })
+    )
+
+    expect(parsed.openingBid).toBe("1000000.00")
+    expect(parsed.minIncrement).toBe("1000000")
+  })
+
+  it("rejects an opening bid or increment above BRL 1000000.00", () => {
+    for (const field of ["openingBid", "minIncrement"] as const) {
+      const result = storeLotSchema.safeParse(
+        validStoreLot({ [field]: "1000000.01" })
+      )
+
+      expect(result.success).toBe(false)
+
+      if (!result.success) {
+        expect(issueMessages(result.error, field)).toEqual([
+          "MONEY_ABOVE_LIMIT",
+        ])
+      }
+    }
+  })
+
   it("rejects a datetime that has no timezone offset", () => {
     const result = storeLotSchema.safeParse(
       validStoreLot({ startsAt: "2099-10-26T18:00:00" })

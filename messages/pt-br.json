@@ -600,6 +600,7 @@
     "ROLE_REQUIRED": "Escolha se você quer ser arrematante ou leiloeiro.",
     "TITLE_REQUIRED": "O título é obrigatório",
     "INVALID_MONEY": "Os valores em dinheiro devem ser maiores que zero e ter no máximo 2 casas decimais.",
+    "MONEY_ABOVE_LIMIT": "O valor máximo é R$ 1.000.000,00.",
     "INVALID_DATETIME": "Informe uma data e hora ISO com fuso horário.",
     "INVALID_SCHEDULE": "O lote deve durar pelo menos 4 minutos, e o término deve estar no futuro.",
     "LOT_STARTS_AT_REQUIRED": "Escolha quando o lote abre.",

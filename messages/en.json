@@ -600,6 +600,7 @@
     "ROLE_REQUIRED": "Choose whether you want to be a bidder or an auctioneer.",
     "TITLE_REQUIRED": "Title is required",
     "INVALID_MONEY": "Money values must be greater than zero and have at most 2 decimal places.",
+    "MONEY_ABOVE_LIMIT": "The maximum amount is R$1,000,000.00.",
     "INVALID_DATETIME": "Enter an ISO datetime with a timezone offset.",
     "INVALID_SCHEDULE": "The lot must last at least 4 minutes, and the end must be in the future.",
     "LOT_STARTS_AT_REQUIRED": "Choose when the lot opens.",

@@ -87,8 +87,30 @@ function BidHarness(props: {
 
 describe("storeBidSchema", () => {
   it("accepts a positive amount with at most two decimal places", () => {
-    for (const amount of ["0.01", "0.1", "0.10", "10", "10.5", "10.50"]) {
+    for (const amount of [
+      "0.01",
+      "0.1",
+      "0.10",
+      "10",
+      "10.5",
+      "10.50",
+      "1000000.00",
+    ]) {
       expect(storeBidSchema.parse({ id: lotId, amount }).amount).toBe(amount)
+    }
+  })
+
+  it("rejects an amount above BRL 1000000.00", () => {
+    for (const amount of ["1000000.01", "1000001", "99999999.99"]) {
+      const result = storeBidSchema.safeParse({ id: lotId, amount })
+
+      expect(result.success).toBe(false)
+
+      if (!result.success) {
+        expect(issueMessages(result.error, "amount")).toEqual([
+          "MONEY_ABOVE_LIMIT",
+        ])
+      }
     }
   })
 

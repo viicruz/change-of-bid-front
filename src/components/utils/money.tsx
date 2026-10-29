@@ -2,12 +2,38 @@
 
 //* Libraries imports
 import { useLocale } from "next-intl";
-import { useMemo } from "react";
+import { useMemo, type CSSProperties } from "react";
+
+//* Utils imports
+import { cn } from "@/src/lib/utils"
 
 type MoneyProps = {
   amount: number | string
   id?: string
   className?: string
+  //* Shrinks the amount to the width of the nearest `@container`
+  fit?: boolean
+}
+
+type FitAmountProps = {
+  children: string
+  className?: string
+}
+
+/**
+ * Keeps a formatted amount on one line, shrinking it below the inherited font size
+ * only when it is wider than the nearest `@container`.
+ * @param children - The formatted amount.
+ */
+export function FitAmount(props: FitAmountProps) {
+  return (
+    <span
+      className={cn("amount-fit", props.className)}
+      style={{ "--fit-chars": props.children.length } as CSSProperties}
+    >
+      {props.children}
+    </span>
+  )
 }
 
 /**
@@ -31,7 +57,9 @@ export function Money(props: MoneyProps) {
 
   return (
     <span id={props.id} className={props.className}>
-      <data value={props.amount}>{formattedAmount}</data>
+      <data value={props.amount}>
+        {props.fit ? <FitAmount>{formattedAmount}</FitAmount> : formattedAmount}
+      </data>
     </span>
   )
 }

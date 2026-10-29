@@ -6,6 +6,7 @@ import * as z from "zod"
 
 //* Schema imports
 import { apiResponseErrorSchema } from "@/src/schemas/common/api"
+import { isWithinMoneyLimit } from "@/src/schemas/common/money"
 import { lotSchema } from "@/src/schemas/lot"
 
 //* Local imports
@@ -16,7 +17,11 @@ const minimumLotDurationMs = 4 * 60 * 1000
 
 const moneyInputSchema = z
   .string()
-  .regex(/^(?:0\.(?:0[1-9]|[1-9]\d?)|[1-9]\d*(?:\.\d{1,2})?)$/, "INVALID_MONEY")
+  .regex(/^(?:0\.(?:0[1-9]|[1-9]\d?)|[1-9]\d*(?:\.\d{1,2})?)$/, {
+    error: "INVALID_MONEY",
+    abort: true,
+  })
+  .refine(isWithinMoneyLimit, "MONEY_ABOVE_LIMIT")
 
 export const storeLotSchema = z
   .object({
