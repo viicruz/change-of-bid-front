@@ -148,7 +148,7 @@ describe("useShowReceipt", () => {
       const cached = queryClient.getQueryData<ShowReceipt>(queryKey(shareToken))
 
       expect(request.url.href).toBe(
-        `http://localhost:3001/public/receipts/${shareToken}`
+        `http://localhost:3000/backend/public/receipts/${shareToken}`
       )
       expect(request.url.search).toBe("")
       expect(request.init.method).toBe("GET")

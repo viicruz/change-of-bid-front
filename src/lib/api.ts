@@ -4,8 +4,8 @@ import * as z from "zod"
 //* Auth imports
 import { readBearerToken } from "@/src/lib/auth-client"
 
-//* Env imports
-import { env } from "@/src/env/client"
+//* Local imports
+import { backendBaseUrl } from "@/src/lib/backend-url"
 
 type ApiGetOptions<T> = {
   url: string
@@ -47,7 +47,7 @@ function resolveUrl(
   path: string,
   params: Record<string, string | undefined> | undefined
 ) {
-  const base = env.NEXT_PUBLIC_BACKEND_URL.replace(/\/$/, "")
+  const base = backendBaseUrl()
   const normalizedPath = path.startsWith("/") ? path : `/${path}`
   const url = new URL(`${base}${normalizedPath}`)
 

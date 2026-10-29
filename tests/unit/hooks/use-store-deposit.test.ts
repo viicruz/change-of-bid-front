@@ -229,7 +229,7 @@ describe("useStoreDeposit", () => {
     const request = lastRequest()
 
     expect(request.url.href).toBe(
-      "http://localhost:3001/private/wallet/deposits"
+      "http://localhost:3000/backend/private/wallet/deposits"
     )
     expect(request.init.method).toBe("POST")
     expect(request.init.body).toBe(JSON.stringify({ amount: "2.50" }))

@@ -194,7 +194,7 @@ describe("useIndexParticipations", () => {
     }
 
     expect(request.url.href).toBe(
-      "http://localhost:3001/private/participations"
+      "http://localhost:3000/backend/private/participations"
     )
     expect(request.url.search).toBe("")
     expect(request.init.method).toBe("GET")
@@ -231,7 +231,7 @@ describe("useIndexParticipations", () => {
       "success:0::none:false:false:null:none:undefined:null:null:null:null"
     )
 
-    expect(lastRequest().url.pathname).toBe("/private/participations")
+    expect(lastRequest().url.pathname).toBe("/backend/private/participations")
     expect(lastRequest().url.search).toBe("")
   })
 

@@ -10,10 +10,8 @@ import {
   readBearerToken,
 } from "@/src/lib/auth-client"
 
-//* Env imports
-import { env } from "@/src/env/client"
-
 //* Local imports
+import { backendBaseUrl } from "@/src/lib/backend-url"
 import { queryClient } from "@/src/lib/query-client"
 
 /** @expected-unused */
@@ -28,9 +26,7 @@ export class SignOutError extends Error {
 }
 
 function signOutUrl() {
-  const base = env.NEXT_PUBLIC_BACKEND_URL.replace(/\/$/, "")
-
-  return `${base}/api/auth/sign-out`
+  return `${backendBaseUrl()}/api/auth/sign-out`
 }
 
 async function signOut() {

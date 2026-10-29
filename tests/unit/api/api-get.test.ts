@@ -46,7 +46,7 @@ describe("api.get", () => {
     const [url, init] = fetchMock.mock.calls[0] as [URL, RequestInit]
     const headers = new Headers(init.headers)
 
-    expect(url.href).toBe("http://localhost:3001/private/lots")
+    expect(url.href).toBe("http://localhost:3000/backend/private/lots")
     expect(init.method).toBe("GET")
     expect(headers.get("Authorization")).toBe("Bearer session-token")
     expect(headers.get("Accept")).toBe("application/json")

@@ -168,7 +168,7 @@ describe("useShowLot", () => {
       const cached = queryClient.getQueryData<ShowLot>(queryKey(lotId))
 
       expect(request.url.href).toBe(
-        `http://localhost:3001/public/lots/${lotId}`
+        `http://localhost:3000/backend/public/lots/${lotId}`
       )
       expect(request.url.search).toBe("")
       expect(request.init.method).toBe("GET")

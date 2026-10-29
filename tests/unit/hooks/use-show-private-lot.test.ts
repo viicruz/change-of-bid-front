@@ -179,7 +179,7 @@ describe("useShowPrivateLot", () => {
       const cached = queryClient.getQueryData<ShowPrivateLot>(queryKey(lotId))
 
       expect(request.url.href).toBe(
-        `http://localhost:3001/private/lots/${lotId}`
+        `http://localhost:3000/backend/private/lots/${lotId}`
       )
       expect(request.url.search).toBe("")
       expect(request.init.method).toBe("GET")

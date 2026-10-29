@@ -2,8 +2,8 @@
 import { inferAdditionalFields } from "better-auth/client/plugins"
 import { createAuthClient } from "better-auth/react"
 
-//* Env imports
-import { env } from "@/src/env/client"
+//* Local imports
+import { backendBaseUrl } from "@/src/lib/backend-url"
 
 const TOKEN_KEY = "change-of-bid.bearer-token"
 
@@ -36,7 +36,8 @@ function storeToken(response: Response) {
 }
 
 export const authClient = createAuthClient({
-  baseURL: env.NEXT_PUBLIC_BACKEND_URL,
+  //* better-auth only appends /api/auth to a base URL without a path
+  baseURL: `${backendBaseUrl()}/api/auth`,
   fetchOptions: {
     credentials: "include",
     auth: {

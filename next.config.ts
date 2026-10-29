@@ -1,8 +1,18 @@
 import type { NextConfig } from "next"
 import createNextIntlPlugin from "next-intl/plugin"
-import "@/src/env/client"
+import { env } from "@/src/env/client"
 
 const nextConfig: NextConfig = {
+  //* Same-origin proxy so the session cookie is first-party (Safari blocks third-party cookies).
+  //* The source must match backendProxyPath in src/lib/backend-url.ts
+  async rewrites() {
+    return [
+      {
+        source: "/backend/:path*",
+        destination: `${env.NEXT_PUBLIC_BACKEND_URL.replace(/\/$/, "")}/:path*`,
+      },
+    ]
+  },
   images: {
     //* Allow local IP addresses to be used in the images URLs in development
     dangerouslyAllowLocalIP: true,

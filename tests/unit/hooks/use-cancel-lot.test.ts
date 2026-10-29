@@ -130,7 +130,7 @@ describe("useCancelLot", () => {
       .data as CanceledLot
 
     expect(request.url.href).toBe(
-      `http://localhost:3001/private/lots/${lotId}/cancel`
+      `http://localhost:3000/backend/private/lots/${lotId}/cancel`
     )
     expect(request.init.method).toBe("POST")
     expect(request.init.body).toBeUndefined()

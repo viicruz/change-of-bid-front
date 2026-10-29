@@ -251,7 +251,7 @@ describe("useStoreBid", () => {
       .data as StoredBid
 
     expect(request.url.href).toBe(
-      `http://localhost:3001/private/lots/${lotId}/bids`
+      `http://localhost:3000/backend/private/lots/${lotId}/bids`
     )
     expect(request.init.method).toBe("POST")
     expect(request.init.body).toBe(JSON.stringify({ amount: "11.50" }))

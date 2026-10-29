@@ -15,7 +15,7 @@ import { useSignOut } from "@/src/hooks/auth/use-sign-out"
 import { authClient } from "@/src/lib/auth-client"
 
 const tokenKey = "change-of-bid.bearer-token"
-const signOutUrl = "http://localhost:3001/api/auth/sign-out"
+const signOutUrl = "http://localhost:3000/backend/api/auth/sign-out"
 
 function SignOutHarness() {
   const signOut = useSignOut()

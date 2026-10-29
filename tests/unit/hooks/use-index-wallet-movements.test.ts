@@ -145,7 +145,7 @@ describe("useIndexWalletMovements", () => {
     const request = lastRequest()
 
     expect(request.url.href).toBe(
-      "http://localhost:3001/private/wallet/movements?page=2&limit=20"
+      "http://localhost:3000/backend/private/wallet/movements?page=2&limit=20"
     )
     expect(request.init.method).toBe("GET")
     expect(request.init.body).toBeUndefined()
@@ -168,7 +168,7 @@ describe("useIndexWalletMovements", () => {
     await renderAndWait({}, "success:1:1:20:5:HOLD:2.00:string")
 
     expect(lastRequest().url.href).toBe(
-      "http://localhost:3001/private/wallet/movements?page=1&limit=20"
+      "http://localhost:3000/backend/private/wallet/movements?page=1&limit=20"
     )
   })
 

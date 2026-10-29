@@ -121,7 +121,9 @@ describe("useShowWallet", () => {
 
     const request = lastRequest()
 
-    expect(request.url.href).toBe("http://localhost:3001/private/wallet")
+    expect(request.url.href).toBe(
+      "http://localhost:3000/backend/private/wallet"
+    )
     expect(request.url.search).toBe("")
     expect(request.init.method).toBe("GET")
     expect(request.init.body).toBeUndefined()

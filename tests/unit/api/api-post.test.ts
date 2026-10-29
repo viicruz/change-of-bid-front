@@ -49,7 +49,7 @@ describe("api.post", () => {
     const [url, init] = fetchMock.mock.calls[0] as [URL, RequestInit]
     const headers = new Headers(init.headers)
 
-    expect(url.href).toBe("http://localhost:3001/private/lots")
+    expect(url.href).toBe("http://localhost:3000/backend/private/lots")
     expect(init.method).toBe("POST")
     expect(init.body).toBe(JSON.stringify({ title: "Blue-Eyes lot" }))
     expect(headers.get("Authorization")).toBe("Bearer session-token")
@@ -75,7 +75,7 @@ describe("api.post", () => {
     const headers = new Headers(init.headers)
 
     expect(url.href).toBe(
-      "http://localhost:3001/private/lots/3f1c2a4e-8b0d-4e6a-9c11-2d5f7a8b9c0d/cancel"
+      "http://localhost:3000/backend/private/lots/3f1c2a4e-8b0d-4e6a-9c11-2d5f7a8b9c0d/cancel"
     )
     expect(init.method).toBe("POST")
     expect(init.body).toBeUndefined()
