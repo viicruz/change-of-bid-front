@@ -145,12 +145,55 @@ async function searchCardsByName(page: Page, inputId: string) {
   await page.locator(inputId).fill("Dragon")
 }
 
+function dateTimeLocal(date: Date) {
+  const pad = (value: number) => String(value).padStart(2, "0")
+
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
+}
+
+function parseDateTimeLocal(value: string | null) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(value ?? "")
+
+  if (!match) {
+    return null
+  }
+
+  const [, year, month, day, hours, minutes] = match.map(Number)
+
+  return new Date(year, month - 1, day, hours, minutes)
+}
+
+async function fillDateTime(page: Page, id: string, value: string) {
+  const [datePart, time] = value.split("T")
+  const [year, month, day] = datePart.split("-").map(Number)
+  const monthName = new Intl.DateTimeFormat("pt-BR", {
+    month: "long",
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(year, month - 1, day)))
+  const popover = page.locator("[data-slot=popover-content]")
+
+  await page.locator(`#${id}`).click()
+  await popover
+    .getByRole("combobox", { name: "Escolha o ano" })
+    .selectOption(String(year))
+  await popover
+    .getByRole("combobox", { name: "Escolha o mês" })
+    .selectOption(String(month - 1))
+  await popover
+    .getByRole("button", {
+      name: new RegExp(`${day} de ${monthName} de ${year}`, "i"),
+    })
+    .click()
+  await page.locator(`#${id}-time`).fill(time)
+  await expect(page.locator(`#${id}`)).toHaveAttribute("data-value", value)
+}
+
 async function fillLotDetails(page: Page) {
   await page.locator("#lot-title").fill("Lote do dragão")
   await page.locator("#lot-opening-bid").fill("10,00")
   await page.locator("#lot-min-increment").fill("0,50")
-  await page.locator("#lot-starts-at").fill("2099-10-26T18:00")
-  await page.locator("#lot-ends-at").fill("2099-10-28T18:00")
+  await fillDateTime(page, "lot-starts-at", "2099-10-26T18:00")
+  await fillDateTime(page, "lot-ends-at", "2099-10-28T18:00")
 }
 
 describe("create lot page", () => {
@@ -322,15 +365,34 @@ describe("create lot page", () => {
     await openAuctioneer(page)
     await page.locator("#lot-opening-bid").fill("10,00")
     await page.locator("#lot-quick-increment-5").click()
-    await page.locator("#lot-starts-at").fill("2099-10-26T18:00")
+    const before = Date.now()
     await page.locator("#lot-quick-duration-3").click()
+    const after = Date.now()
+    const startsAt = await page
+      .locator("#lot-starts-at")
+      .getAttribute("data-value")
+    const start = parseDateTimeLocal(startsAt)
+    const end = start ? new Date(start) : null
+
+    end?.setDate(end.getDate() + 3)
 
     await expect(page.locator("#lot-min-increment")).toHaveValue("5,00")
     await expect(page.locator("#lot-quick-increment-5")).toHaveAttribute(
       "aria-pressed",
       "true"
     )
-    await expect(page.locator("#lot-ends-at")).toHaveValue("2099-10-29T18:00")
+    expect(start?.getTime()).toBeGreaterThanOrEqual(before - 60_000)
+    expect(start?.getTime()).toBeLessThanOrEqual(after)
+    await expect(page.locator("#lot-starts-at-time")).toHaveValue(
+      startsAt?.slice(11) ?? ""
+    )
+    await expect(page.locator("#lot-ends-at")).toHaveAttribute(
+      "data-value",
+      end ? dateTimeLocal(end) : ""
+    )
+    await expect(page.locator("#lot-ends-at-time")).toHaveValue(
+      end ? dateTimeLocal(end).slice(11) : ""
+    )
     await expect(page.locator("#lot-summary-duration")).toHaveText("3d 0h")
     await expect(page.locator("#lot-summary-opening-bid")).toHaveText(
       "R$ 10,00"

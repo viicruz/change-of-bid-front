@@ -3,7 +3,9 @@ import { describe, expect, it } from "vitest"
 
 //* Lib imports
 import {
-  defaultLotStart,
+  applyCalendarDate,
+  applyClockTime,
+  dateTimeNotBefore,
   durationBetween,
   lotDuration,
   parseDateTimeLocal,
@@ -26,32 +28,62 @@ describe("lot schedule", () => {
     expect(parseDateTimeLocal("05/01/2026 08:03")).toBeNull()
   })
 
-  it("starts by default tomorrow at 20:00", () => {
-    expect(toDateTimeLocal(defaultLotStart(now))).toBe("2026-10-29T20:00")
+  it("keeps the current time when a date is chosen", () => {
+    expect(applyCalendarDate("2026-11-02T18:30", new Date(2099, 9, 26))).toBe(
+      "2099-10-26T18:30"
+    )
   })
 
-  it("ends four minutes after the chosen start", () => {
-    expect(
-      scheduleForDuration({ startsAt: "2026-11-02T18:30", minutes: 4, now })
-    ).toEqual({
-      startsAt: "2026-11-02T18:30",
-      endsAt: "2026-11-02T18:34",
+  it("uses 20:00 when a date is chosen on an empty field", () => {
+    expect(applyCalendarDate("", new Date(2099, 9, 26))).toBe(
+      "2099-10-26T20:00"
+    )
+  })
+
+  it("changes only the hours and minutes", () => {
+    expect(applyClockTime("2099-10-26T20:00", "18:05")).toBe("2099-10-26T18:05")
+  })
+
+  it("leaves the value unchanged when the time has no date", () => {
+    expect(applyClockTime("", "18:05")).toBe("")
+  })
+
+  it("leaves the value unchanged when the time is malformed", () => {
+    expect(applyClockTime("2099-10-26T20:00", "8")).toBe("2099-10-26T20:00")
+  })
+
+  it("keeps a datetime that is already on or after the minimum", () => {
+    expect(dateTimeNotBefore("2099-10-28T18:00", "2099-10-26T18:00")).toBe(
+      "2099-10-28T18:00"
+    )
+    expect(dateTimeNotBefore("2099-10-26T18:00", "2099-10-26T18:00")).toBe(
+      "2099-10-26T18:00"
+    )
+  })
+
+  it("uses the minimum when the datetime is earlier", () => {
+    expect(dateTimeNotBefore("2099-10-26T17:59", "2099-10-26T18:00")).toBe(
+      "2099-10-26T18:00"
+    )
+  })
+
+  it("keeps the value when there is no minimum", () => {
+    expect(dateTimeNotBefore("2099-10-26T17:00", undefined)).toBe(
+      "2099-10-26T17:00"
+    )
+  })
+
+  it("starts a four minute lot at the current moment", () => {
+    expect(scheduleForDuration({ minutes: 4, now })).toEqual({
+      startsAt: "2026-10-28T15:42",
+      endsAt: "2026-10-28T15:46",
     })
   })
 
-  it("ends a duration after the chosen start", () => {
-    expect(
-      scheduleForDuration({ startsAt: "2026-11-02T18:30", days: 3, now })
-    ).toEqual({
-      startsAt: "2026-11-02T18:30",
-      endsAt: "2026-11-05T18:30",
-    })
-  })
-
-  it("fills the default start when there is none", () => {
-    expect(scheduleForDuration({ startsAt: "", days: 1, now })).toEqual({
-      startsAt: "2026-10-29T20:00",
-      endsAt: "2026-10-30T20:00",
+  it("starts a multi-day lot at the current moment", () => {
+    expect(scheduleForDuration({ days: 3, now })).toEqual({
+      startsAt: "2026-10-28T15:42",
+      endsAt: "2026-10-31T15:42",
     })
   })
 
