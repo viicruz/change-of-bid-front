@@ -2,7 +2,7 @@
 
 //* Libraries imports
 import { NextIntlClientProvider } from "next-intl"
-import { act, createElement } from "react"
+import { act, createElement, type ComponentProps } from "react"
 import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -106,14 +106,15 @@ const participations = [
 ]
 
 function HistoryHarness() {
-  return createElement(NextIntlClientProvider, {
-    locale: "en",
-    messages: enMessages,
-    timeZone: "UTC",
-    children: createElement(QueryProvider, {
-      children: createElement(BidHistory),
-    }),
-  })
+  return createElement(
+    NextIntlClientProvider,
+    {
+      locale: "en",
+      messages: enMessages,
+      timeZone: "UTC",
+    } as ComponentProps<typeof NextIntlClientProvider>,
+    createElement(QueryProvider, null, createElement(BidHistory))
+  )
 }
 
 function setInputValue(input: HTMLInputElement, value: string) {

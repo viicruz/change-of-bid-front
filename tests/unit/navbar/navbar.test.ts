@@ -2,7 +2,7 @@
 
 //* Libraries imports
 import { NextIntlClientProvider } from "next-intl"
-import { act, createElement } from "react"
+import { act, createElement, type ComponentProps } from "react"
 import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -46,11 +46,14 @@ function renderNavbar() {
   return createElement(
     QueryProvider,
     null,
-    createElement(NextIntlClientProvider, {
-      locale: "en",
-      messages: enMessages,
-      children: createElement(Navbar),
-    })
+    createElement(
+      NextIntlClientProvider,
+      {
+        locale: "en",
+        messages: enMessages,
+      } as ComponentProps<typeof NextIntlClientProvider>,
+      createElement(Navbar)
+    )
   )
 }
 

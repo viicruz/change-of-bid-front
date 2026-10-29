@@ -3,7 +3,7 @@
 //* Libraries imports
 import { NextIntlClientProvider } from "next-intl"
 import { NuqsTestingAdapter } from "nuqs/adapters/testing"
-import { act, createElement } from "react"
+import { act, createElement, type ComponentProps } from "react"
 import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -32,17 +32,19 @@ vi.mock("@/src/lib/api", async () => {
 })
 
 function ShowcaseHarness() {
-  return createElement(NextIntlClientProvider, {
-    locale: "en",
-    messages: enMessages,
-    timeZone: "UTC",
-    children: createElement(NuqsTestingAdapter, {
-      hasMemory: true,
-      children: createElement(QueryProvider, {
-        children: createElement(LotShowcase),
-      }),
-    }),
-  })
+  return createElement(
+    NextIntlClientProvider,
+    {
+      locale: "en",
+      messages: enMessages,
+      timeZone: "UTC",
+    } as ComponentProps<typeof NextIntlClientProvider>,
+    createElement(
+      NuqsTestingAdapter,
+      { hasMemory: true } as ComponentProps<typeof NuqsTestingAdapter>,
+      createElement(QueryProvider, null, createElement(LotShowcase))
+    )
+  )
 }
 
 function setInputValue(input: HTMLInputElement, value: string) {
