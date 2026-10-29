@@ -10,8 +10,6 @@ import { apiResponseErrorSchema } from "@/src/schemas/common/api"
 //* Local imports
 import { ApiError, api } from "@/src/lib/api"
 
-const tokenKey = "change-of-bid.bearer-token"
-
 const successSchema = z.object({
   ok: z.literal(true),
 })
@@ -27,12 +25,10 @@ function postOptions() {
 
 describe("api.post", () => {
   afterEach(() => {
-    sessionStorage.clear()
     vi.unstubAllGlobals()
   })
 
-  it("sends the bearer token and the JSON body", async () => {
-    sessionStorage.setItem(tokenKey, "session-token")
+  it("sends the JSON body and no authorization header", async () => {
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(JSON.stringify({ ok: true }), {
         status: 201,
@@ -49,15 +45,14 @@ describe("api.post", () => {
     const [url, init] = fetchMock.mock.calls[0] as [URL, RequestInit]
     const headers = new Headers(init.headers)
 
-    expect(url.href).toBe("http://localhost:3001/private/lots")
+    expect(url.href).toBe("http://localhost:3000/backend/private/lots")
     expect(init.method).toBe("POST")
     expect(init.body).toBe(JSON.stringify({ title: "Blue-Eyes lot" }))
-    expect(headers.get("Authorization")).toBe("Bearer session-token")
+    expect(headers.get("Authorization")).toBeNull()
     expect(headers.get("Content-Type")).toBe("application/json")
   })
 
   it("omits the body and the content type when no body is provided", async () => {
-    sessionStorage.setItem(tokenKey, "session-token")
     const fetchMock = vi
       .fn()
       .mockResolvedValue(
@@ -75,29 +70,12 @@ describe("api.post", () => {
     const headers = new Headers(init.headers)
 
     expect(url.href).toBe(
-      "http://localhost:3001/private/lots/3f1c2a4e-8b0d-4e6a-9c11-2d5f7a8b9c0d/cancel"
+      "http://localhost:3000/backend/private/lots/3f1c2a4e-8b0d-4e6a-9c11-2d5f7a8b9c0d/cancel"
     )
     expect(init.method).toBe("POST")
     expect(init.body).toBeUndefined()
-    expect(headers.get("Authorization")).toBe("Bearer session-token")
     expect(headers.get("Accept")).toBe("application/json")
     expect(headers.get("Content-Type")).toBeNull()
-  })
-
-  it("omits the authorization header when no session token is stored", async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValue(
-        new Response(JSON.stringify({ ok: true }), { status: 201 })
-      )
-    vi.stubGlobal("fetch", fetchMock)
-
-    await api.post(postOptions())
-
-    const [, init] = fetchMock.mock.calls[0] as [URL, RequestInit]
-    const headers = new Headers(init.headers)
-
-    expect(headers.get("Authorization")).toBeNull()
   })
 
   it("keeps a plain-text 401 body without parsing it as JSON", async () => {

@@ -11,16 +11,18 @@ GET /public/yugioh/cards/search?fname=blue-eyes&num=32&offset=0
 ## Parâmetros
 
 
-| Parâmetro | Uso                                                      |
-| --------- | -------------------------------------------------------- |
-| `fname`   | Nome parcial. Usado na caixa de busca.                   |
-| `name`    | Nome exato. Não pode ir junto com `id`.                  |
-| `id`      | Um id de carta, ou vários. Não pode ir junto com `name`. |
-| `num`     | Tamanho da página. Padrão `32`.                          |
-| `offset`  | Deslocamento da página. Padrão `0`.                      |
+| Parâmetro | Uso no painel |
+| --- | --- |
+| `fname` | Nome parcial. |
+| `type` | Tipo da carta, um valor do catálogo. |
+| `attribute` | Atributo. |
+| `archetype` | Arquétipo. |
+| `level` | Comparação (`lt`, `lte`, `gt`, `gte`) e um número. A tela não envia um nível exato. |
+| `sort` | `atk`, `def`, `name`, `type`, `level`, `id` ou `new`. |
+| `num` | Tamanho da página. O painel envia `16`. O padrão da rota, sem o parâmetro, é `32`. |
+| `offset` | Deslocamento. O painel usa `página × 16`. |
 
-
-A rota também aceita os filtros do catálogo de origem (`type`, `race`, `attribute`, `atk`, `def`, `level`, `link`, `linkmarker`, `scale`, `cardset`, `archetype`, `banlist`, `sort`, `format`, `misc`, `staple`, `has_effect`, `startdate`, `enddate`, `dateregion`, `language`). O seletor do leiloeiro só precisa de `fname`, `num` e `offset`.
+`name` e `id` também existem na rota e não podem ir juntos. O painel não os envia. O mesmo vale para `race`, `atk`, `def`, `link`, `linkmarker`, `scale`, `cardset`, `banlist`, `format`, `misc`, `staple`, `has_effect`, `startdate`, `enddate`, `dateregion` e `language`: a rota aceita, e esta tela não usa.
 
 `name` e `id` na mesma query é `422` com `type: "validation"`.
 

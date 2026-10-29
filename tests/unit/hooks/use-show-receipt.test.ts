@@ -17,7 +17,6 @@ import {
 //* Local imports
 import { QUERY_KEYS, queryClient } from "@/src/lib/query-client"
 
-const tokenKey = "change-of-bid.bearer-token"
 const shareToken = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefg"
 const lotId = "2d3c4b5a-1111-4222-8333-444455556666"
 
@@ -79,8 +78,6 @@ describe("useShowReceipt", () => {
 
   beforeEach(() => {
     queryClient.clear()
-    sessionStorage.clear()
-    sessionStorage.setItem(tokenKey, "session-token")
     container = document.createElement("div")
     document.body.append(container)
     root = createRoot(container)
@@ -92,7 +89,6 @@ describe("useShowReceipt", () => {
     })
     container.remove()
     queryClient.clear()
-    sessionStorage.clear()
     vi.unstubAllGlobals()
     vi.clearAllMocks()
   })
@@ -148,12 +144,11 @@ describe("useShowReceipt", () => {
       const cached = queryClient.getQueryData<ShowReceipt>(queryKey(shareToken))
 
       expect(request.url.href).toBe(
-        `http://localhost:3001/public/receipts/${shareToken}`
+        `http://localhost:3000/backend/public/receipts/${shareToken}`
       )
       expect(request.url.search).toBe("")
       expect(request.init.method).toBe("GET")
       expect(request.init.body).toBeUndefined()
-      expect(request.headers.get("Authorization")).toBe("Bearer session-token")
       expect(request.headers.get("Accept")).toBe("application/json")
       expect(request.headers.get("Content-Type")).toBeNull()
       expect(fetchMock).toHaveBeenCalledTimes(1)
@@ -216,23 +211,6 @@ describe("useShowReceipt", () => {
         def: 2000,
         attribute: "WATER",
       })
-    })
-  })
-
-  describe("when there is no session", () => {
-    it("still loads the receipt without an authorization header", async () => {
-      sessionStorage.clear()
-      const fetchMock = vi
-        .fn()
-        .mockResolvedValue(jsonResponse(publicReceiptResponse))
-      vi.stubGlobal("fetch", fetchMock)
-
-      await renderAndWait({ shareToken }, "success:7:12.50:1:true:Sealed duel")
-
-      const request = lastRequest()
-
-      expect(request.headers.get("Authorization")).toBeNull()
-      expect(fetchMock).toHaveBeenCalledTimes(1)
     })
   })
 

@@ -1,5 +1,5 @@
 //* The API rejects deposits, opening bids, increments and bids above BRL 1000000.00
-export const maxMoneyAmount = 1_000_000
+const maxMoneyAmount = 1_000_000
 
 /**
  * Checks a decimal money string against the API limit.

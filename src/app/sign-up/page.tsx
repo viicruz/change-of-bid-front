@@ -1,5 +1,6 @@
 //* Libraries imports
 import { getTranslations } from "next-intl/server"
+import type { Metadata } from "next"
 import Link from "next/link"
 
 //* Components imports
@@ -21,6 +22,15 @@ const fannedCards = [
     className: "bottom-0 left-[220px] rotate-12 shadow-brand-red",
   },
 ]
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("pages./sign-up")
+
+  return {
+    title: t("title"),
+    description: t("description"),
+  }
+}
 
 export default async function Page() {
   const t = await getTranslations("pages./sign-up")

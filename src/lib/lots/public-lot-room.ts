@@ -98,6 +98,35 @@ export function rememberViewerParticipant(
   })
 }
 
+export function isViewer(
+  participantNo: number | null,
+  viewerParticipantNo: number | null
+) {
+  return viewerParticipantNo !== null && participantNo === viewerParticipantNo
+}
+
+//* Who is looking at the bid panel, read from the auth session
+export type BidViewer = "pending" | "guest" | "bidder" | "auctioneer"
+
+//* What the bid panel offers: nothing, the bid form or a lock for who cannot bid
+export type BidPanelState = "none" | "bidder" | "guest" | "auctioneer"
+
+export function resolveBidPanelState(
+  room: ShowLot,
+  viewer: BidViewer
+): BidPanelState {
+  if (viewer === "pending" || room.lot.status !== "LIVE") {
+    return "none"
+  }
+
+  //* The leader cannot outbid themselves
+  if (isViewer(room.lot.leaderParticipantNo, room.viewerParticipantNo)) {
+    return "none"
+  }
+
+  return viewer
+}
+
 export function viewerPlacedLastBid(room: ShowLot) {
   const lastBid = room.lot.bids.at(-1) ?? null
 

@@ -21,8 +21,6 @@ import { ApiError, ApiSchemaError } from "@/src/lib/api"
 import { QUERY_KEYS, queryClient } from "@/src/lib/query-client"
 import type { Wallet } from "@/src/schemas/wallet"
 
-const tokenKey = "change-of-bid.bearer-token"
-
 const previousWallet: Wallet = {
   totalBalance: "10.00",
   committedBalance: "4.00",
@@ -147,9 +145,21 @@ describe("storeDepositSchema", () => {
       expect(result.success).toBe(false)
 
       if (!result.success) {
-        expect(issueMessages(result.error, "amount")).toContain("INVALID_MONEY")
+        expect(issueMessages(result.error, "amount")).toEqual(["INVALID_MONEY"])
       }
     }
+  })
+
+  it("applies the custom message to both the type and the format issue", () => {
+    const notString = storeDepositSchema.safeParse({ amount: 2.5 })
+    const badFormat = storeDepositSchema.safeParse({ amount: "1,50" })
+
+    expect(notString.error?.issues).toMatchObject([
+      { code: "invalid_type", path: ["amount"], message: "INVALID_MONEY" },
+    ])
+    expect(badFormat.error?.issues).toMatchObject([
+      { code: "invalid_format", path: ["amount"], message: "INVALID_MONEY" },
+    ])
   })
 })
 
@@ -159,8 +169,6 @@ describe("useStoreDeposit", () => {
 
   beforeEach(() => {
     queryClient.clear()
-    sessionStorage.clear()
-    sessionStorage.setItem(tokenKey, "session-token")
     queryClient.setQueryData([QUERY_KEYS.WALLETS.SINGLE], previousWallet)
     container = document.createElement("div")
     document.body.append(container)
@@ -173,7 +181,6 @@ describe("useStoreDeposit", () => {
     })
     container.remove()
     queryClient.clear()
-    sessionStorage.clear()
     vi.unstubAllGlobals()
     vi.clearAllMocks()
   })
@@ -229,11 +236,10 @@ describe("useStoreDeposit", () => {
     const request = lastRequest()
 
     expect(request.url.href).toBe(
-      "http://localhost:3001/private/wallet/deposits"
+      "http://localhost:3000/backend/private/wallet/deposits"
     )
     expect(request.init.method).toBe("POST")
     expect(request.init.body).toBe(JSON.stringify({ amount: "2.50" }))
-    expect(request.headers.get("Authorization")).toBe("Bearer session-token")
     expect(request.headers.get("Accept")).toBe("application/json")
     expect(request.headers.get("Content-Type")).toBe("application/json")
     expect(fetchMock).toHaveBeenCalledTimes(1)

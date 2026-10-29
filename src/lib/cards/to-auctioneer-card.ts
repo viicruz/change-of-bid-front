@@ -3,7 +3,7 @@ import type { Card } from "@/src/schemas/card"
 
 //* Lib imports
 import type { AuctioneerCard } from "@/src/lib/cards/auctioneer-card"
-import type { CardType } from "@/src/lib/lots/mock-lots"
+import type { CardType } from "@/src/lib/cards/card-types"
 
 const extraDeckFrames = new Set(["fusion", "synchro", "xyz", "link"])
 

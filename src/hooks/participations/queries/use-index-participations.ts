@@ -55,6 +55,7 @@ const apiResponseSchema = z.object({
   lots: z.array(indexParticipationSchema),
 })
 
+/** @expected-unused */
 export type IndexParticipations = z.infer<typeof apiResponseSchema>
 
 export interface IndexParticipationsInput {
@@ -76,7 +77,7 @@ export function useIndexParticipations(props: IndexParticipationsInput = {}) {
     queryKey: [QUERY_KEYS.PARTICIPATIONS.ALL],
     queryFn: indexParticipations,
     enabled,
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 30, // 30 seconds
     retry: (failureCount, error) => {
       if (error instanceof ApiSchemaError) {
         return false

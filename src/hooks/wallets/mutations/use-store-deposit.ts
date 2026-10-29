@@ -18,7 +18,7 @@ import {
 } from "@/src/lib/query-client"
 
 const depositAmountSchema = z
-  .string("INVALID_MONEY")
+  .string({ error: "INVALID_MONEY" })
   .trim()
   .regex(/^(?:0\.(?:0[1-9]|[1-9]\d?)|[1-9]\d{0,15}(?:\.\d{1,2})?)$/, {
     error: "INVALID_MONEY",

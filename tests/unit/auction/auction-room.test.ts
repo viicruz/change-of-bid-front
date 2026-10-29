@@ -481,7 +481,7 @@ describe("AuctionRoom", () => {
 
       expect(fetchMock).toHaveBeenCalledTimes(1)
       expect(call?.[0].href).toBe(
-        `http://localhost:3001/private/lots/${lotId}/bids`
+        `http://localhost:3000/backend/private/lots/${lotId}/bids`
       )
       expect(call?.[1].method).toBe("POST")
       expect(call?.[1].body).toBe(JSON.stringify({ amount: "16.50" }))

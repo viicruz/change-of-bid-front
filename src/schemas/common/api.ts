@@ -11,5 +11,3 @@ export const apiResponseErrorSchema = z.object({
   found: z.unknown().optional(),
   errors: z.array(z.unknown()).optional(),
 })
-
-export type ApiResponseError = z.infer<typeof apiResponseErrorSchema>

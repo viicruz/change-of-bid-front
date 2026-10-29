@@ -15,7 +15,6 @@ import { useShowLot, type ShowLot } from "@/src/hooks/lots/queries/use-show-lot"
 import { publicLotQueryKey } from "@/src/lib/lots/public-lot-room"
 import { queryClient } from "@/src/lib/query-client"
 
-const tokenKey = "change-of-bid.bearer-token"
 const lotId = "6f1c2a40-7b3e-4d1a-9c20-1a2b3c4d5e6f"
 
 const publicLotResponse = {
@@ -100,8 +99,6 @@ describe("useShowLot", () => {
 
   beforeEach(() => {
     queryClient.clear()
-    sessionStorage.clear()
-    sessionStorage.setItem(tokenKey, "session-token")
     container = document.createElement("div")
     document.body.append(container)
     root = createRoot(container)
@@ -113,7 +110,6 @@ describe("useShowLot", () => {
     })
     container.remove()
     queryClient.clear()
-    sessionStorage.clear()
     vi.unstubAllGlobals()
     vi.clearAllMocks()
   })
@@ -168,12 +164,11 @@ describe("useShowLot", () => {
       const cached = queryClient.getQueryData<ShowLot>(queryKey(lotId))
 
       expect(request.url.href).toBe(
-        `http://localhost:3001/public/lots/${lotId}`
+        `http://localhost:3000/backend/public/lots/${lotId}`
       )
       expect(request.url.search).toBe("")
       expect(request.init.method).toBe("GET")
       expect(request.init.body).toBeUndefined()
-      expect(request.headers.get("Authorization")).toBe("Bearer session-token")
       expect(request.headers.get("Accept")).toBe("application/json")
       expect(request.headers.get("Content-Type")).toBeNull()
       expect(fetchMock).toHaveBeenCalledTimes(1)
@@ -438,31 +433,8 @@ describe("useShowLot", () => {
         "success:LIVE:2:15.00:false:none:1:true:true"
       )
 
-      const request = lastRequest()
-
-      expect(request.headers.get("Authorization")).toBe("Bearer session-token")
-    })
-  })
-
-  describe("when there is no session", () => {
-    it("still loads the lot and leaves the viewer number empty", async () => {
-      sessionStorage.clear()
-      const response = {
-        ...publicLotResponse,
-        viewerParticipantNo: null,
-      }
-      const fetchMock = vi.fn().mockResolvedValue(jsonResponse(response))
-      vi.stubGlobal("fetch", fetchMock)
-
-      await renderAndWait(
-        { id: lotId },
-        "success:LIVE:2:15.00:false:none:1:true:true"
-      )
-
-      const request = lastRequest()
       const cached = queryClient.getQueryData<ShowLot>(queryKey(lotId))
 
-      expect(request.headers.get("Authorization")).toBeNull()
       expect(cached?.viewerParticipantNo).toBeNull()
       expect(fetchMock).toHaveBeenCalledTimes(1)
     })

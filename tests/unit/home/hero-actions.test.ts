@@ -2,7 +2,7 @@
 
 //* Libraries imports
 import { NextIntlClientProvider } from "next-intl"
-import { act, createElement } from "react"
+import { act, createElement, type ComponentProps } from "react"
 import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -25,11 +25,14 @@ vi.mock("@/src/hooks/auth/use-auth-session", () => ({
 }))
 
 function renderHeroActions() {
-  return createElement(NextIntlClientProvider, {
-    locale: "en",
-    messages: enMessages,
-    children: createElement(HeroActions),
-  })
+  return createElement(
+    NextIntlClientProvider,
+    {
+      locale: "en",
+      messages: enMessages,
+    } as ComponentProps<typeof NextIntlClientProvider>,
+    createElement(HeroActions)
+  )
 }
 
 function linkById(container: HTMLElement, id: string) {

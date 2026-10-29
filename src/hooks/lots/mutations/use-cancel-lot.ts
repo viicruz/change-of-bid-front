@@ -12,10 +12,11 @@ import { lotSchema, privateLotStatusEnum } from "@/src/schemas/lot"
 import { api } from "@/src/lib/api"
 import { QUERY_KEYS, queryInvalidator } from "@/src/lib/query-client"
 
-export const cancelLotSchema = z.object({
+const cancelLotSchema = z.object({
   id: lotSchema.shape.id,
 })
 
+/** @expected-unused */
 export type CancelLotInput = z.infer<typeof cancelLotSchema>
 
 const canceledLotSchema = z.object({

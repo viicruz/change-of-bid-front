@@ -14,5 +14,3 @@ export const authUserSchema = z.object({
   updatedAt: z.date(),
   role: userRoleSchema,
 })
-
-export type AuthUser = z.infer<typeof authUserSchema>

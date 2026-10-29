@@ -31,6 +31,8 @@ const indexLotSchema = z.object({
   currentBid: lotSchema.shape.openingBid.nullable(),
   bidCount: z.number().int().nonnegative(),
   sold: z.boolean(),
+  //* `items` holds at most the first 5; this is the lot's real total
+  totalItems: z.number().int().nonnegative(),
 })
 
 export type IndexLot = z.infer<typeof indexLotSchema>
@@ -39,6 +41,7 @@ const apiResponseSchema = z.object({
   lots: z.array(indexLotSchema),
 })
 
+/** @expected-unused */
 export type IndexLots = z.infer<typeof apiResponseSchema>
 
 export interface IndexLotsInput {
@@ -88,7 +91,7 @@ export function useIndexLots(props: IndexLotsInput = {}) {
     queryKey: [QUERY_KEYS.LOTS.ALL, q ?? null, status ?? null],
     queryFn: () => indexLots(q, status),
     enabled,
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 30, // 30 seconds
     retry: (failureCount, error) => {
       if (
         error instanceof ApiError &&

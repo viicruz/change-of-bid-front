@@ -12,8 +12,10 @@ import {
   publicLotCountdownTarget,
   publicLotLiveUrl,
   publicLotQueryKey,
+  isViewer,
   rememberViewerParticipant,
   remainingLotTime,
+  resolveBidPanelState,
   viewerPlacedLastBid,
   viewerWasJustOutbid,
 } from "@/src/lib/lots/public-lot-room"
@@ -81,10 +83,7 @@ describe("publicLotLiveUrl", () => {
 
 describe("publicLotQueryKey", () => {
   it("matches the public lot cache key", () => {
-    expect(publicLotQueryKey(lotId)).toEqual([
-      QUERY_KEYS.LOTS.SINGLE,
-      lotId,
-    ])
+    expect(publicLotQueryKey(lotId)).toEqual([QUERY_KEYS.LOTS.SINGLE, lotId])
   })
 })
 
@@ -278,6 +277,45 @@ describe("viewer leadership", () => {
 
     expect(viewerPlacedLastBid(earlier)).toBe(false)
     expect(viewerWasJustOutbid(earlier)).toBe(false)
+  })
+})
+
+describe("isViewer", () => {
+  it("matches the viewer's own participant number", () => {
+    expect(isViewer(4, 4)).toBe(true)
+    expect(isViewer(3, 4)).toBe(false)
+  })
+
+  it("never matches when the viewer has no participant number", () => {
+    expect(isViewer(null, null)).toBe(false)
+    expect(isViewer(4, null)).toBe(false)
+  })
+})
+
+describe("resolveBidPanelState", () => {
+  it("offers the viewer's own action on a live lot they do not lead", () => {
+    expect(resolveBidPanelState(room(), "bidder")).toBe("bidder")
+    expect(resolveBidPanelState(room(), "guest")).toBe("guest")
+    expect(resolveBidPanelState(room(), "auctioneer")).toBe("auctioneer")
+  })
+
+  it("offers nothing while the session is still loading", () => {
+    expect(resolveBidPanelState(room(), "pending")).toBe("none")
+  })
+
+  it("offers nothing when the lot is not live", () => {
+    for (const status of ["SCHEDULED", "ENDED", "CANCELED"] as const) {
+      const notLive = room({ lot: { ...room().lot, status } })
+
+      expect(resolveBidPanelState(notLive, "bidder")).toBe("none")
+      expect(resolveBidPanelState(notLive, "guest")).toBe("none")
+    }
+  })
+
+  it("offers nothing to the current leader", () => {
+    const leading = room({ viewerParticipantNo: 4 })
+
+    expect(resolveBidPanelState(leading, "bidder")).toBe("none")
   })
 })
 

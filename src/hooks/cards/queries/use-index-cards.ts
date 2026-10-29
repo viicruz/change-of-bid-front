@@ -41,6 +41,7 @@ const cardSearchResponseSchema = z.object({
   meta: cardSearchMetaSchema.optional(),
 })
 
+/** @expected-unused */
 export type CardSearchResponse = z.infer<typeof cardSearchResponseSchema>
 
 type StringFilter = string | readonly string[]
@@ -88,7 +89,7 @@ export interface IndexCardsInput {
   enabled?: boolean
 }
 
-export class CardSearchFiltersError extends Error {
+class CardSearchFiltersError extends Error {
   constructor(message: string) {
     super(message)
     this.name = "CardSearchFiltersError"
