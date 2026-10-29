@@ -82,26 +82,40 @@
       "morePages": "More pages"
     },
     "/sign-up": {
-      "title": "Create an account",
-      "description": "Choose how you want to take part, then sign up with your email and password.",
-      "role": "How do you want to take part?",
+      "title": "Create account",
+      "hasAccount": "Already have an account?",
+      "signInLink": "Log in",
+      "brand": {
+        "tag": "New duelist?",
+        "titleA": "JOIN THE",
+        "titleB": "DUEL.",
+        "description": "Create your account to auction the cards sitting in your binder or fight for live lots down to the last second.",
+        "logoAlt": "Change of Bid"
+      },
+      "role": "Account type",
       "roles": {
-        "bidder": {
-          "title": "Bidder",
-          "description": "Place bids on lots and follow your wins."
-        },
         "auctioneer": {
           "title": "Auctioneer",
-          "description": "Create lots and run the auctions."
+          "description": "I want to auction my cards and watch the bids climb."
+        },
+        "bidder": {
+          "title": "Bidder",
+          "description": "I want to bid on and win cards for my deck."
         }
       },
       "name": "Name",
+      "namePlaceholder": "What should duelists call you?",
       "email": "Email",
+      "emailPlaceholder": "duelist@email.com",
       "password": "Password",
-      "confirmPassword": "Confirm password",
-      "submit": "Create account",
-      "submitting": "Creating account...",
-      "signInLink": "I already have an account"
+      "passwordPlaceholder": "Min. 8 characters",
+      "confirmPassword": "Repeat password",
+      "confirmPasswordPlaceholder": "Type it again",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "passwordsMatch": "Passwords match!",
+      "submit": "Create my account",
+      "submitting": "Creating account..."
     },
     "/wallet": {
       "title": "Wallet",
