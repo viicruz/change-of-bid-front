@@ -35,7 +35,7 @@ export function DesignThemeToggle() {
             aria-pressed={pressed}
             onClick={() => setTheme(option.value)}
             className={cn(
-              "h-[38px] px-3 font-heading text-xs",
+              "h-9.5 px-3 font-heading text-xs",
               pressed ? "bg-brand-red text-white" : "bg-header text-foreground"
             )}
           >
@@ -120,7 +120,7 @@ export function SegmentedAndChips() {
               aria-pressed={on}
               onClick={() => setSegment(item.value)}
               className={cn(
-                "h-[38px] min-w-11 px-3 font-heading text-[13px]",
+                "h-9.5 min-w-11 px-3 font-heading text-[13px]",
                 on ? "bg-brand-red text-white" : "bg-card text-foreground"
               )}
             >

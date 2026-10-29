@@ -166,7 +166,8 @@ export function LotDetailsFields() {
           {...form.register("description")}
         />
       </LotField>
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] items-start gap-3.5">
+      {/* Wide enough for R$ 1.000.000,00 before the fields sit side by side */}
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] items-start gap-3.5">
         <LotMoneyField
           id="lot-opening-bid"
           name="openingBid"

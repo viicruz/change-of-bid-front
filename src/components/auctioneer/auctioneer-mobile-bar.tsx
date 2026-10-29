@@ -6,6 +6,7 @@ import { useFormContext, useWatch } from "react-hook-form"
 
 //* Components imports
 import { Button } from "@/src/components/ui/button"
+import { FitAmount } from "@/src/components/utils/money"
 
 //* Hooks imports
 import { useCreateLotMutation } from "@/src/components/auctioneer/create-lot-provider"
@@ -45,7 +46,7 @@ export function AuctioneerMobileBar(props: AuctioneerMobileBarProps) {
       id="auctioneer-mobile-bar"
       className="sticky bottom-0 z-20 -mx-[clamp(16px,3vw,40px)] hidden items-center justify-between gap-3 border-t-4 border-brand-red bg-header px-4 py-2.5 max-[760px]:flex"
     >
-      <div className="min-w-0">
+      <div className="@container min-w-0 flex-1">
         <span className="block text-xs font-bold text-muted-foreground uppercase">
           {t("minimalValue")}
         </span>
@@ -53,9 +54,11 @@ export function AuctioneerMobileBar(props: AuctioneerMobileBarProps) {
           id="auctioneer-mobile-bar-value"
           className="block font-heading text-base whitespace-nowrap"
         >
-          {openingBid && openingAmount > 0
-            ? format.number(openingAmount, currencyFormat)
-            : "—"}
+          <FitAmount>
+            {openingBid && openingAmount > 0
+              ? format.number(openingAmount, currencyFormat)
+              : "—"}
+          </FitAmount>
         </span>
         <span
           id="auctioneer-mobile-bar-cards"

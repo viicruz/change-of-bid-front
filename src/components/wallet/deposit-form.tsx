@@ -23,6 +23,7 @@ import { ApiError } from "@/src/lib/api"
 
 const knownDepositErrorCodes = new Set([
   "INVALID_MONEY",
+  "MONEY_ABOVE_LIMIT",
   "NOT_BIDDER",
   "WALLET_NOT_FOUND",
   "AMOUNT_OUT_OF_RANGE",

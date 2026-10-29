@@ -18,6 +18,9 @@ import { cn } from "@/src/lib/utils"
 const committedStripes =
   "bg-[repeating-linear-gradient(-45deg,var(--color-brand-red)_0_3px,var(--color-brand-red-dark)_3px_6px)]"
 
+//* Big balances shrink to the room left beside the icon instead of leaking out of the tile
+const fitBox = "@container min-w-0 flex-1"
+
 type BalanceTileProps = {
   label: ReactNode
   value: ReactNode
@@ -31,7 +34,7 @@ function BalanceTile(props: BalanceTileProps) {
   return (
     <div
       className={cn(
-        "flex flex-col gap-2 border-4 border-black p-5.5 shadow-hard-8",
+        "flex min-w-0 flex-col gap-2 border-4 border-black p-5.5 shadow-hard-8",
         props.className
       )}
     >
@@ -65,7 +68,7 @@ export function BalanceCards(props: ShowWallet) {
             {t("availableBalance")}
           </>
         }
-        value={<Money id="wallet-available-balance" amount={props.availableBalance} />}
+        value={<Money id="wallet-available-balance" fit className={fitBox} amount={props.availableBalance} />}
         hint={t("availableHint")}
       />
       <BalanceTile
@@ -81,7 +84,7 @@ export function BalanceCards(props: ShowWallet) {
         value={
           <>
             <LockIcon aria-hidden="true" className="size-7.5 shrink-0 text-brand-red" strokeWidth={3} strokeLinecap="square" />
-            <Money id="wallet-committed-balance" amount={props.committedBalance} />
+            <Money id="wallet-committed-balance" fit className={fitBox} amount={props.committedBalance} />
           </>
         }
         hint={t("committedHint")}
@@ -91,7 +94,7 @@ export function BalanceCards(props: ShowWallet) {
         labelClassName="text-[#D9D4E0]"
         hintClassName="text-[#D9D4E0]"
         label={t("totalBalance")}
-        value={<Money id="wallet-balance" className="text-brand-yellow" amount={props.totalBalance} />}
+        value={<Money id="wallet-balance" fit className={cn(fitBox, "text-brand-yellow")} amount={props.totalBalance} />}
         hint={t("totalHint")}
       />
     </div>

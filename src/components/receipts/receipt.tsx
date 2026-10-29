@@ -11,6 +11,7 @@ import { LotItemList } from "@/src/components/cards/lot-item-list"
 import { ArrowRightIcon, Tag } from "@/src/components/ui/brand"
 import { Button, buttonVariants } from "@/src/components/ui/button"
 import { Skeleton } from "@/src/components/ui/skeleton"
+import { FitAmount } from "@/src/components/utils/money"
 
 //* Hooks imports
 import {
@@ -170,7 +171,7 @@ function ReceiptSummary(props: { receipt: ReceiptData }) {
         {t("settled")}
       </div>
       <div className="flex flex-col gap-5 p-5.5">
-        <div>
+        <div className="@container">
           <h2 className="m-0 text-[13px] font-bold tracking-[1px] text-muted-foreground uppercase">
             {t("finalAmount")}
           </h2>
@@ -178,7 +179,9 @@ function ReceiptSummary(props: { receipt: ReceiptData }) {
             id="receipt-final-amount"
             className="m-0 type-value text-[clamp(36px,4vw,48px)]"
           >
-            {format.number(moneyToNumber(receipt.finalAmount), currencyFormat)}
+            <FitAmount>
+              {format.number(moneyToNumber(receipt.finalAmount), currencyFormat)}
+            </FitAmount>
           </p>
         </div>
         <dl className="m-0 border-3 border-input">
