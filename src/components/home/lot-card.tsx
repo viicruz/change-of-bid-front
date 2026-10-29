@@ -118,7 +118,7 @@ function LotTitle(props: { lot: IndexLot }) {
         </Link>
       </h3>
       <p className="mt-1.5 mb-0 text-sm text-muted-foreground">
-        {t("cardCount", { count: props.lot.items.length })}
+        {t("cardCount", { count: props.lot.totalItems })}
       </p>
     </div>
   )

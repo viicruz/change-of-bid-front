@@ -31,6 +31,8 @@ const indexLotSchema = z.object({
   currentBid: lotSchema.shape.openingBid.nullable(),
   bidCount: z.number().int().nonnegative(),
   sold: z.boolean(),
+  //* `items` holds at most the first 5; this is the lot's real total
+  totalItems: z.number().int().nonnegative(),
 })
 
 export type IndexLot = z.infer<typeof indexLotSchema>

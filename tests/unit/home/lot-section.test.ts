@@ -49,6 +49,7 @@ const liveLot: IndexLot = {
   currentBid: "1500.00",
   bidCount: 3,
   sold: false,
+  totalItems: 0,
 }
 
 const endedLot: IndexLot = {
