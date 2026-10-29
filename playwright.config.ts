@@ -1,6 +1,9 @@
 //* Libraries imports
 import { defineConfig, devices } from "@playwright/test"
 
+//* Local imports
+import { mockBackendPort } from "./tests/e2e/mock-backend"
+
 const isCi = Boolean(process.env.CI)
 
 function isProjectSelected(name: string) {
@@ -52,9 +55,18 @@ export default defineConfig({
     ...(isProjectSelected("e2e")
       ? [
           {
+            command: "node tests/e2e/mock-backend.ts",
+            url: `http://localhost:${mockBackendPort}/api/auth/get-session`,
+            reuseExistingServer: !isCi,
+          },
+          {
+            //* A reused dev server must also point to the mock backend, or /auctioneer redirects home
             command: "npm run dev -- --port 3000",
             url: "http://localhost:3000",
             reuseExistingServer: !isCi,
+            env: {
+              NEXT_PUBLIC_BACKEND_URL: `http://localhost:${mockBackendPort}`,
+            },
           },
         ]
       : []),

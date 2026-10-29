@@ -1,6 +1,9 @@
 //* Libraries imports
 import { expect, test, type Page, type Route } from "@playwright/test"
 
+//* Local imports
+import { sessionCookieName, sessionToken } from "./mock-backend"
+
 const describe = test.describe
 const it = test
 
@@ -151,6 +154,17 @@ function sessionPayload(role: "AUCTIONEER" | "BIDDER" | null) {
 }
 
 async function mockSession(page: Page, role: "AUCTIONEER" | "BIDDER" | null) {
+  //* The server-side role check reads this cookie through the mock backend
+  if (role != null) {
+    await page.context().addCookies([
+      {
+        name: sessionCookieName,
+        value: sessionToken(role),
+        url: test.info().project.use.baseURL,
+      },
+    ])
+  }
+
   await page.route(sessionEndpoint, async (route) => {
     if (route.request().method() === "OPTIONS") {
       await route.fulfill({ status: 204, headers: corsHeaders })

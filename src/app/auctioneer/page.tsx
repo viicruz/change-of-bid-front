@@ -6,6 +6,9 @@ import type { Metadata } from "next"
 import { AuctioneerPanel } from "@/src/components/auctioneer/auctioneer-panel"
 import { Footer } from "@/src/components/footer/footer"
 
+//* Auth imports
+import { requireAuctioneer } from "@/src/lib/auth-server"
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("pages./auctioneer")
 
@@ -15,7 +18,9 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-export default function Page() {
+export default async function Page() {
+  await requireAuctioneer()
+
   return (
     <>
       <main className="mx-auto w-full max-w-360 flex-1 px-[clamp(16px,3vw,40px)] pt-7 pb-16">
