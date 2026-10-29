@@ -36,6 +36,27 @@ NEXT_PUBLIC_BACKEND_URL=http://localhost:3001
 
 Altere esse valor se o backend não estiver na porta `3001`.
 
+## Docker
+
+O `docker-compose.yml` sobe só este frontend. PostgreSQL e a API ficam de fora: o [backend](https://github.com/viicruz/change-of-bid-back) precisa estar em execução antes.
+
+Requisitos: Docker e Docker Compose. O compose usa a rede do host (`network_mode: host`), então `localhost:3001` aponta para a API tanto no navegador quanto dentro do container. Isso funciona no Linux.
+
+```bash
+cp example.env .env
+docker compose up --build
+```
+
+Abra [http://localhost:3000](http://localhost:3000).
+
+`NEXT_PUBLIC_BACKEND_URL` é lida do `.env` e fica fixada na imagem. O padrão é `http://localhost:3001`. Se mudar esse valor, suba de novo com `docker compose up --build`.
+
+Para parar:
+
+```bash
+docker compose down
+```
+
 ## Contas
 
 O seed do [backend](https://github.com/viicruz/change-of-bid-back) (`npm run db:seed`) cria estas contas. A senha de todas é `123123123`.
