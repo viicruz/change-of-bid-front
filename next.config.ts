@@ -3,6 +3,8 @@ import createNextIntlPlugin from "next-intl/plugin"
 import { env } from "@/src/env/client"
 
 const nextConfig: NextConfig = {
+  //* Minimal server bundle for the Docker image (see Dockerfile)
+  output: "standalone",
   //* Same-origin proxy so the session cookie is first-party (Safari blocks third-party cookies).
   //* The source must match backendProxyPath in src/lib/backend-url.ts
   async rewrites() {
