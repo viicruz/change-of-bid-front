@@ -2,6 +2,7 @@
   "pages": {
     "/": {
       "title": "Vitrine de lotes",
+      "description": "Leilões de cartas Yu-Gi-Oh! ao vivo, agendados e encerrados.",
       "hero": {
         "tag": "Leilões de cartas Yu-Gi-Oh!",
         "titleA": "DÊ O",
@@ -83,6 +84,7 @@
     },
     "/sign-up": {
       "title": "Criar conta",
+      "description": "Crie sua conta para leiloar cartas ou dar lances em lotes ao vivo.",
       "hasAccount": "Já tem conta?",
       "signInLink": "Entrar",
       "brand": {
@@ -584,6 +586,7 @@
     },
     "/sign-in": {
       "title": "Entrar",
+      "description": "Entre para dar lances e acompanhar seus leilões.",
       "noAccount": "Ainda não tem conta?",
       "signUpLink": "Criar conta",
       "brand": {
