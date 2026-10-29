@@ -1,13 +1,15 @@
 "use client"
 
 //* Libraries imports
+import { ArrowRightIcon } from "lucide-react"
 import { useTranslations } from "next-intl"
+import Link from "next/link"
 import { useState, type ChangeEvent, type MouseEvent } from "react"
 
 //* Components imports
 import { BidCard } from "@/src/components/bids/bid-card"
-import { Button } from "@/src/components/ui/button"
-import Card from "@/src/components/ui/card"
+import { BidSummary } from "@/src/components/bids/bid-summary"
+import { Button, buttonVariants } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
 import Pagination from "@/src/components/ui/pagination"
@@ -28,9 +30,16 @@ import {
 const loadingSkeletonCount = 3
 const bidHistoryPageSize = 5
 
-const bidFilters = ["SCHEDULED", "LIVE", "ENDED", "CANCELED", "won"] as const
+const bidFilters = ["LIVE", "SCHEDULED", "ENDED", "CANCELED", "won"] as const
 
 type BidHistoryFilter = (typeof bidFilters)[number]
+
+//* Error boxes share the hard-edged look of the rest of the app
+const errorBox =
+  "flex w-full flex-col items-start gap-3 border-4 border-border bg-card p-[22px] font-semibold text-red-text shadow-hard-8 shadow-brand-red"
+
+const emptyBox =
+  "flex flex-col items-center gap-4 border-4 border-border bg-card p-7 text-center shadow-hard-8"
 
 function matchesFilter(
   participation: IndexParticipation,
@@ -69,11 +78,13 @@ export function BidHistory() {
   })
   const page = pageState.filtersKey === filtersKey ? pageState.page : 1
   const participations = participationsQuery.data?.lots ?? []
-  const visibleParticipations = participations.filter((participation) => {
-    return (
-      matchesQuery(participation, query) && matchesFilter(participation, filter)
-    )
+  //* Counts follow the search, so each filter tells how many rows it would leave
+  const searchedParticipations = participations.filter((participation) => {
+    return matchesQuery(participation, query)
   })
+  const visibleParticipations = searchedParticipations.filter((participation) =>
+    matchesFilter(participation, filter)
+  )
   const pageCount = Math.max(
     1,
     Math.ceil(visibleParticipations.length / bidHistoryPageSize)
@@ -100,6 +111,11 @@ export function BidHistory() {
     })
   }
 
+  function onClearFilters() {
+    setQuery("")
+    setFilter(null)
+  }
+
   function onPageChange(nextPage: number) {
     if (nextPage === currentPage || nextPage < 1 || nextPage > pageCount) {
       return
@@ -112,65 +128,80 @@ export function BidHistory() {
   }
 
   return (
-    <section className="flex w-full flex-col gap-6 rounded-xl p-6 ring-1 ring-foreground/10">
-      <Card.Root>
-        <Card.Header className="items-center text-center">
-          <Card.Title>
-            <h2 id="bid-history-title">{t("historyTitle")}</h2>
-          </Card.Title>
-        </Card.Header>
-        <Card.Content className="flex flex-col gap-4">
-          <Label htmlFor="bid-search">{t("searchLabel")}</Label>
-          <Input
-            id="bid-search"
-            type="search"
-            value={query}
-            placeholder={t("searchPlaceholder")}
-            onChange={onQueryChange}
-          />
+    <div className="flex flex-col gap-12">
+      {participationsQuery.isError ? null : (
+        <BidSummary
+          isPending={participationsQuery.isPending}
+          participations={participations}
+        />
+      )}
+      <section
+        className="flex min-w-0 flex-col gap-[18px]"
+        aria-labelledby="bid-history-title"
+      >
+        <h2 id="bid-history-title" className="type-h2">
+          {t("historyTitle")}
+        </h2>
+        <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
+          <div className="flex w-full max-w-103 flex-col gap-2">
+            <Label htmlFor="bid-search">{t("searchLabel")}</Label>
+            <Input
+              id="bid-search"
+              type="search"
+              value={query}
+              placeholder={t("searchPlaceholder")}
+              onChange={onQueryChange}
+            />
+          </div>
           <div
             id="bid-filters"
             role="group"
             aria-label={t("filtersLabel")}
-            className="flex flex-wrap justify-center gap-2"
+            className="flex flex-wrap gap-2"
           >
             {bidFilters.map((bidFilter) => {
               const selected = filter === bidFilter
+              const count = searchedParticipations.filter((participation) =>
+                matchesFilter(participation, bidFilter)
+              ).length
 
               return (
                 <Button
                   key={bidFilter}
                   id={`bid-filter-${bidFilter}`}
                   type="button"
+                  size="sm"
                   variant={selected ? "default" : "outline"}
                   aria-pressed={selected}
                   onClick={() => onFilterToggle(bidFilter)}
                 >
                   {t(`filters.${bidFilter}`)}
+                  {participationsQuery.isSuccess ? (
+                    <span className="tabular-nums opacity-70">{count}</span>
+                  ) : null}
                 </Button>
               )
             })}
           </div>
-          <BidHistoryResults
-            isError={participationsQuery.isError}
-            isPending={participationsQuery.isPending}
-            participationCount={participations.length}
-            visibleCount={visibleParticipations.length}
-            pageParticipations={pageParticipations}
-            showPagination={showPagination}
-            page={currentPage}
-            pageCount={pageCount}
-            onPageChange={onPageChange}
-          />
-        </Card.Content>
-      </Card.Root>
-    </section>
+        </div>
+        <BidHistoryResults
+          query={participationsQuery}
+          participationCount={participations.length}
+          visibleCount={visibleParticipations.length}
+          pageParticipations={pageParticipations}
+          showPagination={showPagination}
+          page={currentPage}
+          pageCount={pageCount}
+          onPageChange={onPageChange}
+          onClearFilters={onClearFilters}
+        />
+      </section>
+    </div>
   )
 }
 
 type BidHistoryResultsProps = {
-  isError: boolean
-  isPending: boolean
+  query: ReturnType<typeof useIndexParticipations>
   participationCount: number
   visibleCount: number
   pageParticipations: IndexParticipation[]
@@ -178,27 +209,42 @@ type BidHistoryResultsProps = {
   page: number
   pageCount: number
   onPageChange: (page: number) => void
+  onClearFilters: () => void
 }
 
 function BidHistoryResults(props: BidHistoryResultsProps) {
   const t = useTranslations("pages./my-bids")
 
-  if (props.isError) {
-    return <p id="bid-history-error">{t("error")}</p>
+  if (props.query.isError) {
+    return (
+      <div className={errorBox} role="alert">
+        <p id="bid-history-error">{t("error")}</p>
+        <Button
+          id="bid-history-retry"
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={props.query.isFetching}
+          onClick={() => props.query.refetch()}
+        >
+          {props.query.isFetching ? t("retrying") : t("retry")}
+        </Button>
+      </div>
+    )
   }
 
-  if (props.isPending) {
+  if (props.query.isPending) {
     return (
       <>
         <p className="sr-only">{t("loading")}</p>
         <ul
           aria-labelledby="bid-history-title"
           aria-busy="true"
-          className="flex flex-col gap-3"
+          className="flex flex-col gap-6"
         >
           {Array.from({ length: loadingSkeletonCount }, (_, index) => (
             <li key={`bid-history-skeleton-${index}`}>
-              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-40 w-full rounded-none border-4 border-black/20" />
             </li>
           ))}
         </ul>
@@ -207,16 +253,55 @@ function BidHistoryResults(props: BidHistoryResultsProps) {
   }
 
   if (props.participationCount === 0) {
-    return <p id="bid-history-empty">{t("empty")}</p>
+    return (
+      <div className={emptyBox}>
+        <p
+          id="bid-history-empty"
+          className="font-semibold text-muted-foreground"
+        >
+          {t("empty")}
+        </p>
+        <Link
+          id="bid-history-empty-cta"
+          href="/#live"
+          className={buttonVariants({ size: "sm" })}
+        >
+          {t("emptyCta")}
+          <ArrowRightIcon
+            aria-hidden="true"
+            strokeWidth={3}
+            strokeLinecap="square"
+          />
+        </Link>
+      </div>
+    )
   }
 
   if (props.visibleCount === 0) {
-    return <p id="bid-history-empty-filtered">{t("emptyFiltered")}</p>
+    return (
+      <div className={emptyBox}>
+        <p
+          id="bid-history-empty-filtered"
+          className="font-semibold text-muted-foreground"
+        >
+          {t("emptyFiltered")}
+        </p>
+        <Button
+          id="bid-history-clear-filters"
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={props.onClearFilters}
+        >
+          {t("clearFilters")}
+        </Button>
+      </div>
+    )
   }
 
   return (
     <>
-      <ul id="bid-history" className="flex flex-col gap-3">
+      <ul id="bid-history" className="flex flex-col gap-6">
         {props.pageParticipations.map((participation) => (
           <li key={participation.id} id={`bid-${participation.id}`}>
             <BidCard participation={participation} />
@@ -294,7 +379,11 @@ function BidHistoryPagination(props: BidHistoryPaginationProps) {
   }
 
   return (
-    <Pagination.Root id="bid-history-pagination" aria-label={t("pagination")}>
+    <Pagination.Root
+      id="bid-history-pagination"
+      aria-label={t("pagination")}
+      className="pt-4"
+    >
       <Pagination.Content className="flex-wrap justify-center">
         <Pagination.Item>
           <Pagination.Previous

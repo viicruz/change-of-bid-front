@@ -174,7 +174,7 @@ function BellIcon() {
   )
 }
 
-function LotTimer(props: { endsAt: Date }) {
+export function LotTimer(props: { endsAt: Date }) {
   const t = useTranslations("pages./")
   const now = useNow()
   const remainingMs = Math.max(0, props.endsAt.getTime() - now)

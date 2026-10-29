@@ -197,6 +197,8 @@
     "/my-bids": {
       "title": "My bids",
       "description": "See your latest bids.",
+      "pageTag": "Your duel log",
+      "subtitle": "Follow every lot you bid on: what is live right now, what is coming up and what you took home.",
       "searchLabel": "Search bids",
       "searchPlaceholder": "Search by lot name",
       "filtersLabel": "Filter bids",
@@ -232,7 +234,24 @@
       "pagination": "Bid pages",
       "goToPage": "Go to page {page}",
       "currentPage": "Page {page}",
-      "morePages": "More pages"
+      "morePages": "More pages",
+      "summary": {
+        "label": "Bids summary",
+        "live": "Bidding now",
+        "liveHint": "Live lots with your bid.",
+        "won": "Won",
+        "wonHint": "Lots you took home.",
+        "total": "Lots joined",
+        "totalHint": "Every lot you have bid on."
+      },
+      "cardCount": "{count, plural, one {# card} other {# cards}}",
+      "bidCount": "{count, plural, one {# bid} other {# bids}}",
+      "participant": "Participant #{number}",
+      "placeBid": "Place bid",
+      "retry": "Try again",
+      "retrying": "Trying again...",
+      "emptyCta": "See live lots",
+      "clearFilters": "Clear filters"
     },
     "/receipts/[shareToken]": {
       "title": "Winning receipt",

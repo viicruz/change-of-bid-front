@@ -187,7 +187,7 @@ describe("BidHistory", () => {
 
   function titlesInOrder() {
     return [...container.querySelectorAll("#bid-history > li")].map((item) => {
-      return item.querySelector("[data-slot=card-title]")?.textContent
+      return item.querySelector("[data-slot=bid-title]")?.textContent
     })
   }
 
