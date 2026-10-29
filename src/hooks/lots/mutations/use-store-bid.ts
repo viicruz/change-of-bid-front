@@ -15,7 +15,7 @@ import { rememberViewerParticipant } from "@/src/lib/lots/public-lot-room"
 import { QUERY_KEYS, queryInvalidator } from "@/src/lib/query-client"
 
 const bidAmountSchema = z
-  .string("INVALID_MONEY")
+  .string({ error: "INVALID_MONEY" })
   .trim()
   .regex(/^(?:0\.(?:0[1-9]|[1-9]\d?)|[1-9]\d*(?:\.\d{1,2})?)$/, {
     error: "INVALID_MONEY",

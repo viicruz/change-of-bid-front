@@ -145,9 +145,21 @@ describe("storeDepositSchema", () => {
       expect(result.success).toBe(false)
 
       if (!result.success) {
-        expect(issueMessages(result.error, "amount")).toContain("INVALID_MONEY")
+        expect(issueMessages(result.error, "amount")).toEqual(["INVALID_MONEY"])
       }
     }
+  })
+
+  it("applies the custom message to both the type and the format issue", () => {
+    const notString = storeDepositSchema.safeParse({ amount: 2.5 })
+    const badFormat = storeDepositSchema.safeParse({ amount: "1,50" })
+
+    expect(notString.error?.issues).toMatchObject([
+      { code: "invalid_type", path: ["amount"], message: "INVALID_MONEY" },
+    ])
+    expect(badFormat.error?.issues).toMatchObject([
+      { code: "invalid_format", path: ["amount"], message: "INVALID_MONEY" },
+    ])
   })
 })
 
