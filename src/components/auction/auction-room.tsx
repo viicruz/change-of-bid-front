@@ -1,39 +1,25 @@
 "use client"
 
 //* Libraries imports
-import { zodResolver } from "@hookform/resolvers/zod"
-import { LockIcon } from "lucide-react"
 import { useFormatter, useTranslations } from "next-intl"
 import Link from "next/link"
-import type { ReactNode, SubmitEvent } from "react"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
+import type { ReactNode } from "react"
 
 //* Components imports
-import {
-  CheckIcon,
-  ClockIcon,
-  GavelIcon,
-} from "@/src/components/auction/auction-icons"
+import { CheckIcon, ClockIcon } from "@/src/components/auction/auction-icons"
+import { BidLock } from "@/src/components/auction/bid-lock"
 import { LotGallery } from "@/src/components/auction/lot-gallery"
 import {
   LotBreadcrumb,
   LotContents,
   LotHeading,
 } from "@/src/components/auction/lot-header"
+import { PlaceBidForm } from "@/src/components/auction/place-bid-form"
 import { ArrowRightIcon } from "@/src/components/ui/brand"
-import { Button, buttonVariants, press } from "@/src/components/ui/button"
-import { Input } from "@/src/components/ui/input"
-import { Label } from "@/src/components/ui/label"
 import { FitAmount } from "@/src/components/utils/money"
 
 //* Hooks imports
 import { useAuthSession } from "@/src/hooks/auth/use-auth-session"
-import { useErrorTranslations } from "@/src/hooks/commons/use-error-translations"
-import {
-  storeBidSchema,
-  useStoreBid,
-} from "@/src/hooks/lots/mutations/use-store-bid"
 import { useShowLot, type ShowLot } from "@/src/hooks/lots/queries/use-show-lot"
 import { useLotCountdown } from "@/src/hooks/lots/use-lot-countdown"
 import {
@@ -47,14 +33,7 @@ import { userRoleSchema } from "@/src/schemas/user"
 
 //* Local imports
 import { ApiError } from "@/src/lib/api"
-import {
-  bidErrorMessageKey,
-  centsToMoney,
-  minimumBidCents,
-  moneyToCents,
-  moneyToNumber,
-  readBidErrorCode,
-} from "@/src/lib/auction/bid-money"
+import { minimumBidCents, moneyToNumber } from "@/src/lib/auction/bid-money"
 import { endingSoonMs, formatCountdown } from "@/src/lib/lots/countdown"
 import {
   publicLotCountdownTarget,
@@ -66,16 +45,9 @@ import { cn } from "@/src/lib/utils"
 //* The history card shows the latest bids; the audit page has all of them
 const recentBidsLimit = 8
 
-//* Quick bids add 1, 2 and 5 minimum increments over the current bid
-const quickBidSteps = [1, 2, 5]
-
 const currencyFormat = {
   style: "currency",
   currency: "BRL",
-} as const
-
-const incrementFormat = {
-  maximumFractionDigits: 2,
 } as const
 
 const bidTimeFormat = {
@@ -128,236 +100,6 @@ function SmallLabel(props: { className?: string; children: ReactNode }) {
     >
       {props.children}
     </div>
-  )
-}
-
-const placeBidSchema = storeBidSchema.pick({ amount: true })
-
-type PlaceBidValues = z.infer<typeof placeBidSchema>
-
-type BidLockProps = {
-  id: string
-  message: string
-  actionHref?: string
-  actionLabel?: string
-}
-
-function BidLock(props: BidLockProps) {
-  const t = useTranslations("pages./auction/[id]")
-
-  return (
-    <div id={props.id} className="relative">
-      <div
-        aria-hidden="true"
-        inert
-        className="pointer-events-none flex flex-col gap-4 blur-sm select-none"
-      >
-        <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium">{t("yourBid")}</span>
-          <div className="h-13 border-3 border-input bg-field" />
-        </div>
-        <div className="flex h-13 items-center justify-center border-4 border-black bg-primary px-4 text-lg text-primary-foreground">
-          {t("placeBid")}
-        </div>
-      </div>
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/70 p-4 text-center">
-        <LockIcon aria-hidden="true" className="size-6" />
-        <p id={`${props.id}-message`} className="text-sm font-medium">
-          {props.message}
-        </p>
-        {props.actionHref && props.actionLabel ? (
-          <a
-            id={`${props.id}-action`}
-            href={props.actionHref}
-            className={buttonVariants({
-              size: "sm",
-              className: "no-underline",
-            })}
-          >
-            {props.actionLabel}
-          </a>
-        ) : null}
-      </div>
-    </div>
-  )
-}
-
-function PlaceBidForm(props: { lot: PublicLot }) {
-  const t = useTranslations("pages./auction/[id]")
-  const format = useFormatter()
-  const translateError = useErrorTranslations()
-  const storeBid = useStoreBid()
-  const form = useForm<PlaceBidValues>({
-    resolver: zodResolver(placeBidSchema),
-    defaultValues: {
-      amount: "",
-    },
-  })
-  const amountError = form.formState.errors.amount?.message
-  const requestErrorCode = storeBid.isError
-    ? readBidErrorCode(storeBid.error)
-    : null
-  const invalid = Boolean(amountError) || storeBid.isError
-  const describedBy = [
-    amountError ? "bid-amount-error" : null,
-    storeBid.isError ? "place-bid-error" : null,
-  ]
-    .filter((id) => id !== null)
-    .join(" ")
-  const minimumCents = minimumBidCents(props.lot)
-  const baseCents = moneyToCents(props.lot.currentBid ?? props.lot.openingBid)
-  const incrementCents = moneyToCents(props.lot.minIncrement)
-  //* Without bids the first quick bid is the opening bid itself
-  const quickBids = quickBidSteps.map(
-    (step) => minimumCents + incrementCents * (step - 1)
-  )
-  //* From R$ 10.000,00 up three amounts no longer fit side by side, so each takes a row
-  const stackQuickBids = quickBids.some(
-    (cents) => format.number(cents / 100, currencyFormat).length > 11
-  )
-
-  function pickQuickBid(cents: number) {
-    storeBid.reset()
-    form.setValue("amount", centsToMoney(cents), {
-      shouldValidate: form.formState.isSubmitted,
-    })
-  }
-
-  function onSubmit(event: SubmitEvent<HTMLFormElement>) {
-    storeBid.reset()
-    void form.handleSubmit((values) => {
-      storeBid.mutate(
-        {
-          id: props.lot.id,
-          amount: values.amount,
-        },
-        {
-          onSuccess: () => {
-            form.reset({ amount: "" })
-          },
-        }
-      )
-    })(event)
-  }
-
-  return (
-    <form
-      id="place-bid-form"
-      className="flex flex-col gap-3.5"
-      noValidate
-      onSubmit={onSubmit}
-    >
-      <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
-        <legend className="mb-2 p-0 text-[13px] font-bold tracking-[1px] uppercase">
-          {t("quickBid")}
-        </legend>
-        <div
-          className={cn(
-            "grid gap-2.5",
-            stackQuickBids ? "grid-cols-1" : "grid-cols-3"
-          )}
-        >
-          {quickBids.map((cents) => {
-            const deltaCents = cents - baseCents
-
-            return (
-              <button
-                key={cents}
-                type="button"
-                disabled={storeBid.isPending}
-                onClick={() => pickQuickBid(cents)}
-                className={cn(
-                  press,
-                  "@container flex min-w-0 items-center gap-0.5 rounded-none border-3 border-input bg-card text-foreground shadow-hard-3 disabled:pointer-events-none disabled:opacity-45",
-                  stackQuickBids
-                    ? "min-h-11 justify-between gap-3 px-3.5 py-2"
-                    : "min-h-14 flex-col px-1.5 py-2"
-                )}
-              >
-                <span className="font-heading text-[15px] text-red-text">
-                  <FitAmount>
-                    {deltaCents === 0
-                      ? t("quickBidMinimum")
-                      : `+ ${format.number(deltaCents / 100, incrementFormat)}`}
-                  </FitAmount>
-                </span>
-                <span className="text-[13px] font-bold">
-                  <FitAmount>
-                    {format.number(cents / 100, currencyFormat)}
-                  </FitAmount>
-                </span>
-              </button>
-            )
-          })}
-        </div>
-      </fieldset>
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="bid-amount" className="text-[13px]">
-          {t("yourBid")}
-        </Label>
-        <div className="flex">
-          <span
-            aria-hidden="true"
-            className={cn(
-              "flex items-center border-3 border-r-0 bg-brand-ink px-3.5 font-heading text-lg text-brand-yellow",
-              invalid ? "border-brand-red" : "border-input"
-            )}
-          >
-            R$
-          </span>
-          <Input
-            id="bid-amount"
-            type="text"
-            inputMode="decimal"
-            placeholder={centsToMoney(minimumCents)}
-            autoComplete="off"
-            aria-invalid={invalid ? true : undefined}
-            aria-describedby={describedBy.length > 0 ? describedBy : undefined}
-            disabled={storeBid.isPending}
-            className="h-auto min-h-14 font-heading text-[22px]"
-            {...form.register("amount", {
-              onChange: () => {
-                if (storeBid.isError) {
-                  storeBid.reset()
-                }
-              },
-            })}
-          />
-        </div>
-        {amountError ? (
-          <p
-            id="bid-amount-error"
-            className="m-0 text-sm font-bold text-red-text"
-          >
-            {translateError(amountError)}
-          </p>
-        ) : null}
-      </div>
-      {storeBid.isError ? (
-        <p
-          id="place-bid-error"
-          role="alert"
-          className="m-0 text-sm font-bold text-red-text"
-        >
-          {requestErrorCode
-            ? t(bidErrorMessageKey[requestErrorCode])
-            : t("bidError")}
-        </p>
-      ) : null}
-      <Button
-        id="place-bid"
-        type="submit"
-        size="lg"
-        disabled={storeBid.isPending}
-        className="w-full gap-3"
-      >
-        <GavelIcon />
-        {storeBid.isPending ? t("placingBid") : t("placeBid")}
-      </Button>
-      <p className="m-0 text-center text-[13px] text-muted-foreground">
-        {t("finalNote")}
-      </p>
-    </form>
   )
 }
 
