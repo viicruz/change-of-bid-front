@@ -30,6 +30,20 @@ NEXT_PUBLIC_BACKEND_URL=http://localhost:3001
 
 Altere esse valor se o backend não estiver na porta `3001`.
 
+## Contas
+
+O seed do [backend](https://github.com/viicruz/change-of-bid-back) (`npm run db:seed`) cria estas contas. A senha de todas é `123123123`.
+
+Além das contas, o mesmo seed cadastra lotes, lances, recebimentos e a validação de hash por HMAC.
+
+Esse seed já está em execução na [produção](https://change-of-bid-front.vercel.app/).
+
+| E-mail | Papel |
+| --- | --- |
+| `bidder@bidder.bidder` | Licitante (`BIDDER`) |
+| `bidder2@bidder.bidder` | Licitante (`BIDDER`) |
+| `auctioneer@auctioneer.auctioneer` | Leiloeiro (`AUCTIONEER`) |
+
 Build de produção:
 
 ```bash
