@@ -640,7 +640,7 @@
     "LOT_STARTS_AT_REQUIRED": "Choose when the lot opens.",
     "LOT_ENDS_AT_REQUIRED": "Choose when the lot ends.",
     "CARD_IDS_REQUIRED": "Add at least one card.",
-    "00000_UNKNOWN_ERROR": "Unable to create the account."
+    "00000_UNKNOWN_ERROR": "Unknown error."
   },
   "exceptions": {
     "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": "User already exists. Use another email.",

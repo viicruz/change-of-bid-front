@@ -640,7 +640,7 @@
     "LOT_STARTS_AT_REQUIRED": "Escolha quando o lote abre.",
     "LOT_ENDS_AT_REQUIRED": "Escolha quando o lote termina.",
     "CARD_IDS_REQUIRED": "Adicione pelo menos uma carta.",
-    "00000_UNKNOWN_ERROR": "Não foi possível criar a conta."
+    "00000_UNKNOWN_ERROR": "Erro desconhecido."
   },
   "exceptions": {
     "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": "O usuário já existe. Use outro e-mail.",
