@@ -58,6 +58,8 @@ Agenda:
 - `endsAt - startsAt` precisa ser de pelo menos 24 horas. Exatamente 24 horas é aceito.
 - `startsAt` pode estar no passado ou no futuro.
 
+O formulário deste repositório valida um mínimo menor. A API continua recusando abaixo de 24 horas. Veja [frontend.md](../frontend.md).
+
 Cartas:
 
 - Não há campo de quantidade. Cada entrada vira um item com `quantity: 1`. Enviar o mesmo id duas vezes cria dois itens.
@@ -149,7 +151,7 @@ Os dois são opcionais. Quando os dois são enviados, o lote precisa passar nos 
 
 `q` ignora espaços nas pontas. Vazio ou só com espaços equivale a omitir o parâmetro. A comparação não diferencia maiúsculas de minúsculas. `%`, `_` e `\` são caracteres literais.
 
-A busca olha o título do lote e o nome da carta gravado no item. Não olha a descrição nem o nome atual no catálogo. Se várias cartas do mesmo lote corresponderem, o lote aparece uma vez, com todos os itens.
+A busca olha o título do lote e o nome da carta gravado no item. Não olha a descrição nem o nome atual no catálogo. Se várias cartas do mesmo lote corresponderem, o lote aparece uma vez. `items` nessa lista é uma prévia; `totalItems` é a contagem do lote.
 
 `status` fora dessa lista, inclusive `ACTIVE` e `CANCELED`, é `422` com `type: "validation"`. Lotes cancelados nunca aparecem, com ou sem filtro.
 
@@ -176,6 +178,7 @@ Ordem:
       "currentBid": null,
       "bidCount": 0,
       "sold": false,
+      "totalItems": 1,
       "items": [
         {
           "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
@@ -197,7 +200,8 @@ Ordem:
 | `bidCount` | Lances aceitos. |
 | `sold` | `true` só quando o lote tem vencedor. |
 | `endsAt` | Fim atual. Se o lote foi prorrogado, este já é o novo fim. |
-| `items` | Cartas, ordenadas por `position`. |
+| `items` | Cartas na ordem de `position`. O hook da vitrine trata esta lista como prévia de no máximo cinco itens. |
+| `totalItems` | Quantidade real de cartas do lote. A contagem no card da vitrine lê este campo. |
 
 Para o preço em destaque, use `currentBid` quando não for `null`. Caso contrário, use `openingBid`.
 
