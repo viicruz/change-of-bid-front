@@ -1,8 +1,8 @@
 # Requisitos do projeto
 
-Fonte: a página “Requisitos do projeto” do Notion, lida em 2026-10-28. Esta é a especificação de produto. O formato de requisição e resposta fica em [api/](./api/).
+Fonte: a página “Requisitos do projeto” do Notion, relida em 2026-10-29. Esta é a especificação de produto. O formato de requisição e resposta fica em [api/](./api/). O que este repositório implementa, e onde o código diverge, fica em [frontend.md](./frontend.md).
 
-Onde esta página ainda cita uma decisão em aberto e a página do endpoint já descreve o comportamento, o cliente implementa a página do endpoint. Esses casos estão no final.
+Onde esta página ainda cita uma decisão em aberto e a página do endpoint já descreve o comportamento, vale a página do endpoint. Esses casos estão no final. Regras de persistência, liquidação e hash são do servidor. A interface apresenta o resultado e não as executa.
 
 ## Definições
 
@@ -183,9 +183,9 @@ Somas, reservas, liberações e liquidações mantêm a fórmula de saldo, e um 
 
 ### RNF-05 - Ambiente com Docker Compose
 
-O projeto fornece Docker Compose para o ambiente usado na avaliação, cobrindo PostgreSQL, a API e este frontend. Dados persistentes e imagens armazenadas têm uma estratégia de persistência documentada nesse ambiente.
+O ambiente de avaliação cobre PostgreSQL, a API e este frontend. Dados persistentes e imagens armazenadas têm uma estratégia de persistência no ambiente da API.
 
-A partir do repositório e do README, quem avalia configura as variáveis, sobe os serviços, aplica o esquema e carrega os dados iniciais.
+Neste repositório, o Compose sobe somente o Next.js. PostgreSQL, migrações e seed ficam no repositório da API. Veja [frontend.md](./frontend.md).
 
 ### RNF-06 - Testes automatizados
 
@@ -307,7 +307,7 @@ Estes pontos ainda estavam abertos na página de requisitos. As páginas de endp
 
 **Janela de tempo (P-06, RN-02).** O instante de início já é ao vivo: `serverNow >= startsAt` e `serverNow < endsAt`. O instante de fim já é encerrado: `serverNow >= endsAt`. `CANCELED` prevalece sobre o relógio.
 
-**Duração na criação.** `endsAt` está no futuro, e `endsAt - startsAt` é de pelo menos 24 horas. Exatamente 24 horas é aceito. `startsAt` pode estar no passado.
+**Duração na criação.** `endsAt` está no futuro, e `endsAt - startsAt` é de pelo menos 24 horas. Exatamente 24 horas é aceito. `startsAt` pode estar no passado. O formulário deste repositório ainda aceita durações menores. Veja [frontend.md](./frontend.md).
 
 **Teto do depósito (P-04).** Os requisitos limitam cada depósito a R$ 1.000.000,00. `POST /private/wallet/deposits`, como documentada, aceita até `"9999999999999999.99"` e recusa um depósito que levaria a carteira além desse limite numérico (`AMOUNT_OUT_OF_RANGE`). Siga a rota até a API passar a aplicar o teto comercial.
 

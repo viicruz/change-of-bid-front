@@ -1,0 +1,14 @@
+services:
+  web:
+    build:
+      context: .
+      args:
+        # Usada pelo navegador (WebSocket, imagens) e pelo servidor Next (SSR, rewrite /backend).
+        # Fica fixada no build: depois de alterar, rode `docker compose up --build`.
+        NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL:-http://localhost:3001}
+    image: change-of-bid-front
+    container_name: change-of-bid-front
+    # Rede do host: `localhost:3001` aponta para o backend tanto no navegador quanto dentro do container.
+    # O app fica em http://localhost:3000.
+    network_mode: host
+    restart: unless-stopped

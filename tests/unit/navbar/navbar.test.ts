@@ -2,7 +2,7 @@
 
 //* Libraries imports
 import { NextIntlClientProvider } from "next-intl"
-import { act, createElement } from "react"
+import { act, createElement, type ComponentProps } from "react"
 import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -46,11 +46,14 @@ function renderNavbar() {
   return createElement(
     QueryProvider,
     null,
-    createElement(NextIntlClientProvider, {
-      locale: "en",
-      messages: enMessages,
-      children: createElement(Navbar),
-    })
+    createElement(
+      NextIntlClientProvider,
+      {
+        locale: "en",
+        messages: enMessages,
+      } as ComponentProps<typeof NextIntlClientProvider>,
+      createElement(Navbar)
+    )
   )
 }
 
@@ -129,7 +132,7 @@ describe("Navbar", () => {
   })
 
   describe("when the user is an auctioneer", () => {
-    it("shows lots and the auctioneer panel", () => {
+    it("shows lots, the auctioneer panel, and wallet", () => {
       authSession.data = { user: { role: "AUCTIONEER" } }
 
       act(() => {
@@ -142,8 +145,10 @@ describe("Navbar", () => {
       expect(
         linkById(container, "navbar-link-auctioneer")?.getAttribute("href")
       ).toBe("/auctioneer")
+      expect(
+        linkById(container, "navbar-link-wallet")?.getAttribute("href")
+      ).toBe("/wallet")
       expect(linkById(container, "navbar-link-my-bids")).toBeNull()
-      expect(linkById(container, "navbar-link-wallet")).toBeNull()
       expect(linkById(container, "navbar-link-sign-in")).toBeNull()
       expect(linkById(container, "navbar-sign-out")?.textContent).toBe(
         "Sign out"

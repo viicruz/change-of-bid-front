@@ -10,6 +10,7 @@ import { useState, type ReactNode } from "react"
 //* Components imports
 import { LiveDot } from "@/src/components/ui/brand"
 import { Button, buttonVariants } from "@/src/components/ui/button"
+import { FitAmount } from "@/src/components/utils/money"
 
 //* Hooks imports
 import type { IndexLot } from "@/src/hooks/lots/queries/use-index-lots"
@@ -117,7 +118,7 @@ function LotTitle(props: { lot: IndexLot }) {
         </Link>
       </h3>
       <p className="mt-1.5 mb-0 text-sm text-muted-foreground">
-        {t("cardCount", { count: props.lot.items.length })}
+        {t("cardCount", { count: props.lot.totalItems })}
       </p>
     </div>
   )
@@ -173,7 +174,7 @@ function BellIcon() {
   )
 }
 
-function LotTimer(props: { endsAt: Date }) {
+export function LotTimer(props: { endsAt: Date }) {
   const t = useTranslations("pages./")
   const now = useNow()
   const remainingMs = Math.max(0, props.endsAt.getTime() - now)
@@ -223,16 +224,18 @@ function LiveLotCard(props: { lot: IndexLot }) {
           {t("liveBadge")}
         </CornerBadge>
       </LotStage>
-      <div className="flex flex-1 flex-col gap-3 p-4.5">
+      <div className="@container flex flex-1 flex-col gap-3 p-4.5">
         <LotTitle lot={props.lot} />
-        <div className="flex items-end justify-between gap-2">
-          <div>
+        <div className="flex flex-wrap items-end justify-between gap-x-2 gap-y-1">
+          <div className="min-w-0">
             <Label>{t("currentBid")}</Label>
             <div className="font-heading text-[26px] leading-[1.1]">
-              {format.number(moneyToNumber(bidAmount), currencyFormat)}
+              <FitAmount>
+                {format.number(moneyToNumber(bidAmount), currencyFormat)}
+              </FitAmount>
             </div>
           </div>
-          <div className="pb-1 text-sm font-semibold text-muted-foreground">
+          <div className="ml-auto pb-1 text-sm font-semibold whitespace-nowrap text-muted-foreground">
             {t("bidCount", { count: props.lot.bidCount })}
           </div>
         </div>
@@ -268,7 +271,8 @@ function ScheduledLotCard(props: { lot: IndexLot }) {
       </LotStage>
       <div className="flex flex-1 flex-col gap-3 p-4.5">
         <LotTitle lot={props.lot} />
-        <div className="flex border-3 border-input">
+        {/* The opening bid drops under the date when both don't fit side by side */}
+        <div className="flex flex-wrap gap-0.75 border-3 border-input bg-input">
           <div className="flex-1 bg-brand-ink px-2.5 py-2 text-brand-yellow">
             <Label className="text-[11px] text-white">{t("opensAt")}</Label>
             <div className="font-heading text-[17px] leading-[1.2]">
@@ -281,7 +285,7 @@ function ScheduledLotCard(props: { lot: IndexLot }) {
               </span>
             </div>
           </div>
-          <div className="flex-1 border-l-3 border-input px-2.5 py-2">
+          <div className="min-w-fit flex-1 bg-card px-2.5 py-2">
             <Label className="text-[11px]">{t("startingBid")}</Label>
             <div className="font-heading text-[17px] leading-[1.2]">
               {format.number(
@@ -319,16 +323,18 @@ function EndedLotCard(props: { lot: IndexLot }) {
           {props.lot.sold ? t("sold") : t("unsold")}
         </div>
       </LotStage>
-      <div className="flex flex-1 flex-col gap-3 p-4.5">
+      <div className="@container flex flex-1 flex-col gap-3 p-4.5">
         <LotTitle lot={props.lot} />
-        <div className="flex items-end justify-between gap-2 border-t-3 border-dashed border-input pt-3">
-          <div>
+        <div className="flex flex-wrap items-end justify-between gap-x-2 gap-y-1 border-t-3 border-dashed border-input pt-3">
+          <div className="min-w-0">
             <Label>{props.lot.sold ? t("finalPrice") : t("startingBid")}</Label>
             <div className="font-heading text-2xl leading-[1.1] text-red-text">
-              {format.number(moneyToNumber(finalAmount), currencyFormat)}
+              <FitAmount>
+                {format.number(moneyToNumber(finalAmount), currencyFormat)}
+              </FitAmount>
             </div>
           </div>
-          <div className="text-right text-[13px] font-semibold text-muted-foreground">
+          <div className="ml-auto grow basis-0 text-right text-[13px] font-semibold text-muted-foreground">
             {t("endedOn", {
               date: format.dateTime(props.lot.endsAt, endedFormat),
             })}

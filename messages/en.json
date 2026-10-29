@@ -2,6 +2,7 @@
   "pages": {
     "/": {
       "title": "Lot showcase",
+      "description": "Live, upcoming and ended Yu-Gi-Oh! card auctions.",
       "hero": {
         "tag": "Yu-Gi-Oh! card auctions",
         "titleA": "PLACE YOUR",
@@ -83,6 +84,7 @@
     },
     "/sign-up": {
       "title": "Create account",
+      "description": "Create your account to auction cards or bid on live lots.",
       "hasAccount": "Already have an account?",
       "signInLink": "Log in",
       "brand": {
@@ -197,6 +199,8 @@
     "/my-bids": {
       "title": "My bids",
       "description": "See your latest bids.",
+      "pageTag": "Your duel log",
+      "subtitle": "Follow every lot you bid on: what is live right now, what is coming up and what you took home.",
       "searchLabel": "Search bids",
       "searchPlaceholder": "Search by lot name",
       "filtersLabel": "Filter bids",
@@ -232,7 +236,24 @@
       "pagination": "Bid pages",
       "goToPage": "Go to page {page}",
       "currentPage": "Page {page}",
-      "morePages": "More pages"
+      "morePages": "More pages",
+      "summary": {
+        "label": "Bids summary",
+        "live": "Bidding now",
+        "liveHint": "Live lots with your bid.",
+        "won": "Won",
+        "wonHint": "Lots you took home.",
+        "total": "Lots joined",
+        "totalHint": "Every lot you have bid on."
+      },
+      "cardCount": "{count, plural, one {# card} other {# cards}}",
+      "bidCount": "{count, plural, one {# bid} other {# bids}}",
+      "participant": "Participant #{number}",
+      "placeBid": "Place bid",
+      "retry": "Try again",
+      "retrying": "Trying again...",
+      "emptyCta": "See live lots",
+      "clearFilters": "Clear filters"
     },
     "/receipts/[shareToken]": {
       "title": "Winning receipt",
@@ -565,6 +586,7 @@
     },
     "/sign-in": {
       "title": "Sign in",
+      "description": "Sign in to bid on lots and follow your auctions.",
       "noAccount": "Don’t have an account?",
       "signUpLink": "Sign up",
       "brand": {
@@ -589,6 +611,18 @@
     "/design": {
       "title": "Design System",
       "description": "Change of Bid colors, typography, components, icons, motion and voice."
+    },
+    "/not-found": {
+      "title": "Page not found",
+      "description": "The page you are looking for doesn’t exist or has moved.",
+      "tag": "Error 404",
+      "titleA": "CARD",
+      "titleB": "OUT",
+      "titleC": "OF THE DECK.",
+      "subtitle": "This page doesn’t exist, has moved or went straight to the graveyard. Check the address or head back to the table and find your next lot.",
+      "ctaLive": "See live lots",
+      "ctaHome": "Back to home",
+      "graveyardBadge": "Sent to the graveyard"
     }
   },
   "schemas": {
@@ -600,12 +634,13 @@
     "ROLE_REQUIRED": "Choose whether you want to be a bidder or an auctioneer.",
     "TITLE_REQUIRED": "Title is required",
     "INVALID_MONEY": "Money values must be greater than zero and have at most 2 decimal places.",
+    "MONEY_ABOVE_LIMIT": "The maximum amount is R$1,000,000.00.",
     "INVALID_DATETIME": "Enter an ISO datetime with a timezone offset.",
     "INVALID_SCHEDULE": "The lot must last at least 4 minutes, and the end must be in the future.",
     "LOT_STARTS_AT_REQUIRED": "Choose when the lot opens.",
     "LOT_ENDS_AT_REQUIRED": "Choose when the lot ends.",
     "CARD_IDS_REQUIRED": "Add at least one card.",
-    "00000_UNKNOWN_ERROR": "Unable to create the account."
+    "00000_UNKNOWN_ERROR": "Unknown error."
   },
   "exceptions": {
     "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL": "User already exists. Use another email.",

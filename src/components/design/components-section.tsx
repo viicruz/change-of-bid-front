@@ -413,7 +413,7 @@ function LotCards() {
 
 function Feedback() {
   return (
-    <div className="flex flex-col gap-[18px]">
+    <div className="flex flex-col gap-4.5">
       <SubTitle>Feedback e dados</SubTitle>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] gap-7">
         <Panel className="flex flex-col gap-3.5 p-5">

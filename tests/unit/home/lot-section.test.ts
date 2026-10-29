@@ -2,7 +2,7 @@
 
 //* Libraries imports
 import { NextIntlClientProvider } from "next-intl"
-import { act, createElement } from "react"
+import { act, createElement, type ComponentProps } from "react"
 import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -49,6 +49,7 @@ const liveLot: IndexLot = {
   currentBid: "1500.00",
   bidCount: 3,
   sold: false,
+  totalItems: 0,
 }
 
 const endedLot: IndexLot = {
@@ -61,17 +62,22 @@ const endedLot: IndexLot = {
 }
 
 function SectionHarness(props: { query: string; status: PublicLotStatus }) {
-  return createElement(NextIntlClientProvider, {
-    locale: "en",
-    messages: enMessages,
-    timeZone: "UTC",
-    children: createElement(QueryProvider, {
-      children: createElement(LotSection, {
+  return createElement(
+    NextIntlClientProvider,
+    {
+      locale: "en",
+      messages: enMessages,
+      timeZone: "UTC",
+    } as ComponentProps<typeof NextIntlClientProvider>,
+    createElement(
+      QueryProvider,
+      null,
+      createElement(LotSection, {
         query: props.query,
         status: props.status,
-      }),
-    }),
-  })
+      })
+    )
+  )
 }
 
 describe("LotSection", () => {

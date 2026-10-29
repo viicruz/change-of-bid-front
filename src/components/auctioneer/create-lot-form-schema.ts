@@ -12,7 +12,7 @@ import {
 import { cardAttributeSchema } from "@/src/schemas/card"
 
 //* Lib imports
-import { cardTypes } from "@/src/lib/lots/mock-lots"
+import { cardTypes } from "@/src/lib/cards/card-types"
 
 const lotCardFieldSchema = z.object({
   cardId: z.number().int().positive(),
@@ -104,7 +104,7 @@ function toStoreLotInput(values: CreateLotFormValues) {
   }
 }
 
-export function toOffsetDateTime(value: string) {
+function toOffsetDateTime(value: string) {
   const trimmed = value.trim()
 
   if (trimmed.length === 0) {

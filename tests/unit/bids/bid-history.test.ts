@@ -2,7 +2,7 @@
 
 //* Libraries imports
 import { NextIntlClientProvider } from "next-intl"
-import { act, createElement } from "react"
+import { act, createElement, type ComponentProps } from "react"
 import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -106,14 +106,15 @@ const participations = [
 ]
 
 function HistoryHarness() {
-  return createElement(NextIntlClientProvider, {
-    locale: "en",
-    messages: enMessages,
-    timeZone: "UTC",
-    children: createElement(QueryProvider, {
-      children: createElement(BidHistory),
-    }),
-  })
+  return createElement(
+    NextIntlClientProvider,
+    {
+      locale: "en",
+      messages: enMessages,
+      timeZone: "UTC",
+    } as ComponentProps<typeof NextIntlClientProvider>,
+    createElement(QueryProvider, null, createElement(BidHistory))
+  )
 }
 
 function setInputValue(input: HTMLInputElement, value: string) {
@@ -187,7 +188,7 @@ describe("BidHistory", () => {
 
   function titlesInOrder() {
     return [...container.querySelectorAll("#bid-history > li")].map((item) => {
-      return item.querySelector("[data-slot=card-title]")?.textContent
+      return item.querySelector("[data-slot=bid-title]")?.textContent
     })
   }
 

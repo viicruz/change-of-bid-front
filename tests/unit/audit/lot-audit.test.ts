@@ -130,9 +130,11 @@ function AuditHarness(props: { id: string }) {
       messages: enMessages,
       timeZone: "UTC",
     } as ComponentProps<typeof NextIntlClientProvider>,
-    createElement(QueryProvider, {
-      children: createElement(LotAudit, { id: props.id }),
-    })
+    createElement(
+      QueryProvider,
+      null,
+      createElement(LotAudit, { id: props.id })
+    )
   )
 }
 

@@ -1,4 +1,16 @@
 {
   "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
-  "ignorePatterns": ["**/*.css", "src/components/ui/**"]
+  "entry": ["global.ts", "playwright/gallery/main.tsx"],
+  "ignoreFindings": ["src/components/ui/**"],
+  "ignoreExports": [{ "file": "**/*.story.tsx", "exports": ["*"] }],
+  "overrides": [
+    {
+      "files": ["src/components/ui/**"],
+      "rules": {
+        "complexity-cyclomatic": "off",
+        "complexity-cognitive": "off",
+        "complexity-crap": "off"
+      }
+    }
+  ]
 }

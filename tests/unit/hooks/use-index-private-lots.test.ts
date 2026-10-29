@@ -17,8 +17,6 @@ import type { PrivateLotStatus } from "@/src/schemas/lot"
 //* Local imports
 import { queryClient } from "@/src/lib/query-client"
 
-const tokenKey = "change-of-bid.bearer-token"
-
 const privateLotsResponse = {
   totalReceived: "150.00",
   lots: [
@@ -101,8 +99,6 @@ describe("useIndexPrivateLots", () => {
 
   beforeEach(() => {
     queryClient.clear()
-    sessionStorage.clear()
-    sessionStorage.setItem(tokenKey, "session-token")
     container = document.createElement("div")
     document.body.append(container)
     root = createRoot(container)
@@ -114,7 +110,6 @@ describe("useIndexPrivateLots", () => {
     })
     container.remove()
     queryClient.clear()
-    sessionStorage.clear()
     vi.unstubAllGlobals()
     vi.clearAllMocks()
   })
@@ -170,9 +165,8 @@ describe("useIndexPrivateLots", () => {
     const request = lastRequest()
 
     expect(request.url.href).toBe(
-      "http://localhost:3001/private/lots?q=drag%C3%B5es&status=LIVE"
+      "http://localhost:3000/backend/private/lots?q=drag%C3%B5es&status=LIVE"
     )
-    expect(request.headers.get("Authorization")).toBe("Bearer session-token")
     expect(request.headers.get("Accept")).toBe("application/json")
   })
 
@@ -188,7 +182,7 @@ describe("useIndexPrivateLots", () => {
 
     const request = lastRequest()
 
-    expect(request.url.href).toBe("http://localhost:3001/private/lots")
+    expect(request.url.href).toBe("http://localhost:3000/backend/private/lots")
     expect(request.url.searchParams.has("q")).toBe(false)
     expect(request.url.searchParams.has("status")).toBe(false)
   })
@@ -201,7 +195,7 @@ describe("useIndexPrivateLots", () => {
 
     await renderAndWait({}, "success:0.00:0:none:false")
 
-    expect(lastRequest().url.pathname).toBe("/private/lots")
+    expect(lastRequest().url.pathname).toBe("/backend/private/lots")
   })
 
   it("surfaces a forbidden response for a user who is not an auctioneer", async () => {

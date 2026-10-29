@@ -3,7 +3,7 @@
 //* Libraries imports
 import { NextIntlClientProvider } from "next-intl"
 import { NuqsTestingAdapter } from "nuqs/adapters/testing"
-import { act, createElement } from "react"
+import { act, createElement, type ComponentProps } from "react"
 import { createRoot, type Root } from "react-dom/client"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -100,17 +100,19 @@ function movementsPage(page: number) {
 }
 
 function SummaryHarness() {
-  return createElement(NextIntlClientProvider, {
-    locale: "en",
-    messages: enMessages,
-    timeZone: "UTC",
-    children: createElement(NuqsTestingAdapter, {
-      hasMemory: true,
-      children: createElement(QueryProvider, {
-        children: createElement(WalletSummary),
-      }),
-    }),
-  })
+  return createElement(
+    NextIntlClientProvider,
+    {
+      locale: "en",
+      messages: enMessages,
+      timeZone: "UTC",
+    } as ComponentProps<typeof NextIntlClientProvider>,
+    createElement(
+      NuqsTestingAdapter,
+      { hasMemory: true } as ComponentProps<typeof NuqsTestingAdapter>,
+      createElement(QueryProvider, null, createElement(WalletSummary))
+    )
+  )
 }
 
 async function openDeposit(root: ParentNode) {

@@ -17,7 +17,6 @@ import {
 //* Local imports
 import { QUERY_KEYS, queryClient } from "@/src/lib/query-client"
 
-const tokenKey = "change-of-bid.bearer-token"
 const lotId = "6f1c2a40-7b3e-4d1a-9c20-1a2b3c4d5e6f"
 
 const privateLotResponse = {
@@ -107,8 +106,6 @@ describe("useShowPrivateLot", () => {
 
   beforeEach(() => {
     queryClient.clear()
-    sessionStorage.clear()
-    sessionStorage.setItem(tokenKey, "session-token")
     container = document.createElement("div")
     document.body.append(container)
     root = createRoot(container)
@@ -120,7 +117,6 @@ describe("useShowPrivateLot", () => {
     })
     container.remove()
     queryClient.clear()
-    sessionStorage.clear()
     vi.unstubAllGlobals()
     vi.clearAllMocks()
   })
@@ -179,12 +175,11 @@ describe("useShowPrivateLot", () => {
       const cached = queryClient.getQueryData<ShowPrivateLot>(queryKey(lotId))
 
       expect(request.url.href).toBe(
-        `http://localhost:3001/private/lots/${lotId}`
+        `http://localhost:3000/backend/private/lots/${lotId}`
       )
       expect(request.url.search).toBe("")
       expect(request.init.method).toBe("GET")
       expect(request.init.body).toBeUndefined()
-      expect(request.headers.get("Authorization")).toBe("Bearer session-token")
       expect(request.headers.get("Accept")).toBe("application/json")
       expect(request.headers.get("Content-Type")).toBeNull()
       expect(fetchMock).toHaveBeenCalledTimes(1)

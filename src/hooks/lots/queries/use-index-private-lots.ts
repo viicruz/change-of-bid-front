@@ -43,6 +43,7 @@ const apiResponseSchema = z.object({
   lots: z.array(indexPrivateLotSchema),
 })
 
+/** @expected-unused */
 export type IndexPrivateLots = z.infer<typeof apiResponseSchema>
 
 export interface IndexPrivateLotsInput {

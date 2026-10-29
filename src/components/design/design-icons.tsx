@@ -136,7 +136,7 @@ const icons = {
   },
 } satisfies Record<string, IconDefinition>
 
-export type DesignIconName = keyof typeof icons
+type DesignIconName = keyof typeof icons
 
 /** Icons shown in the "Ícones" catalog (the close icon is used only in "Voz"). */
 export const catalogIcons = (Object.keys(icons) as DesignIconName[]).filter(

@@ -23,7 +23,6 @@ import { ApiError, ApiSchemaError } from "@/src/lib/api"
 import { publicLotQueryKey } from "@/src/lib/lots/public-lot-room"
 import { QUERY_KEYS, queryClient } from "@/src/lib/query-client"
 
-const tokenKey = "change-of-bid.bearer-token"
 const lotId = "3f1c2a4e-8b0d-4e6a-9c11-2d5f7a8b9c0d"
 const bidId = "7c9e6679-7425-40de-944b-e07fc1f90ae7"
 
@@ -87,8 +86,30 @@ function BidHarness(props: {
 
 describe("storeBidSchema", () => {
   it("accepts a positive amount with at most two decimal places", () => {
-    for (const amount of ["0.01", "0.1", "0.10", "10", "10.5", "10.50"]) {
+    for (const amount of [
+      "0.01",
+      "0.1",
+      "0.10",
+      "10",
+      "10.5",
+      "10.50",
+      "1000000.00",
+    ]) {
       expect(storeBidSchema.parse({ id: lotId, amount }).amount).toBe(amount)
+    }
+  })
+
+  it("rejects an amount above BRL 1000000.00", () => {
+    for (const amount of ["1000000.01", "1000001", "99999999.99"]) {
+      const result = storeBidSchema.safeParse({ id: lotId, amount })
+
+      expect(result.success).toBe(false)
+
+      if (!result.success) {
+        expect(issueMessages(result.error, "amount")).toEqual([
+          "MONEY_ABOVE_LIMIT",
+        ])
+      }
     }
   })
 
@@ -120,7 +141,7 @@ describe("storeBidSchema", () => {
       expect(result.success).toBe(false)
 
       if (!result.success) {
-        expect(issueMessages(result.error, "amount")).toContain("INVALID_MONEY")
+        expect(issueMessages(result.error, "amount")).toEqual(["INVALID_MONEY"])
       }
     }
   })
@@ -136,9 +157,21 @@ describe("storeBidSchema", () => {
       expect(result.success).toBe(false)
 
       if (!result.success) {
-        expect(issueMessages(result.error, "amount")).toContain("INVALID_MONEY")
+        expect(issueMessages(result.error, "amount")).toEqual(["INVALID_MONEY"])
       }
     }
+  })
+
+  it("applies the custom message to both the type and the format issue", () => {
+    const notString = storeBidSchema.safeParse({ id: lotId, amount: 10.5 })
+    const badFormat = storeBidSchema.safeParse({ id: lotId, amount: "10,50" })
+
+    expect(notString.error?.issues).toMatchObject([
+      { code: "invalid_type", path: ["amount"], message: "INVALID_MONEY" },
+    ])
+    expect(badFormat.error?.issues).toMatchObject([
+      { code: "invalid_format", path: ["amount"], message: "INVALID_MONEY" },
+    ])
   })
 
   it("rejects a lot id that is not a UUID", () => {
@@ -157,8 +190,6 @@ describe("useStoreBid", () => {
 
   beforeEach(() => {
     queryClient.clear()
-    sessionStorage.clear()
-    sessionStorage.setItem(tokenKey, "session-token")
     container = document.createElement("div")
     document.body.append(container)
     root = createRoot(container)
@@ -170,7 +201,6 @@ describe("useStoreBid", () => {
     })
     container.remove()
     queryClient.clear()
-    sessionStorage.clear()
     vi.unstubAllGlobals()
     vi.clearAllMocks()
   })
@@ -229,11 +259,10 @@ describe("useStoreBid", () => {
       .data as StoredBid
 
     expect(request.url.href).toBe(
-      `http://localhost:3001/private/lots/${lotId}/bids`
+      `http://localhost:3000/backend/private/lots/${lotId}/bids`
     )
     expect(request.init.method).toBe("POST")
     expect(request.init.body).toBe(JSON.stringify({ amount: "11.50" }))
-    expect(request.headers.get("Authorization")).toBe("Bearer session-token")
     expect(request.headers.get("Accept")).toBe("application/json")
     expect(request.headers.get("Content-Type")).toBe("application/json")
     expect(fetchMock).toHaveBeenCalledTimes(1)

@@ -95,9 +95,11 @@ function ReceiptHarness(props: { shareToken: string }) {
       messages: enMessages,
       timeZone: "UTC",
     } as ComponentProps<typeof NextIntlClientProvider>,
-    createElement(QueryProvider, {
-      children: createElement(Receipt, { shareToken: props.shareToken }),
-    })
+    createElement(
+      QueryProvider,
+      null,
+      createElement(Receipt, { shareToken: props.shareToken })
+    )
   )
 }
 

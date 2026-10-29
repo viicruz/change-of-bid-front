@@ -92,6 +92,7 @@ const bidderLinks: NavbarLink[] = [
 const auctioneerLinks: NavbarLink[] = [
   { id: "home", href: "/", label: "links.home" },
   { id: "auctioneer", href: "/auctioneer", label: "links.auctioneer" },
+  { id: "wallet", href: "/wallet", label: "links.wallet" },
 ]
 
 const linkIcons: Record<string, LucideIcon> = {

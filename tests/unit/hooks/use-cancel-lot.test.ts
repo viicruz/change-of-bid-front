@@ -18,7 +18,6 @@ import {
 import { ApiError } from "@/src/lib/api"
 import { QUERY_KEYS, queryClient } from "@/src/lib/query-client"
 
-const tokenKey = "change-of-bid.bearer-token"
 const lotId = "3f1c2a4e-8b0d-4e6a-9c11-2d5f7a8b9c0d"
 
 const canceledLotResponse = {
@@ -60,8 +59,6 @@ describe("useCancelLot", () => {
 
   beforeEach(() => {
     queryClient.clear()
-    sessionStorage.clear()
-    sessionStorage.setItem(tokenKey, "session-token")
     container = document.createElement("div")
     document.body.append(container)
     root = createRoot(container)
@@ -73,7 +70,6 @@ describe("useCancelLot", () => {
     })
     container.remove()
     queryClient.clear()
-    sessionStorage.clear()
     vi.unstubAllGlobals()
     vi.clearAllMocks()
   })
@@ -130,11 +126,10 @@ describe("useCancelLot", () => {
       .data as CanceledLot
 
     expect(request.url.href).toBe(
-      `http://localhost:3001/private/lots/${lotId}/cancel`
+      `http://localhost:3000/backend/private/lots/${lotId}/cancel`
     )
     expect(request.init.method).toBe("POST")
     expect(request.init.body).toBeUndefined()
-    expect(request.headers.get("Authorization")).toBe("Bearer session-token")
     expect(request.headers.get("Accept")).toBe("application/json")
     expect(request.headers.get("Content-Type")).toBeNull()
     expect(fetchMock).toHaveBeenCalledTimes(1)
