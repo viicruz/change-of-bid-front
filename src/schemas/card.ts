@@ -3,12 +3,10 @@ import * as z from "zod"
 
 function defineEnum<const T extends readonly [string, ...string[]]>(values: T) {
   const schema = z.enum(values)
-  const enumObject = schema.enum
-  const array = Object.values(enumObject) as Array<z.infer<typeof schema>>
+  const array = Object.values(schema.enum) as Array<z.infer<typeof schema>>
 
   return {
     schema,
-    enum: enumObject,
     array,
   }
 }
@@ -25,32 +23,20 @@ const cardAttribute = defineEnum([
 
 export const cardAttributeSchema = cardAttribute.schema
 export type CardAttribute = z.infer<typeof cardAttributeSchema>
-export const cardAttributeEnum = cardAttribute.enum
 export const cardAttributeArray: CardAttribute[] = cardAttribute.array
 
-const cardBanlist = defineEnum(["tcg", "ocg", "goat"])
+export type CardBanlist = "tcg" | "ocg" | "goat"
 
-export const cardBanlistSchema = cardBanlist.schema
-export type CardBanlist = z.infer<typeof cardBanlistSchema>
-export const cardBanlistEnum = cardBanlist.enum
-export const cardBanlistArray: CardBanlist[] = cardBanlist.array
-
-const cardFormat = defineEnum([
-  "tcg",
-  "goat",
-  "ocg goat",
-  "speed duel",
-  "master duel",
-  "rush duel",
-  "duel links",
-  "genesys",
-  "genesys ocg",
-])
-
-export const cardFormatSchema = cardFormat.schema
-export type CardFormat = z.infer<typeof cardFormatSchema>
-export const cardFormatEnum = cardFormat.enum
-export const cardFormatArray: CardFormat[] = cardFormat.array
+export type CardFormat =
+  | "tcg"
+  | "goat"
+  | "ocg goat"
+  | "speed duel"
+  | "master duel"
+  | "rush duel"
+  | "duel links"
+  | "genesys"
+  | "genesys ocg"
 
 const cardSort = defineEnum([
   "atk",
@@ -62,32 +48,18 @@ const cardSort = defineEnum([
   "new",
 ])
 
-export const cardSortSchema = cardSort.schema
-export type CardSort = z.infer<typeof cardSortSchema>
-export const cardSortEnum = cardSort.enum
+export type CardSort = z.infer<typeof cardSort.schema>
 export const cardSortArray: CardSort[] = cardSort.array
 
-const cardLanguage = defineEnum(["fr", "de", "it", "pt"])
+export type CardLanguage = "fr" | "de" | "it" | "pt"
 
-export const cardLanguageSchema = cardLanguage.schema
-export type CardLanguage = z.infer<typeof cardLanguageSchema>
-export const cardLanguageEnum = cardLanguage.enum
-export const cardLanguageArray: CardLanguage[] = cardLanguage.array
-
-const cardDateRegion = defineEnum(["tcg", "ocg"])
-
-export const cardDateRegionSchema = cardDateRegion.schema
-export type CardDateRegion = z.infer<typeof cardDateRegionSchema>
-export const cardDateRegionEnum = cardDateRegion.enum
-export const cardDateRegionArray: CardDateRegion[] = cardDateRegion.array
+export type CardDateRegion = "tcg" | "ocg"
 
 const numericComparisonOperator = defineEnum(["lt", "lte", "gt", "gte"])
 
-export const numericComparisonOperatorSchema = numericComparisonOperator.schema
 export type NumericComparisonOperator = z.infer<
-  typeof numericComparisonOperatorSchema
+  typeof numericComparisonOperator.schema
 >
-export const numericComparisonOperatorEnum = numericComparisonOperator.enum
 export const numericComparisonOperatorArray: NumericComparisonOperator[] =
   numericComparisonOperator.array
 
@@ -102,25 +74,17 @@ const cardLinkMarker = defineEnum([
   "Bottom-Right",
 ])
 
-export const cardLinkMarkerSchema = cardLinkMarker.schema
+const cardLinkMarkerSchema = cardLinkMarker.schema
 export type CardLinkMarker = z.infer<typeof cardLinkMarkerSchema>
-export const cardLinkMarkerEnum = cardLinkMarker.enum
-export const cardLinkMarkerArray: CardLinkMarker[] = cardLinkMarker.array
 
 const cardBanlistStatus = defineEnum(["Forbidden", "Limited", "Semi-Limited"])
 
-export const cardBanlistStatusSchema = cardBanlistStatus.schema
-export type CardBanlistStatus = z.infer<typeof cardBanlistStatusSchema>
-export const cardBanlistStatusEnum = cardBanlistStatus.enum
-export const cardBanlistStatusArray: CardBanlistStatus[] =
-  cardBanlistStatus.array
+const cardBanlistStatusSchema = cardBanlistStatus.schema
 
-export const numericComparisonSchema = z.object({
-  operator: numericComparisonOperatorSchema,
-  value: z.coerce.number(),
-})
-
-export type NumericComparison = z.infer<typeof numericComparisonSchema>
+export type NumericComparison = {
+  operator: NumericComparisonOperator
+  value: number
+}
 
 const binaryFlagSchema = z.literal([0, 1])
 
@@ -132,16 +96,12 @@ const cardSetSchema = z.object({
   set_price: z.string(),
 })
 
-export type CardSet = z.infer<typeof cardSetSchema>
-
 const cardImageSchema = z.object({
   id: z.coerce.number(),
   image_url: z.string(),
   image_url_small: z.string(),
   image_url_cropped: z.string().optional(),
 })
-
-export type CardImage = z.infer<typeof cardImageSchema>
 
 const cardPriceSchema = z.object({
   cardmarket_price: z.string(),
@@ -151,15 +111,11 @@ const cardPriceSchema = z.object({
   coolstuffinc_price: z.string(),
 })
 
-export type CardPrice = z.infer<typeof cardPriceSchema>
-
 const cardBanlistInfoSchema = z.object({
   ban_tcg: cardBanlistStatusSchema.optional(),
   ban_ocg: cardBanlistStatusSchema.optional(),
   ban_goat: cardBanlistStatusSchema.optional(),
 })
-
-export type CardBanlistInfo = z.infer<typeof cardBanlistInfoSchema>
 
 const cardMiscInfoSchema = z.object({
   beta_name: z.string().optional(),
@@ -181,8 +137,6 @@ const cardMiscInfoSchema = z.object({
   genesys_points: z.coerce.number().optional(),
   genesys_ocg_points: z.coerce.number().optional(),
 })
-
-export type CardMiscInfo = z.infer<typeof cardMiscInfoSchema>
 
 export const cardSchema = z.object({
   id: z.coerce.number(),
