@@ -438,6 +438,8 @@
       "characterCount": "{count}/{max}",
       "quickIncrements": "Quick increments",
       "schedule": "When it happens",
+      "pickDate": "Pick a date",
+      "scheduleTime": "Time",
       "quickDuration": "Duration:",
       "quickDurationShort": "{days}d",
       "quickDurationMinutesShort": "{minutes}M",

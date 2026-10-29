@@ -5,6 +5,7 @@ import { useFormatter, useTranslations } from "next-intl"
 import { Controller, useFormContext, useWatch } from "react-hook-form"
 
 //* Components imports
+import { LotDateTimeField } from "@/src/components/auctioneer/lot-date-time-field"
 import { LotField } from "@/src/components/auctioneer/lot-field"
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
@@ -22,7 +23,7 @@ import { cn } from "@/src/lib/utils"
 const titleMaxLength = 80
 const descriptionMaxLength = 500
 const quickIncrements = [1, 5, 10] as const
-const quickDurationMinutes = 4
+const quickDurationMinutes = 5
 const quickDurationDays = [1, 3, 5, 7] as const
 
 const textareaClassName =
@@ -105,7 +106,6 @@ export function LotDetailsFields() {
 
   function onQuickDuration(duration: { days?: number; minutes?: number }) {
     const schedule = scheduleForDuration({
-      startsAt,
       days: duration.days,
       minutes: duration.minutes,
       now: new Date(),
@@ -217,16 +217,24 @@ export function LotDetailsFields() {
             label={t("startsAt")}
             error={errorMessage(errors.startsAt?.message)}
           >
-            <Input
-              id="lot-starts-at"
-              type="datetime-local"
-              className="font-semibold"
-              aria-invalid={errors.startsAt ? true : undefined}
-              aria-describedby={lotFieldDescribedBy({
-                id: "lot-starts-at",
-                error: errors.startsAt,
-              })}
-              {...form.register("startsAt")}
+            <Controller
+              control={form.control}
+              name="startsAt"
+              render={({ field }) => (
+                <LotDateTimeField
+                  id="lot-starts-at"
+                  value={field.value}
+                  datePlaceholder={t("pickDate")}
+                  timeLabel={t("scheduleTime")}
+                  invalid={Boolean(errors.startsAt)}
+                  describedBy={lotFieldDescribedBy({
+                    id: "lot-starts-at",
+                    error: errors.startsAt,
+                  })}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                />
+              )}
             />
           </LotField>
           <LotField
@@ -234,17 +242,25 @@ export function LotDetailsFields() {
             label={t("endsAt")}
             error={errorMessage(errors.endsAt?.message)}
           >
-            <Input
-              id="lot-ends-at"
-              type="datetime-local"
-              min={startsAt || undefined}
-              className="font-semibold"
-              aria-invalid={errors.endsAt ? true : undefined}
-              aria-describedby={lotFieldDescribedBy({
-                id: "lot-ends-at",
-                error: errors.endsAt,
-              })}
-              {...form.register("endsAt")}
+            <Controller
+              control={form.control}
+              name="endsAt"
+              render={({ field }) => (
+                <LotDateTimeField
+                  id="lot-ends-at"
+                  value={field.value}
+                  datePlaceholder={t("pickDate")}
+                  timeLabel={t("scheduleTime")}
+                  minimum={startsAt || undefined}
+                  invalid={Boolean(errors.endsAt)}
+                  describedBy={lotFieldDescribedBy({
+                    id: "lot-ends-at",
+                    error: errors.endsAt,
+                  })}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                />
+              )}
             />
           </LotField>
         </div>
@@ -261,7 +277,7 @@ export function LotDetailsFields() {
             {t("quickDuration")}
           </span>
           <Button
-            id="lot-quick-duration-4m"
+            id={`lot-quick-duration-${quickDurationMinutes}m`}
             type="button"
             size="xs"
             variant="outline"
