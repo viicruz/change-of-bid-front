@@ -1,19 +1,14 @@
 //* Libraries imports
-import { z } from "zod";
+import { z } from "zod"
 
 //* Local imports
-import { imageSchema } from "@/src/schemas/common/image";
+import { imageSchema } from "@/src/schemas/common/image"
 
-export const lotStatusSchema = z.enum(["ACTIVE"])
-export type LotStatus = z.infer<typeof lotStatusSchema>
+const lotStatusSchema = z.enum(["ACTIVE"])
 export const lotStatusEnum = lotStatusSchema.enum
-export const lotStatusArray: LotStatus[] = Object.values(lotStatusEnum)
 
 export const publicLotStatusSchema = z.enum(["SCHEDULED", "LIVE", "ENDED"])
 export type PublicLotStatus = z.infer<typeof publicLotStatusSchema>
-export const publicLotStatusEnum = publicLotStatusSchema.enum
-export const publicLotStatusArray: PublicLotStatus[] =
-  Object.values(publicLotStatusEnum)
 
 export const privateLotStatusSchema = z.enum([
   "SCHEDULED",
@@ -23,8 +18,6 @@ export const privateLotStatusSchema = z.enum([
 ])
 export type PrivateLotStatus = z.infer<typeof privateLotStatusSchema>
 export const privateLotStatusEnum = privateLotStatusSchema.enum
-export const privateLotStatusArray: PrivateLotStatus[] =
-  Object.values(privateLotStatusEnum)
 
 const responseMoneySchema = z
   .string()
