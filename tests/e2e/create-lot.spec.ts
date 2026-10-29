@@ -6,6 +6,7 @@ const it = test
 
 const cardSearchEndpoint = /\/public\/yugioh\/cards\/search/
 const storeLotEndpoint = /\/private\/lots$/
+const sessionEndpoint = /\/api\/auth\/get-session/
 const tokenKey = "change-of-bid.bearer-token"
 
 const corsHeaders = {
@@ -126,7 +127,43 @@ async function mockStoreLot(
   })
 }
 
+function sessionPayload(role: "AUCTIONEER" | "BIDDER" | null) {
+  if (role == null) {
+    return { session: null, user: null }
+  }
+
+  return {
+    session: {
+      id: "session-id",
+      userId: "user-id",
+      expiresAt: "2099-10-28T21:00:00.000Z",
+    },
+    user: {
+      id: "user-id",
+      name: "Ada Lovelace",
+      email: "ada@example.com",
+      emailVerified: true,
+      image: null,
+      createdAt: "2026-10-24T18:00:00.000Z",
+      updatedAt: "2026-10-24T18:00:00.000Z",
+      role,
+    },
+  }
+}
+
+async function mockSession(page: Page, role: "AUCTIONEER" | "BIDDER" | null) {
+  await page.route(sessionEndpoint, async (route) => {
+    if (route.request().method() === "OPTIONS") {
+      await route.fulfill({ status: 204, headers: corsHeaders })
+      return
+    }
+
+    await fulfillJson(route, 200, sessionPayload(role))
+  })
+}
+
 async function openAuctioneer(page: Page) {
+  await mockSession(page, "AUCTIONEER")
   await page.route(storeLotEndpoint, async (route) => {
     if (route.request().method() !== "GET") {
       await route.fallback()
@@ -197,6 +234,25 @@ async function fillLotDetails(page: Page) {
 }
 
 describe("create lot page", () => {
+  it("redirects a signed-out visitor to the home page", async ({ page }) => {
+    await mockSession(page, null)
+    await page.goto("/auctioneer")
+
+    await expect(page).toHaveURL("/")
+    await expect(page.locator("#create-lot")).toHaveCount(0)
+  })
+
+  it("redirects a bidder to the home page", async ({ page }) => {
+    await mockSession(page, "BIDDER")
+    await page.addInitScript((key) => {
+      sessionStorage.setItem(key, "session-token")
+    }, tokenKey)
+    await page.goto("/auctioneer")
+
+    await expect(page).toHaveURL("/")
+    await expect(page.locator("#create-lot")).toHaveCount(0)
+  })
+
   it("shows an empty lot form and the empty mocked lot list", async ({
     page,
   }) => {
