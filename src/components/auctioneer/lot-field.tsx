@@ -10,16 +10,33 @@ type LotFieldProps = {
   id: string
   label: string
   error?: string
+  //* Right of the label, such as a character count (`${id}-hint`)
+  hint?: string
   children: ReactNode
 }
 
 export function LotField(props: LotFieldProps) {
   return (
-    <div className="flex flex-col gap-2">
-      <Label htmlFor={props.id}>{props.label}</Label>
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-baseline justify-between gap-2">
+        <Label htmlFor={props.id} className="text-[13px]">
+          {props.label}
+        </Label>
+        {props.hint ? (
+          <span
+            id={`${props.id}-hint`}
+            className="text-[13px] font-semibold text-muted-foreground"
+          >
+            {props.hint}
+          </span>
+        ) : null}
+      </div>
       {props.children}
       {props.error ? (
-        <p id={`${props.id}-error`} className="text-sm text-destructive">
+        <p
+          id={`${props.id}-error`}
+          className="text-[13px] font-bold text-red-text"
+        >
           {props.error}
         </p>
       ) : null}

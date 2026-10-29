@@ -111,6 +111,14 @@ describe("lotSchema", () => {
 })
 
 describe("storeLotSchema", () => {
+  it("accepts a lot that lasts exactly 4 minutes", () => {
+    const parsed = storeLotSchema.parse(
+      validStoreLot({ endsAt: "2099-10-26T18:04:00.000Z" })
+    )
+
+    expect(parsed.endsAt).toBe("2099-10-26T18:04:00.000Z")
+  })
+
   it("accepts a lot that lasts exactly 24 hours", () => {
     const parsed = storeLotSchema.parse(validStoreLot())
 
@@ -193,9 +201,9 @@ describe("storeLotSchema", () => {
     }
   })
 
-  it("rejects a lot that lasts less than 24 hours", () => {
+  it("rejects a lot that lasts less than 4 minutes", () => {
     const result = storeLotSchema.safeParse(
-      validStoreLot({ endsAt: "2099-10-27T17:00:00.000Z" })
+      validStoreLot({ endsAt: "2099-10-26T18:03:00.000Z" })
     )
 
     expect(result.success).toBe(false)

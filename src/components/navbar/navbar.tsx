@@ -2,24 +2,31 @@
 
 //* Libraries imports
 import {
+  CalendarClockIcon,
   GavelIcon,
   HouseIcon,
   LayoutDashboardIcon,
   LogInIcon,
   LogOutIcon,
   MenuIcon,
+  RadioIcon,
+  SkullIcon,
   UserPlusIcon,
   WalletIcon,
   type LucideIcon,
 } from "lucide-react"
 import { useTranslations } from "next-intl"
+import Image from "next/image"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useState } from "react"
 
 //* Components imports
 import { LanguageSelect } from "@/src/components/button/language-select"
-import { Button } from "@/src/components/ui/button"
+import { ThemeToggle } from "@/src/components/button/theme-toggle"
+import { lotSectionAnchors } from "@/src/components/home/lot-section"
+import { LiveDot, Wordmark } from "@/src/components/ui/brand"
+import { Button, buttonVariants } from "@/src/components/ui/button"
 import {
   Sheet,
   SheetContent,
@@ -39,7 +46,15 @@ import { userRoleSchema, type UserRole } from "@/src/schemas/user"
 import { cn } from "@/src/lib/utils"
 
 type NavbarLinkLabel =
-  "home" | "myBids" | "wallet" | "auctioneer" | "signIn" | "signUp"
+  | "links.home"
+  | "links.myBids"
+  | "links.wallet"
+  | "links.auctioneer"
+  | "links.signIn"
+  | "links.signUp"
+  | "sections.live"
+  | "sections.scheduled"
+  | "sections.ended"
 
 type NavbarLink = {
   id: string
@@ -47,20 +62,36 @@ type NavbarLink = {
   label: NavbarLinkLabel
 }
 
+//* Guests browse the home sections; signing in and up sit on the right
 const guestLinks: NavbarLink[] = [
-  { id: "sign-in", href: "/sign-in", label: "signIn" },
-  { id: "sign-up", href: "/sign-up", label: "signUp" },
+  { id: "live", href: `/#${lotSectionAnchors.LIVE}`, label: "sections.live" },
+  {
+    id: "scheduled",
+    href: `/#${lotSectionAnchors.SCHEDULED}`,
+    label: "sections.scheduled",
+  },
+  {
+    id: "ended",
+    href: `/#${lotSectionAnchors.ENDED}`,
+    label: "sections.ended",
+  },
+]
+
+const guestMenuLinks: NavbarLink[] = [
+  ...guestLinks,
+  { id: "sign-in", href: "/sign-in", label: "links.signIn" },
+  { id: "sign-up", href: "/sign-up", label: "links.signUp" },
 ]
 
 const bidderLinks: NavbarLink[] = [
-  { id: "home", href: "/", label: "home" },
-  { id: "my-bids", href: "/my-bids", label: "myBids" },
-  { id: "wallet", href: "/wallet", label: "wallet" },
+  { id: "home", href: "/", label: "links.home" },
+  { id: "my-bids", href: "/my-bids", label: "links.myBids" },
+  { id: "wallet", href: "/wallet", label: "links.wallet" },
 ]
 
 const auctioneerLinks: NavbarLink[] = [
-  { id: "home", href: "/", label: "home" },
-  { id: "auctioneer", href: "/auctioneer", label: "auctioneer" },
+  { id: "home", href: "/", label: "links.home" },
+  { id: "auctioneer", href: "/auctioneer", label: "links.auctioneer" },
 ]
 
 const linkIcons: Record<string, LucideIcon> = {
@@ -70,7 +101,12 @@ const linkIcons: Record<string, LucideIcon> = {
   auctioneer: LayoutDashboardIcon,
   "sign-in": LogInIcon,
   "sign-up": UserPlusIcon,
+  live: RadioIcon,
+  scheduled: CalendarClockIcon,
+  ended: SkullIcon,
 }
+
+const logoSize = 640
 
 function isCurrentPath(pathname: string, href: string) {
   if (href === "/") {
@@ -116,7 +152,7 @@ function NavbarLinks(props: {
       className={cn(
         stacked
           ? "flex flex-col gap-1 px-3 py-4"
-          : "hidden items-center gap-1 md:flex"
+          : "hidden flex-wrap items-center gap-x-7 gap-y-1 md:flex"
       )}
     >
       {props.links.map((link) => {
@@ -133,24 +169,27 @@ function NavbarLinks(props: {
                 "inline-flex items-center gap-3 text-sm",
                 stacked
                   ? "group w-full border-l-2 px-4 py-3 transition-[padding,background-color,color,border-color] duration-200 ease-out motion-safe:hover:pl-6"
-                  : "relative px-2.5 py-1.5 text-muted-foreground transition-colors after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:origin-center after:bg-foreground after:transition-[scale] after:duration-200 after:ease-out motion-reduce:after:transition-none",
+                  : "relative min-h-11 text-[15px] font-bold tracking-[0.5px] uppercase transition-colors after:absolute after:inset-x-0 after:bottom-1.5 after:h-0.5 after:origin-center after:bg-brand-red after:transition-[scale] after:duration-200 after:ease-out motion-reduce:after:transition-none",
                 current
                   ? stacked
                     ? "border-background bg-background/10 text-background"
-                    : "text-foreground after:scale-x-100"
+                    : "text-red-text after:scale-x-100"
                   : stacked
                     ? "border-transparent text-background/70 hover:bg-background/10 hover:text-background"
-                    : "after:scale-x-0 hover:text-foreground motion-safe:hover:after:scale-x-100"
+                    : "text-foreground after:scale-x-0 hover:text-red-text motion-safe:hover:after:scale-x-100"
               )}
               onClick={props.onNavigate}
             >
+              {!stacked && link.id === "live" ? (
+                <LiveDot size={9} className="bg-brand-red" />
+              ) : null}
               {stacked && Icon ? (
                 <Icon
                   className="size-4 transition-[scale] duration-200 ease-out group-hover:scale-110 motion-reduce:transition-none"
                   aria-hidden
                 />
               ) : null}
-              {t(`links.${link.label}`)}
+              {t(link.label)}
             </Link>
           </li>
         )
@@ -259,15 +298,49 @@ function NavbarMenu(props: {
           layout="stack"
           onNavigate={closeMenu}
         />
-        {props.signedIn ? (
-          <SignOutButton
-            id="navbar-menu-sign-out"
-            layout="stack"
-            onDone={closeMenu}
-          />
-        ) : null}
+        <div className="mt-auto">
+          {props.signedIn ? (
+            <SignOutButton
+              id="navbar-menu-sign-out"
+              layout="stack"
+              onDone={closeMenu}
+            />
+          ) : null}
+          {/* On phones the header only fits the brand and this menu */}
+          <div className="flex items-center gap-3 border-t border-background/20 px-7 py-4">
+            <LanguageSelect id="navbar-menu-language" />
+            <ThemeToggle id="navbar-menu-theme" />
+          </div>
+        </div>
       </SheetContent>
     </Sheet>
+  )
+}
+
+function GuestActions() {
+  const t = useTranslations("navbar")
+
+  return (
+    <>
+      <Link
+        id="navbar-link-sign-in"
+        href="/sign-in"
+        className="flex min-h-11 items-center text-[15px] font-bold text-foreground uppercase no-underline hover:text-red-text"
+      >
+        {t("links.signIn")}
+      </Link>
+      <Link
+        id="navbar-link-sign-up"
+        href="/sign-up"
+        className={buttonVariants({
+          variant: "secondary",
+          size: "sm",
+          className: "no-underline",
+        })}
+      >
+        {t("links.signUp")}
+      </Link>
+    </>
   )
 }
 
@@ -281,37 +354,50 @@ export function Navbar() {
     session.isPending
   )
   const signedIn = !session.isPending && session.data != null
+  const guest = !session.isPending && session.data == null
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b-4 border-brand-red bg-header text-foreground print:hidden">
       <nav
         aria-label={t("label")}
-        className="flex items-center justify-between gap-4 px-6 py-3"
+        className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-8 gap-y-3 px-[clamp(16px,4vw,48px)] py-2.5"
       >
-        <div className="flex items-center gap-6">
-          <Link
-            id="navbar-brand"
-            href="/"
-            className="font-heading text-lg tracking-tight"
-          >
-            {t("brand")}
-          </Link>
-          <NavbarLinks
-            links={links}
-            pathname={pathname}
-            idPrefix="navbar-link-"
-            layout="row"
+        <Link
+          id="navbar-brand"
+          href="/"
+          aria-label={t("brand")}
+          className="flex items-center gap-3 text-foreground no-underline"
+        >
+          <Image
+            src="/design/logo.png"
+            alt=""
+            width={logoSize}
+            height={logoSize}
+            sizes="56px"
+            preload
+            className="block size-14"
           />
-        </div>
-        <div className="flex items-center gap-2">
-          <LanguageSelect />
-          {signedIn ? (
-            <SignOutButton id="navbar-sign-out" layout="row" />
-          ) : null}
+          <Wordmark />
+        </Link>
+        <NavbarLinks
+          links={links}
+          pathname={pathname}
+          idPrefix="navbar-link-"
+          layout="row"
+        />
+        <div className="flex items-center gap-4">
+          <div className="hidden flex-wrap items-center gap-x-4 gap-y-3 md:flex">
+            <LanguageSelect id="navbar-language" />
+            <ThemeToggle id="navbar-theme" />
+            {signedIn ? (
+              <SignOutButton id="navbar-sign-out" layout="row" />
+            ) : null}
+            {guest ? <GuestActions /> : null}
+          </div>
           {links.length > 0 ? (
             <div className="md:hidden">
               <NavbarMenu
-                links={links}
+                links={guest ? guestMenuLinks : links}
                 pathname={pathname}
                 signedIn={signedIn}
               />

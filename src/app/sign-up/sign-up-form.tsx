@@ -2,18 +2,27 @@
 
 //* Libraries imports
 import { zodResolver } from "@hookform/resolvers/zod"
-import { cn } from "cn"
-import { Gavel, HandCoins, type LucideIcon } from "lucide-react"
+import { cn } from "@/src/lib/utils"
+import {
+  Check,
+  Eye,
+  EyeOff,
+  Gavel,
+  HandCoins,
+  type LucideIcon,
+} from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useState, type ReactNode } from "react"
 import {
   Controller,
   useForm,
+  useWatch,
   type UseFormRegisterReturn,
 } from "react-hook-form"
 
 //* Components imports
+import { ArrowRightIcon } from "@/src/components/ui/brand"
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
@@ -42,15 +51,16 @@ function isApiFieldCode(code: unknown): code is ApiFieldCode {
 
 const roleOptions = [
   {
-    value: "BIDDER",
-    icon: HandCoins,
-  },
-  {
     value: "AUCTIONEER",
     icon: Gavel,
   },
+  {
+    value: "BIDDER",
+    icon: HandCoins,
+  },
 ] as const satisfies readonly { value: UserRole; icon: LucideIcon }[]
 
+//* Selected tile flips to ink with yellow text and a red shadow
 function SignUpRoleOption(props: {
   value: UserRole
   title: string
@@ -63,24 +73,21 @@ function SignUpRoleOption(props: {
   return (
     <Label
       className={cn(
-        "group flex cursor-pointer items-center gap-3 border border-border bg-background p-3 transition-colors hover:bg-muted/70 has-focus-visible:border-ring has-focus-visible:ring-3 has-focus-visible:ring-ring/50 has-data-checked:border-foreground has-data-checked:bg-muted",
-        props.invalid && "border-destructive"
+        "flex cursor-pointer flex-col items-stretch gap-2.5 border-3 border-input bg-card p-4 leading-normal font-normal tracking-normal text-foreground normal-case shadow-hard-4 transition-transform duration-120 ease-out hover:-translate-x-0.5 hover:-translate-y-0.5 has-data-checked:border-black has-data-checked:bg-brand-ink has-data-checked:text-brand-yellow has-data-checked:shadow-hard-6 has-data-checked:shadow-brand-red motion-reduce:transition-none",
+        props.invalid && "border-brand-red"
       )}
     >
-      <span className="flex size-8 shrink-0 items-center justify-center border border-border bg-card text-foreground transition-colors group-has-data-checked:border-foreground group-has-data-checked:bg-foreground group-has-data-checked:text-background">
-        <Icon className="size-4" aria-hidden />
+      <span className="flex items-center justify-between">
+        <Icon className="size-8.5" strokeWidth={2.5} aria-hidden />
+        <RadioGroupItem
+          id={`sign-up-role-${props.value.toLowerCase()}`}
+          value={props.value}
+          aria-invalid={props.invalid || undefined}
+          className="border-current bg-transparent *:data-[slot=radio-group-indicator]:hidden data-checked:bg-brand-red"
+        />
       </span>
-      <span className="flex min-w-0 flex-1 flex-col gap-1">
-        <span className="text-sm leading-none font-medium">{props.title}</span>
-        <span className="text-xs leading-snug font-normal text-muted-foreground">
-          {props.description}
-        </span>
-      </span>
-      <RadioGroupItem
-        id={`sign-up-role-${props.value.toLowerCase()}`}
-        value={props.value}
-        aria-invalid={props.invalid || undefined}
-      />
+      <span className="font-heading text-xl leading-none">{props.title}</span>
+      <span className="text-sm leading-[1.4]">{props.description}</span>
     </Label>
   )
 }
@@ -90,27 +97,44 @@ function SignUpField(props: {
   label: string
   type: string
   autoComplete: string
+  placeholder: string
   error?: string
   registration: UseFormRegisterReturn
+  //* Button glued to the input's right edge
+  addon?: ReactNode
+  children?: ReactNode
 }) {
   const errorId = `${props.id}-error`
+  const input = (
+    <Input
+      id={props.id}
+      type={props.type}
+      autoComplete={props.autoComplete}
+      placeholder={props.placeholder}
+      aria-invalid={props.error ? true : undefined}
+      aria-describedby={props.error ? errorId : undefined}
+      className={cn(props.addon && "peer flex-1 border-r-0")}
+      {...props.registration}
+    />
+  )
 
   return (
     <div className="flex flex-col gap-2">
       <Label htmlFor={props.id}>{props.label}</Label>
-      <Input
-        id={props.id}
-        type={props.type}
-        autoComplete={props.autoComplete}
-        aria-invalid={props.error ? true : undefined}
-        aria-describedby={props.error ? errorId : undefined}
-        {...props.registration}
-      />
+      {props.addon ? (
+        <div className="flex">
+          {input}
+          {props.addon}
+        </div>
+      ) : (
+        input
+      )}
       {props.error ? (
-        <p id={errorId} className="text-sm text-destructive">
+        <p id={errorId} className="text-sm font-bold text-destructive">
           {props.error}
         </p>
       ) : null}
+      {props.children}
     </div>
   )
 }
@@ -121,6 +145,7 @@ export function SignUpForm() {
   const translateError = useErrorTranslations()
   const signUp = useSignUp()
   const [formErrorCode, setFormErrorCode] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
   const form = useForm<SignUpValues>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -129,6 +154,10 @@ export function SignUpForm() {
       password: "",
       confirmPassword: "",
     },
+  })
+  const [password, confirmPassword] = useWatch({
+    control: form.control,
+    name: ["password", "confirmPassword"],
   })
 
   function onSubmit(values: SignUpValues) {
@@ -159,29 +188,113 @@ export function SignUpForm() {
   }
 
   const errors = form.formState.errors
+  const passwordType = showPassword ? "text" : "password"
+  const passwordsMatch =
+    password.length > 0 &&
+    password === confirmPassword &&
+    !errors.confirmPassword
 
   return (
     <form
       id="sign-up-form"
-      className="flex flex-col gap-4"
+      className="flex flex-col gap-5.5"
       noValidate
       onSubmit={form.handleSubmit(onSubmit)}
     >
+      <SignUpField
+        id="sign-up-name"
+        label={t("name")}
+        type="text"
+        autoComplete="name"
+        placeholder={t("namePlaceholder")}
+        error={
+          errors.name?.message ? translateError(errors.name.message) : undefined
+        }
+        registration={form.register("name")}
+      />
+      <SignUpField
+        id="sign-up-email"
+        label={t("email")}
+        type="email"
+        autoComplete="email"
+        placeholder={t("emailPlaceholder")}
+        error={
+          errors.email?.message
+            ? translateError(errors.email.message)
+            : undefined
+        }
+        registration={form.register("email")}
+      />
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-x-4.5 gap-y-5.5">
+        <SignUpField
+          id="sign-up-password"
+          label={t("password")}
+          type={passwordType}
+          autoComplete="new-password"
+          placeholder={t("passwordPlaceholder")}
+          error={
+            errors.password?.message
+              ? translateError(errors.password.message)
+              : undefined
+          }
+          registration={form.register("password")}
+          addon={
+            <button
+              id="sign-up-password-toggle"
+              type="button"
+              aria-label={showPassword ? t("hidePassword") : t("showPassword")}
+              aria-controls="sign-up-password sign-up-confirm-password"
+              onClick={() => setShowPassword((shown) => !shown)}
+              className="flex size-13 shrink-0 items-center justify-center border-3 border-input bg-brand-ink text-brand-yellow outline-none peer-aria-invalid:border-brand-red focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-ring focus-visible:outline-solid"
+            >
+              {showPassword ? (
+                <EyeOff className="size-5" strokeWidth={2.5} aria-hidden />
+              ) : (
+                <Eye className="size-5" strokeWidth={2.5} aria-hidden />
+              )}
+            </button>
+          }
+        />
+        <SignUpField
+          id="sign-up-confirm-password"
+          label={t("confirmPassword")}
+          type={passwordType}
+          autoComplete="new-password"
+          placeholder={t("confirmPasswordPlaceholder")}
+          error={
+            errors.confirmPassword?.message
+              ? translateError(errors.confirmPassword.message)
+              : undefined
+          }
+          registration={form.register("confirmPassword")}
+        >
+          {passwordsMatch ? (
+            <p
+              id="sign-up-passwords-match"
+              className="flex items-center gap-1.5 text-sm font-bold"
+            >
+              <Check
+                className="size-4 text-brand-red"
+                strokeWidth={3.5}
+                aria-hidden
+              />
+              {t("passwordsMatch")}
+            </p>
+          ) : null}
+        </SignUpField>
+      </div>
       <Controller
         name="role"
         control={form.control}
         render={({ field }) => (
-          <div className="flex flex-col gap-2">
-            <p
-              id="sign-up-role-label"
-              className="text-sm leading-none font-medium"
-            >
+          <div className="flex flex-col gap-2.5">
+            <p id="sign-up-role-label" className="type-label text-sm">
               {t("role")}
             </p>
             <RadioGroup
               id="sign-up-role"
               name={field.name}
-              className="grid gap-2"
+              className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4"
               aria-labelledby="sign-up-role-label"
               aria-invalid={errors.role ? true : undefined}
               aria-describedby={errors.role ? "sign-up-role-error" : undefined}
@@ -206,71 +319,34 @@ export function SignUpForm() {
               })}
             </RadioGroup>
             {errors.role?.message ? (
-              <p id="sign-up-role-error" className="text-sm text-destructive">
+              <p
+                id="sign-up-role-error"
+                className="text-sm font-bold text-destructive"
+              >
                 {translateError(errors.role.message)}
               </p>
             ) : null}
           </div>
         )}
       />
-      <SignUpField
-        id="sign-up-name"
-        label={t("name")}
-        type="text"
-        autoComplete="name"
-        error={
-          errors.name?.message ? translateError(errors.name.message) : undefined
-        }
-        registration={form.register("name")}
-      />
-      <SignUpField
-        id="sign-up-email"
-        label={t("email")}
-        type="email"
-        autoComplete="email"
-        error={
-          errors.email?.message
-            ? translateError(errors.email.message)
-            : undefined
-        }
-        registration={form.register("email")}
-      />
-      <SignUpField
-        id="sign-up-password"
-        label={t("password")}
-        type="password"
-        autoComplete="new-password"
-        error={
-          errors.password?.message
-            ? translateError(errors.password.message)
-            : undefined
-        }
-        registration={form.register("password")}
-      />
-      <SignUpField
-        id="sign-up-confirm-password"
-        label={t("confirmPassword")}
-        type="password"
-        autoComplete="new-password"
-        error={
-          errors.confirmPassword?.message
-            ? translateError(errors.confirmPassword.message)
-            : undefined
-        }
-        registration={form.register("confirmPassword")}
-      />
       {formErrorCode !== null ? (
-        <p id="sign-up-error" role="alert" className="text-sm text-destructive">
+        <p
+          id="sign-up-error"
+          role="alert"
+          className="text-sm font-bold text-destructive"
+        >
           {translateError(formErrorCode)}
         </p>
       ) : null}
       <Button
         id="sign-up-submit"
         type="submit"
-        className="w-full"
+        size="lg"
+        className="mt-1.5 h-auto min-h-16 w-full px-4.5 whitespace-normal"
         disabled={signUp.isPending || signUp.isSuccess}
       >
         {signUp.isPending ? t("submitting") : t("submit")}
+        <ArrowRightIcon />
       </Button>
     </form>
   )

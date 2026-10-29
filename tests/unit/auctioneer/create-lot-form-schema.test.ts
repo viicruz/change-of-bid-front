@@ -23,6 +23,8 @@ function validForm(
       {
         cardId: 89631139,
         name: "Blue-Eyes White Dragon",
+        cardType: "monster",
+        attribute: "LIGHT",
         imageUrl:
           "https://images.ygoprodeck.com/images/cards_small/89631139.jpg",
       },
@@ -56,9 +58,9 @@ describe("createLotFormSchema", () => {
     expect(issueMessages(result.error, "cards")).toContain("CARD_IDS_REQUIRED")
   })
 
-  it("rejects a schedule shorter than 24 hours", () => {
+  it("rejects a schedule shorter than 4 minutes", () => {
     const result = createLotFormSchema.safeParse(
-      validForm({ endsAt: "2099-10-26T20:00" })
+      validForm({ endsAt: "2099-10-26T18:03" })
     )
 
     expect(result.success).toBe(false)
@@ -68,6 +70,25 @@ describe("createLotFormSchema", () => {
     }
 
     expect(issueMessages(result.error, "endsAt")).toContain("INVALID_SCHEDULE")
+  })
+
+  it("asks for the dates when they are empty", () => {
+    const result = createLotFormSchema.safeParse(
+      validForm({ startsAt: "", endsAt: "" })
+    )
+
+    expect(result.success).toBe(false)
+
+    if (result.success) {
+      return
+    }
+
+    expect(issueMessages(result.error, "startsAt")).toEqual([
+      "LOT_STARTS_AT_REQUIRED",
+    ])
+    expect(issueMessages(result.error, "endsAt")).toEqual([
+      "LOT_ENDS_AT_REQUIRED",
+    ])
   })
 })
 

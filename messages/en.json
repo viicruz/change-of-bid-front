@@ -2,66 +2,163 @@
   "pages": {
     "/": {
       "title": "Lot showcase",
-      "ctaTitle": "Join the auction",
-      "ctaDescription": "Create an account to bid on Yu-Gi-Oh cards.",
-      "ctaButton": "Start bidding",
-      "searchLabel": "Search lots",
-      "searchPlaceholder": "Search by lot name",
-      "filtersLabel": "Filter by type",
-      "cardTypes": {
-        "monster": "Monster",
-        "spell": "Spell",
-        "trap": "Trap",
-        "extra": "Extra Deck"
+      "hero": {
+        "tag": "Yu-Gi-Oh! card auctions",
+        "titleA": "PLACE YOUR",
+        "titleB": "BID",
+        "titleC": "TURN THE",
+        "titleD": "TABLES.",
+        "description": "Meta staples, rarities and that one card missing from your deck, all in fast-paced auctions. Activate your trap card: one last-second bid changes the whole duel.",
+        "ctaLive": "See live lots",
+        "ctaSignUp": "Sign up free",
+        "stepsLabel": "How it works",
+        "steps": {
+          "pick": "Pick a lot",
+          "bid": "Place your bid",
+          "win": "Win it!"
+        },
+        "cardAlt": "Card {name}",
+        "logoAlt": "Change of Bid logo",
+        "stickerLabel": "New bid!",
+        "liveBadge": "Live"
+      },
+      "marquee": {
+        "bid": "Place your bid",
+        "win": "Win it",
+        "duel": "Duel",
+        "collect": "Collect"
       },
       "sections": {
-        "LIVE": "Live lots",
-        "SCHEDULED": "Scheduled lots",
-        "ENDED": "Closed lots"
+        "LIVE": {
+          "tag": "Happening now",
+          "title": "Live lots",
+          "description": "The clock is ticking. Blink and you lose the card."
+        },
+        "SCHEDULED": {
+          "tag": "Coming to the field",
+          "title": "Upcoming lots",
+          "description": "Get your deck ready: set a reminder and we'll ping you the moment bidding opens."
+        },
+        "ENDED": {
+          "tag": "Straight to the Graveyard",
+          "title": "Ended lots",
+          "description": "These have already been won. Check the final prices and calibrate your next bids."
+        }
+      },
+      "searchLabel": "Search lots",
+      "searchPlaceholder": "Search by lot name",
+      "filtersLabel": "Filter lots",
+      "filters": {
+        "LIVE": "Live",
+        "SCHEDULED": "Upcoming",
+        "ENDED": "Ended"
       },
       "loading": "Loading lots.",
       "error": "Could not load lots.",
       "empty": "No lots found.",
+      "cardAlt": "Card {name}",
+      "cardCount": "{count, plural, one {# card} other {# cards}}",
+      "liveBadge": "Live",
+      "scheduledBadge": "Upcoming",
       "currentBid": "Current bid",
-      "finalBid": "Final bid",
-      "endsAt": "Ends at",
-      "startsAt": "Starts at",
-      "endedAt": "Ended at",
-      "audit": "Audit"
+      "bidCount": "{count, plural, one {# bid} other {# bids}}",
+      "endsIn": "Ends in",
+      "endingSoon": "Ending soon!",
+      "closed": "Ended",
+      "placeBid": "Place bid",
+      "opensAt": "Opens",
+      "startingBid": "Starting bid",
+      "sold": "Sold!",
+      "unsold": "No bids",
+      "finalPrice": "Final price",
+      "endedOn": "Ended {date}",
+      "details": "See details",
+      "audit": "Audit",
+      "previous": "Previous",
+      "next": "Next",
+      "pagination": "{section} pages",
+      "goToPage": "Go to page {page}",
+      "currentPage": "Page {page}",
+      "morePages": "More pages"
     },
     "/sign-up": {
-      "title": "Create an account",
-      "description": "Choose how you want to take part, then sign up with your email and password.",
-      "role": "How do you want to take part?",
+      "title": "Create account",
+      "hasAccount": "Already have an account?",
+      "signInLink": "Log in",
+      "brand": {
+        "tag": "New duelist?",
+        "titleA": "JOIN THE",
+        "titleB": "DUEL.",
+        "description": "Create your account to auction the cards sitting in your binder or fight for live lots down to the last second.",
+        "logoAlt": "Change of Bid"
+      },
+      "role": "Account type",
       "roles": {
-        "bidder": {
-          "title": "Bidder",
-          "description": "Place bids on lots and follow your wins."
-        },
         "auctioneer": {
           "title": "Auctioneer",
-          "description": "Create lots and run the auctions."
+          "description": "I want to auction my cards and watch the bids climb."
+        },
+        "bidder": {
+          "title": "Bidder",
+          "description": "I want to bid on and win cards for my deck."
         }
       },
       "name": "Name",
+      "namePlaceholder": "What should duelists call you?",
       "email": "Email",
+      "emailPlaceholder": "duelist@email.com",
       "password": "Password",
-      "confirmPassword": "Confirm password",
-      "submit": "Create account",
-      "submitting": "Creating account...",
-      "signInLink": "I already have an account"
+      "passwordPlaceholder": "Min. 8 characters",
+      "confirmPassword": "Repeat password",
+      "confirmPasswordPlaceholder": "Type it again",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "passwordsMatch": "Passwords match!",
+      "submit": "Create my account",
+      "submitting": "Creating account..."
     },
     "/wallet": {
       "title": "Wallet",
       "description": "See your balance and latest transactions.",
-      "depositDescription": "Deposit funds into your wallet.",
+      "pageTag": "Your duelist vault",
+      "subtitle": "Track your balance, how much is locked in bids and everything that came in and went out of your account.",
+      "deposit": "Deposit",
+      "depositTitle": "Deposit funds",
+      "depositPresets": "Quick amounts",
       "depositAmountLabel": "Amount",
-      "depositSubmit": "Deposit",
+      "depositSubmit": "Confirm deposit",
       "depositSubmitting": "Depositing...",
+      "depositCancel": "Cancel",
+      "depositSuccess": "Deposit of {amount} confirmed!",
       "depositError": "Unable to deposit.",
       "loading": "Loading balance.",
       "error": "Could not load your balance.",
+      "retry": "Try again",
+      "retrying": "Trying again...",
+      "balanceSummary": "Balance summary",
+      "balanceBar": "{available}% available, {committed}% locked in bids",
+      "balanceShare": "{label} · {percent}%",
+      "availableBalance": "Available balance",
+      "availableHint": "Free for new bids.",
+      "committedBalance": "Locked in bids",
+      "committedHint": "Comes back to you if you’re outbid.",
       "totalBalance": "Total balance",
+      "totalHint": "Available + locked.",
+      "how": {
+        "title": "How your balance works",
+        "bid": {
+          "title": "You place a bid",
+          "description": "The amount leaves your available balance and is locked in the lot."
+        },
+        "outbid": {
+          "title": "Someone outbids you",
+          "description": "The amount returns to your available balance instantly."
+        },
+        "win": {
+          "title": "You win the lot",
+          "description": "The locked amount leaves your wallet and goes to the auctioneer’s."
+        }
+      },
       "historyTitle": "Transaction history",
       "movements": {
         "loading": "Loading transactions.",
@@ -75,10 +172,25 @@
         "morePages": "More pages",
         "types": {
           "DEPOSIT": "Deposit",
-          "HOLD": "Bid hold",
-          "RELEASE": "Hold released",
-          "SETTLEMENT_DEBIT": "Settlement charge",
-          "SETTLEMENT_CREDIT": "Settlement credit"
+          "HOLD": "Bid",
+          "RELEASE": "Refund",
+          "SETTLEMENT_DEBIT": "Win",
+          "SETTLEMENT_CREDIT": "Sale"
+        },
+        "viewLot": "View lot",
+        "columns": {
+          "date": "Date",
+          "description": "Description",
+          "type": "Type",
+          "available": "Available",
+          "committed": "Locked"
+        },
+        "descriptions": {
+          "DEPOSIT": "Wallet deposit",
+          "HOLD": "Bid on a lot",
+          "RELEASE": "Outbid — amount returned",
+          "SETTLEMENT_DEBIT": "Win paid to the auctioneer",
+          "SETTLEMENT_CREDIT": "Lot sale received"
         }
       }
     },
@@ -134,11 +246,16 @@
       "endedAt": "Settled at",
       "winner": "Winner number",
       "items": "Cards in the lot",
-      "quantity": "Quantity",
       "print": "Print receipt",
       "share": "Share receipt",
       "copied": "Link copied.",
-      "shareError": "Could not copy the link."
+      "shareError": "Could not copy the link.",
+      "cardCount": "{count, plural, one {# card} other {# cards}}",
+      "summary": "Sale summary",
+      "settled": "Sold",
+      "viewLot": "View lot",
+      "viewAudit": "View audit",
+      "browseAuctions": "Browse auctions"
     },
     "/auction/[id]/audit": {
       "title": "Audit",
@@ -155,9 +272,6 @@
       "endsAt": "Ends at",
       "endedAt": "Ended at",
       "participant": "Participant",
-      "bidAmount": "Amount",
-      "bidTime": "Time",
-      "quantity": "Quantity",
       "emptyBids": "This lot has no accepted bids.",
       "tamperedWarning": "The stored bids do not match the chain. This record is not trustworthy.",
       "verificationFailedWarning": "The server could not verify the bid chain. Do not treat this record as intact or tampered.",
@@ -171,7 +285,14 @@
         "INTACT": "Chain intact",
         "TAMPERED": "Chain tampered",
         "VERIFICATION_FAILED": "Verification failed"
-      }
+      },
+      "pageTag": "Public audit",
+      "backToLot": "Back to lot",
+      "cards": "Cards in the lot",
+      "bidCount": "{count, plural, one {# bid} other {# bids}}",
+      "sequence": "Bid {number}",
+      "lastBid": "Last bid",
+      "browseAuctions": "Browse auctions"
     },
     "/auction/[id]": {
       "title": "Lot room",
@@ -179,27 +300,20 @@
       "loading": "Loading lot.",
       "error": "Could not load the lot.",
       "notFound": "Lot was not found.",
-      "lotInfo": "Lot information",
-      "lotDescription": "Description",
-      "openingBid": "Starting bid",
       "minimumIncrement": "Minimum increment",
-      "startsAt": "Starts at",
-      "endsAt": "Ends at",
-      "countdownStarts": "Starts in {time}",
-      "countdownEnds": "Ends in {time}",
       "quantity": "Quantity",
       "currentBid": "Current bid",
       "noCurrentBid": "No current bid.",
-      "leader": "Leader",
-      "youAreWinning": "You are winning",
-      "youWereOutbid": "You were outbid",
-      "bidder": "Bidder #{number}",
+      "youAreWinning": "You're in the lead! Keep an eye on the clock.",
+      "youWereOutbid": "You were outbid! Bid again to take the lead.",
       "winner": "Winner",
       "yourNumber": "Your number",
       "you": "You",
-      "bidValue": "Bid value",
       "placeBid": "Place bid",
       "placingBid": "Placing bid...",
+      "auctioneerCannotBid": "Only a bidder can place a bid.",
+      "guestCannotBid": "Sign in to place a bid.",
+      "signInToBid": "Sign in",
       "bidError": "Unable to place the bid.",
       "bidErrors": {
         "NOT_BIDDER": "Only a bidder can place a bid.",
@@ -217,25 +331,79 @@
       "settling": "The result is still being recorded.",
       "reconnecting": "Reconnecting...",
       "connectionProblem": "The live connection failed. Trying again.",
-      "participant": "Participant",
+      "participant": "Participant #{number}",
       "statuses": {
         "live": "Live",
         "scheduled": "Pending",
         "canceled": "Canceled",
         "closed": "Finished"
-      }
+      },
+      "breadcrumb": {
+        "label": "You are here",
+        "auctions": "Auctions"
+      },
+      "cardCount": "{count, plural, one {# card} other {# cards}}",
+      "cardAlt": "Card {name}",
+      "viewCard": "View {name}",
+      "position": "{current} of {total}",
+      "lotCards": "Cards in this lot",
+      "bidsLabel": "Bids",
+      "whatsIn": "What's in the lot",
+      "timer": {
+        "startsIn": "Starts in",
+        "endsIn": "Ends in",
+        "endingSoon": "Ending soon!",
+        "ended": "Ended",
+        "canceled": "Canceled"
+      },
+      "finalBid": "Final bid",
+      "by": "by",
+      "bidCount": "{count, plural, =0 {no bids} one {# bid} other {# bids}}",
+      "youWithNumber": "You (#{number})",
+      "minimumBid": "Minimum bid",
+      "quickBid": "Quick bid",
+      "quickBidMinimum": "Minimum",
+      "yourBid": "Your bid",
+      "finalNote": "Bids are final and can't be canceled.",
+      "topBid": "Top bid",
+      "fullHistory": "See full history",
+      "canceledNote": "This lot was canceled and no longer takes bids."
     },
     "/auctioneer": {
       "title": "Auctioneer panel",
       "description": "Manage your lots and the cards in them.",
-      "createLot": "Create lot",
+      "pageTag": "Auctioneer dashboard",
+      "createHeading": "Create lot",
+      "createSubtitle": "Build the lot, set the price and dates and send it to the field. Your lots stay on the side for reference.",
+      "viewHeading": "View lot",
+      "viewSubtitle": "Follow the lot's bids and cancel it before it ends if you need to. Your lots stay on the side for reference.",
+      "sectionsLabel": "Page sections",
+      "tabLots": "My lots",
+      "tabNewLot": "New lot",
+      "tabLot": "Lot",
+      "tabCards": "Cards",
+      "tabDetails": "Details",
+      "myLots": "My lots",
+      "lotDetails": "Lot details",
+      "addCards": "Add cards",
+      "closeCardSearch": "Close search",
       "lotSearchLabel": "Search lots",
-      "lotSearchPlaceholder": "Search by lot name",
+      "lotSearchPlaceholder": "Search by lot title",
       "lotFiltersLabel": "Filter lots",
       "lotsLabel": "Lots",
       "lotsLoading": "Loading lots.",
       "lotsError": "Could not load lots.",
       "lotsEmpty": "No lots found.",
+      "lotsCount": "{count, plural, one {# lot} other {# lots}}",
+      "lotFilterAll": "All",
+      "draftLabel": "Draft in progress",
+      "draftUntitled": "Untitled lot",
+      "soldFor": "Sold for",
+      "noBids": "No bids",
+      "lotWhenLive": "Ends {date}",
+      "lotWhenScheduled": "Opens {date}",
+      "lotWhenEnded": "Ended {date}",
+      "lotWhenCanceled": "Canceled",
       "lotLoading": "Loading lot.",
       "lotError": "Could not load the lot.",
       "currentBid": "Current bid",
@@ -249,20 +417,53 @@
       "extensions": "Extensions",
       "winner": "Winner",
       "receivedAmount": "Amount received",
-      "cardsInLot": "Cards already in the lot",
-      "addCard": "Add card",
-      "toggleSidebar": "Toggle sidebar",
+      "cardsInLot": "Cards in this lot",
+      "cardsCount": "{count, plural, =0 {No cards yet} one {# card} other {# cards}}",
+      "emptyLotTitle": "Empty lot for now",
+      "emptyLotText": "Open the search, find your cards and add them to the lot.",
+      "emptyLotSearchText": "Find your cards in the search above and add them to the lot.",
+      "removeCardNamed": "Remove {name} from lot",
+      "add": "Add",
+      "addCardNamed": "Add {name} to lot",
+      "inLot": "In lot",
       "assistanceMenu": "Assistance menu",
-      "lotName": "Name",
+      "lotName": "Lot title",
       "lotDescription": "Description",
       "minimalValue": "Starting bid",
       "minimumIncrement": "Minimum increment",
       "startsAt": "Auction start",
       "endsAt": "Auction end",
-      "removeCard": "Remove card",
+      "lotTitlePlaceholder": "e.g. Labrynth Kit + Extras",
+      "lotDescriptionPlaceholder": "Tell bidders what's in the lot, card condition and how you ship.",
+      "characterCount": "{count}/{max}",
+      "quickIncrements": "Quick increments",
+      "schedule": "When it happens",
+      "pickDate": "Pick a date",
+      "scheduleTime": "Time",
+      "quickDuration": "Duration:",
+      "quickDurationShort": "{days}d",
+      "quickDurationMinutesShort": "{minutes}M",
+      "quickDurationMinutes": "{minutes}M: ends {minutes} minutes after the start",
+      "quickDurationDays": "{days, plural, one {#d: ends # day after the start} other {#d: ends # days after the start}}",
+      "summaryLabel": "Lot summary",
+      "summaryCards": "Cards",
+      "summaryDuration": "Duration",
+      "summaryIncrement": "Increment",
+      "durationValueDays": "{days}d {hours}h",
+      "durationValueHours": "{hours}h {minutes}min",
+      "errorSummary": "{count, plural, one {1 thing left before you can publish the lot:} other {# things left before you can publish the lot:}}",
+      "detailsHaveErrors": "some fields need attention",
+      "createNote": "Once published, the lot can't be edited — only canceled before it ends.",
       "submit": "Publish lot",
       "submitting": "Publishing...",
-      "created": "Lot created.",
+      "newLot": "New",
+      "createdTag": "Lot created!",
+      "createdTitle": "“{title}” is on the field",
+      "createdTextScheduled": "The lot opens {start} and closes {end}, with a starting bid of {value}. It already shows under “Scheduled” in your list.",
+      "createdTextLive": "The lot is already open and closes {end}, with a starting bid of {value}. It already shows under “Live” in your list.",
+      "createAnother": "Create another lot",
+      "viewScheduled": "See in scheduled",
+      "viewLive": "See in live",
       "cancelLot": "Cancel lot",
       "cancelingLot": "Canceling...",
       "canceledLot": "Lot canceled.",
@@ -364,13 +565,30 @@
     },
     "/sign-in": {
       "title": "Sign in",
-      "description": "Sign in with your email and password.",
+      "noAccount": "Don’t have an account?",
+      "signUpLink": "Sign up",
+      "brand": {
+        "tag": "Already a duelist?",
+        "titleA": "BACK TO THE",
+        "titleB": "DUEL.",
+        "description": "Sign in to track your bids, keep an eye on the lots you follow and win before the gavel drops.",
+        "logoAlt": "Change of Bid"
+      },
       "email": "Email",
+      "emailPlaceholder": "duelist@email.com",
       "password": "Password",
+      "passwordPlaceholder": "Your password",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
       "submit": "Sign in",
       "submitting": "Signing in...",
       "unknownError": "Unable to sign in.",
-      "signUpLink": "Create an account"
+      "or": "or",
+      "createAccount": "Sign up free"
+    },
+    "/design": {
+      "title": "Design System",
+      "description": "Change of Bid colors, typography, components, icons, motion and voice."
     }
   },
   "schemas": {
@@ -383,7 +601,9 @@
     "TITLE_REQUIRED": "Title is required",
     "INVALID_MONEY": "Money values must be greater than zero and have at most 2 decimal places.",
     "INVALID_DATETIME": "Enter an ISO datetime with a timezone offset.",
-    "INVALID_SCHEDULE": "The lot must last at least 24 hours, and the end must be in the future.",
+    "INVALID_SCHEDULE": "The lot must last at least 4 minutes, and the end must be in the future.",
+    "LOT_STARTS_AT_REQUIRED": "Choose when the lot opens.",
+    "LOT_ENDS_AT_REQUIRED": "Choose when the lot ends.",
     "CARD_IDS_REQUIRED": "Add at least one card.",
     "00000_UNKNOWN_ERROR": "Unable to create the account."
   },
@@ -410,6 +630,15 @@
       "auctioneer": "Auctioneer",
       "signIn": "Sign in",
       "signUp": "Create account"
+    },
+    "sections": {
+      "live": "Live",
+      "scheduled": "Upcoming",
+      "ended": "Ended"
+    },
+    "theme": {
+      "toLight": "Switch to light theme",
+      "toDark": "Switch to dark theme"
     }
   },
   "localeSelect": {
@@ -417,6 +646,39 @@
     "locales": {
       "en": "English",
       "pt-br": "Português (Brasil)"
+    },
+    "short": {
+      "en": "EN",
+      "pt-br": "PT"
+    }
+  },
+  "components": {
+    "yugiohCard": {
+      "quantity": "Quantity"
+    },
+    "footer": {
+      "label": "Footer",
+      "tagline": "Yu-Gi-Oh! card auctions made by duelists, for duelists.",
+      "auctions": "Auctions",
+      "sellCards": "Sell my cards",
+      "help": "Help",
+      "howItWorks": "How it works",
+      "faq": "FAQ",
+      "shipping": "Shipping & payment",
+      "contact": "Contact us",
+      "alerts": "Lot alerts",
+      "alertsDescription": "Get new lots before everyone else.",
+      "email": "Your email",
+      "emailPlaceholder": "duelist@email.com",
+      "subscribe": "Subscribe",
+      "alertsSoon": "Lot alerts are coming soon.",
+      "rights": "© {year} Change of Bid. All rights reserved.",
+      "konami": "Yu-Gi-Oh! is a trademark of Konami. Change of Bid is not affiliated with Konami."
+    },
+    "lotItemList": {
+      "quantity": "Quantity",
+      "total": "Total",
+      "cardCount": "{count, plural, one {# card} other {# cards}}"
     }
   }
 }

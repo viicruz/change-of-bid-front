@@ -1,6 +1,7 @@
 "use client"
 
 //* Libraries imports
+import { SearchIcon } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useState, type ChangeEvent } from "react"
 
@@ -9,17 +10,24 @@ import {
   AuctioneerLotList,
   auctioneerLotStatusLabelKey,
 } from "@/src/components/auctioneer/auctioneer-lot-list"
-import { CreateLotButton } from "@/src/components/auctioneer/create-lot-button"
+import {
+  AuctioneerPaneHeader,
+  auctioneerPaneClassName,
+} from "@/src/components/auctioneer/auctioneer-pane"
+import { LotDraftItem } from "@/src/components/auctioneer/lot-draft-item"
 import { Button } from "@/src/components/ui/button"
+import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
-import Sidebar from "@/src/components/ui/sidebar"
 
 //* Hooks imports
+import { useIndexPrivateLots } from "@/src/hooks/lots/queries/use-index-private-lots"
 import { useDebounce } from "@/src/hooks/use-debounce"
-import { useIsMobile } from "@/src/hooks/use-mobile"
 
 //* Schema imports
 import type { PrivateLotStatus } from "@/src/schemas/lot"
+
+//* Lib imports
+import { cn } from "@/src/lib/utils"
 
 const searchDebounceMs = 300
 
@@ -32,56 +40,109 @@ const auctioneerLotFilters = [
 
 type AuctioneerSidebarProps = {
   selectedLotId: string | null
+  //* Highlighted with a "new" badge, such as the lot just published
+  newLotId: string | null
+  status: PrivateLotStatus | undefined
+  onStatusChange: (status: PrivateLotStatus | undefined) => void
   onSelectLot: (lotId: string) => void
-  onCreateLot: () => void
+  onOpenDraft: () => void
+  className?: string
+}
+
+function FilterButton(props: {
+  id: string
+  label: string
+  count?: number
+  selected: boolean
+  onSelect: () => void
+}) {
+  return (
+    <Button
+      id={props.id}
+      type="button"
+      size="xs"
+      variant={props.selected ? "default" : "outline"}
+      aria-pressed={props.selected}
+      onClick={props.onSelect}
+    >
+      {props.label}
+      {props.count === undefined ? null : (
+        <span className="font-sans text-[11px] font-bold opacity-85">
+          {props.count}
+        </span>
+      )}
+    </Button>
+  )
 }
 
 export function AuctioneerSidebar(props: AuctioneerSidebarProps) {
   const t = useTranslations("pages./auctioneer")
-  const isMobile = useIsMobile()
-  const { setOpenMobile } = Sidebar.useSidebar()
   const [query, setQuery] = useState("")
-  const [status, setStatus] = useState<PrivateLotStatus | undefined>(undefined)
+  const status = props.status
   const debouncedQuery = useDebounce(query, searchDebounceMs)
+  //* Without a status: feeds the counts, and is the list itself under "all"
+  const allLots = useIndexPrivateLots({ q: debouncedQuery })
+  const lots = allLots.data?.lots
+
+  function countFor(filterStatus?: PrivateLotStatus) {
+    if (!lots) {
+      return undefined
+    }
+
+    if (!filterStatus) {
+      return lots.length
+    }
+
+    return lots.filter((lot) => lot.status === filterStatus).length
+  }
 
   function onQueryChange(event: ChangeEvent<HTMLInputElement>) {
     setQuery(event.target.value)
   }
 
   function onStatusToggle(nextStatus: PrivateLotStatus) {
-    setStatus((current) => {
-      if (current === nextStatus) {
-        return undefined
-      }
-
-      return nextStatus
-    })
+    props.onStatusChange(status === nextStatus ? undefined : nextStatus)
   }
 
-  function onSelectLot(lotId: string) {
-    props.onSelectLot(lotId)
-    setOpenMobile(false)
-  }
+  const total = countFor()
 
   return (
-    <Sidebar.Root
+    <aside
       id="auctioneer-sidebar"
-      collapsible={isMobile ? "offcanvas" : "none"}
-      className={
-        isMobile
-          ? undefined
-          : "h-full shrink-0 rounded-xl ring-1 ring-foreground/10 max-md:hidden"
-      }
+      aria-labelledby="auctioneer-sidebar-title"
+      className={cn(auctioneerPaneClassName, "shadow-hard-6", props.className)}
     >
-      <Sidebar.Header className="gap-4 p-4">
-        <CreateLotButton onCreateLot={props.onCreateLot} />
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="auctioneer-lot-search">{t("lotSearchLabel")}</Label>
-          <Sidebar.Input
+      <AuctioneerPaneHeader
+        titleId="auctioneer-sidebar-title"
+        title={t("myLots")}
+        aside={
+          total === undefined ? null : (
+            <span
+              id="auctioneer-lots-total"
+              className="text-[13px] font-bold text-brand-yellow"
+            >
+              {t("lotsCount", { count: total })}
+            </span>
+          )
+        }
+      />
+      <div className="flex flex-col gap-3 border-b-3 border-line-soft p-3.5">
+        <Label htmlFor="auctioneer-lot-search" className="sr-only">
+          {t("lotSearchLabel")}
+        </Label>
+        <div className="flex">
+          <span
+            aria-hidden="true"
+            className="flex w-11 shrink-0 items-center justify-center border-3 border-r-0 border-input bg-brand-ink text-brand-yellow"
+          >
+            <SearchIcon className="size-4.5" strokeWidth={3} />
+          </span>
+          <Input
             id="auctioneer-lot-search"
             type="search"
             value={query}
             placeholder={t("lotSearchPlaceholder")}
+            className="h-11 px-3 py-2 text-[15px]"
             onChange={onQueryChange}
           />
         </div>
@@ -89,35 +150,38 @@ export function AuctioneerSidebar(props: AuctioneerSidebarProps) {
           id="auctioneer-lot-filters"
           role="group"
           aria-label={t("lotFiltersLabel")}
-          className="flex flex-wrap gap-2"
+          className="flex flex-wrap gap-1.5"
         >
-          {auctioneerLotFilters.map((filterStatus) => {
-            const selected = status === filterStatus
-
-            return (
-              <Button
-                key={filterStatus}
-                id={`auctioneer-lot-filter-${filterStatus}`}
-                type="button"
-                size="xs"
-                variant={selected ? "default" : "outline"}
-                aria-pressed={selected}
-                onClick={() => onStatusToggle(filterStatus)}
-              >
-                {t(`statuses.${auctioneerLotStatusLabelKey[filterStatus]}`)}
-              </Button>
-            )
-          })}
+          <FilterButton
+            id="auctioneer-lot-filter-ALL"
+            label={t("lotFilterAll")}
+            count={total}
+            selected={status === undefined}
+            onSelect={() => props.onStatusChange(undefined)}
+          />
+          {auctioneerLotFilters.map((filterStatus) => (
+            <FilterButton
+              key={filterStatus}
+              id={`auctioneer-lot-filter-${filterStatus}`}
+              label={t(`statuses.${auctioneerLotStatusLabelKey[filterStatus]}`)}
+              count={countFor(filterStatus)}
+              selected={status === filterStatus}
+              onSelect={() => onStatusToggle(filterStatus)}
+            />
+          ))}
         </div>
-      </Sidebar.Header>
-      <Sidebar.Content className="px-2 py-2">
-        <AuctioneerLotList
-          query={debouncedQuery}
-          status={status}
-          selectedLotId={props.selectedLotId}
-          onSelectLot={onSelectLot}
-        />
-      </Sidebar.Content>
-    </Sidebar.Root>
+      </div>
+      <LotDraftItem
+        editing={props.selectedLotId === null}
+        onOpenDraft={props.onOpenDraft}
+      />
+      <AuctioneerLotList
+        query={debouncedQuery}
+        status={status}
+        selectedLotId={props.selectedLotId}
+        newLotId={props.newLotId}
+        onSelectLot={props.onSelectLot}
+      />
+    </aside>
   )
 }

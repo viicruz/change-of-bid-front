@@ -20,6 +20,18 @@ import enMessages from "@/messages/en.json"
 import { ApiError, api } from "@/src/lib/api"
 import { queryClient } from "@/src/lib/query-client"
 
+const authSession = vi.hoisted(() => ({
+  data: null as { user: { role: string } } | null,
+  isPending: false,
+  isRefetching: false,
+  error: null,
+  refetch: vi.fn(),
+}))
+
+vi.mock("@/src/hooks/auth/use-auth-session", () => ({
+  useAuthSession: () => authSession,
+}))
+
 vi.mock("next/image", () => ({
   default: (props: { alt: string; src: string }) =>
     createElement("img", { alt: props.alt, src: props.src }),
@@ -174,6 +186,8 @@ describe("AuctionRoom", () => {
   let root: Root
 
   beforeEach(() => {
+    authSession.data = null
+    authSession.isPending = false
     queryClient.clear()
     FakeSocket.instances = []
     vi.stubGlobal("WebSocket", FakeSocket)
@@ -199,7 +213,7 @@ describe("AuctionRoom", () => {
   }
 
   describe("when the public lot is live", () => {
-    it("shows the title, status, cards in position order, and bids in sequence order", async () => {
+    it("shows the title, status, cards in position order, and the newest bid first", async () => {
       vi.mocked(api.get).mockResolvedValue(publicLot())
 
       await renderRoom(lotId)
@@ -227,12 +241,13 @@ describe("AuctionRoom", () => {
       expect(
         container.querySelector("#viewer-participant")?.textContent
       ).toContain("6")
-      expect(container.querySelector("#place-bid")).toBeInstanceOf(
-        HTMLButtonElement
-      )
-      expect(container.querySelector("#place-bid")?.getAttribute("type")).toBe(
-        "submit"
-      )
+      expect(
+        container.querySelector("#guest-bid-lock-message")?.textContent
+      ).toBe("Sign in to place a bid.")
+      expect(
+        container.querySelector("#guest-bid-lock-action")?.getAttribute("href")
+      ).toBe("/sign-in")
+      expect(container.querySelector("#place-bid")).toBeNull()
 
       const list = container.querySelector("#lot-items")
       const items = container.querySelectorAll("#lot-items > li")
@@ -248,8 +263,8 @@ describe("AuctionRoom", () => {
           "#lot-item-quantity-a1b2c3d4-e5f6-7890-abcd-ef1234567890"
         )?.textContent
       ).toContain("1")
-      expect(container.innerHTML.indexOf("auction-bid-1")).toBeLessThan(
-        container.innerHTML.indexOf("auction-bid-2")
+      expect(container.innerHTML.indexOf("auction-bid-2")).toBeLessThan(
+        container.innerHTML.indexOf("auction-bid-1")
       )
       expect(api.get).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -316,9 +331,76 @@ describe("AuctionRoom", () => {
       )
       expect(container.querySelector("#place-bid")).toBeNull()
     })
+
+    it("keeps the bid form available for a bidder", async () => {
+      authSession.data = { user: { role: "BIDDER" } }
+      vi.mocked(api.get).mockResolvedValue(publicLot())
+
+      await renderRoom(lotId)
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(container.querySelector("#place-bid")).toBeInstanceOf(
+            HTMLButtonElement
+          )
+        })
+      })
+
+      expect(container.querySelector("#auctioneer-bid-lock")).toBeNull()
+      expect(container.querySelector("#bid-amount")).toBeInstanceOf(
+        HTMLInputElement
+      )
+    })
+  })
+
+  describe("when the signed-in user is an auctioneer", () => {
+    it("blocks the bid form on a live lot and explains why", async () => {
+      authSession.data = { user: { role: "AUCTIONEER" } }
+      vi.mocked(api.get).mockResolvedValue(publicLot())
+
+      await renderRoom(lotId)
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(
+            container.querySelector("#auctioneer-bid-lock-message")?.textContent
+          ).toBe("Only a bidder can place a bid.")
+        })
+      })
+
+      expect(container.querySelector("#auctioneer-bid-lock")).not.toBeNull()
+      expect(container.querySelector("#place-bid")).toBeNull()
+      expect(container.querySelector("#place-bid-form")).toBeNull()
+      expect(container.querySelector("#bid-amount")).toBeNull()
+      expect(
+        container.querySelector("#current-bid-value")?.textContent
+      ).toContain("15.00")
+      expect(container.querySelector("#bid-history")).not.toBeNull()
+    })
+
+    it("hides the bid form while the session is still loading", async () => {
+      authSession.isPending = true
+      authSession.data = { user: { role: "AUCTIONEER" } }
+      vi.mocked(api.get).mockResolvedValue(publicLot())
+
+      await renderRoom(lotId)
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(container.querySelector("#current-bid-value")).not.toBeNull()
+        })
+      })
+
+      expect(container.querySelector("#place-bid")).toBeNull()
+      expect(container.querySelector("#auctioneer-bid-lock")).toBeNull()
+    })
   })
 
   describe("when the viewer places a bid", () => {
+    beforeEach(() => {
+      authSession.data = { user: { role: "BIDDER" } }
+    })
+
     const storedBidResponse = {
       id: "7c9e6679-7425-40de-944b-e07fc1f90ae7",
       sequence: 3,
@@ -593,9 +675,9 @@ describe("AuctionRoom", () => {
 
       await act(async () => {
         await vi.waitFor(() => {
-          expect(
-            container.querySelector("#auction-leadership")?.textContent
-          ).toBe("Bidder #4")
+          expect(container.querySelector("#lot-leader")?.textContent).toContain(
+            "Participant #4"
+          )
         })
       })
 
@@ -628,8 +710,8 @@ describe("AuctionRoom", () => {
       expect(
         container.querySelector("#current-bid-value")?.textContent
       ).toContain("20.00")
-      expect(container.querySelector("#auction-leadership")?.textContent).toBe(
-        "Bidder #8"
+      expect(container.querySelector("#lot-leader")?.textContent).toContain(
+        "Participant #8"
       )
       expect(
         container.querySelector("#viewer-participant")?.textContent
@@ -638,7 +720,7 @@ describe("AuctionRoom", () => {
         "20.00"
       )
       expect(container.querySelector("#auction-countdown")?.textContent).toBe(
-        "Ends in 02:00"
+        "Ending soon! 00:02:00"
       )
       expect(container.querySelector("#place-bid-error")).toBeNull()
     })
@@ -670,7 +752,7 @@ describe("AuctionRoom", () => {
         await vi.waitFor(() => {
           expect(
             container.querySelector("#auction-leadership")?.textContent
-          ).toBe("You are winning")
+          ).toBe("You're in the lead! Keep an eye on the clock.")
         })
       })
 
@@ -678,6 +760,7 @@ describe("AuctionRoom", () => {
     })
 
     it("says the viewer was outbid", async () => {
+      authSession.data = { user: { role: "BIDDER" } }
       vi.mocked(api.get).mockResolvedValue(
         publicLot({
           leaderParticipantNo: 4,
@@ -704,7 +787,7 @@ describe("AuctionRoom", () => {
         await vi.waitFor(() => {
           expect(
             container.querySelector("#auction-leadership")?.textContent
-          ).toBe("You were outbid")
+          ).toBe("You were outbid! Bid again to take the lead.")
         })
       })
 
@@ -778,6 +861,8 @@ describe("AuctionRoom", () => {
 
   describe("when the countdown reaches a deadline", () => {
     it("counts the remaining live time and reads the lot again at the end", async () => {
+      //* A bidder keeps the bid form mounted, which flushes the countdown update
+      authSession.data = { user: { role: "BIDDER" } }
       vi.useFakeTimers()
       vi.setSystemTime(new Date("2026-10-27T14:59:58.000Z"))
 
@@ -797,7 +882,7 @@ describe("AuctionRoom", () => {
           await vi.waitFor(() => {
             expect(
               container.querySelector("#auction-countdown")?.textContent
-            ).toBe("Ends in 00:02")
+            ).toBe("Ending soon! 00:00:02")
           })
         })
 
@@ -808,7 +893,7 @@ describe("AuctionRoom", () => {
         })
 
         expect(container.querySelector("#auction-countdown")?.textContent).toBe(
-          "Ends in 00:00"
+          "Ended 00:00:00"
         )
         expect(vi.mocked(api.get).mock.calls.length).toBeGreaterThan(1)
       } finally {
@@ -840,7 +925,7 @@ describe("AuctionRoom", () => {
         })
 
         expect(container.querySelector("#auction-countdown")?.textContent).toBe(
-          "Starts in 01:05"
+          "Starts in 00:01:05"
         )
         expect(container.querySelector("#place-bid")).toBeNull()
       } finally {

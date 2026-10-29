@@ -4,7 +4,7 @@
 import { useTranslations } from "next-intl"
 
 //* Components imports
-import { AuctioneerCardTile } from "@/src/components/auctioneer/auctioneer-card-tile"
+import { CardMeta, CardThumb } from "@/src/components/auctioneer/card-thumb"
 import { Button } from "@/src/components/ui/button"
 
 //* Hooks imports
@@ -33,27 +33,45 @@ export function CardSearchResult(props: CardSearchResultProps) {
     cards.append({
       cardId,
       name: props.card.name,
+      cardType: props.card.cardType,
+      ...(props.card.attribute ? { attribute: props.card.attribute } : {}),
       ...(props.card.imageUrl ? { imageUrl: props.card.imageUrl } : {}),
     })
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <div
-        id={`${idPrefix}card-search-card-${props.card.id}`}
-        className={isSelected ? "blur-[2px]" : undefined}
-      >
-        <AuctioneerCardTile card={props.card} idPrefix={idPrefix} />
+    <div
+      id={`${idPrefix}card-search-card-${props.card.id}`}
+      data-selected={isSelected ? "" : undefined}
+      className="flex items-center gap-3 px-3 py-2.5"
+    >
+      <CardThumb
+        name={props.card.name}
+        cardType={props.card.cardType}
+        imageUrl={props.card.imageUrl}
+        size="sm"
+      />
+      <div className="min-w-0 flex-1">
+        <p className="text-[15px] font-bold">{props.card.name}</p>
+        <CardMeta
+          cardType={props.card.cardType}
+          attribute={props.card.attribute}
+        />
+        {isSelected ? (
+          <p className="text-xs font-bold text-yellow-text">{t("inLot")}</p>
+        ) : null}
       </div>
       <Button
         id={`${idPrefix}add-card-${props.card.id}`}
         type="button"
-        variant="outline"
-        className="w-full"
+        size="sm"
+        //* Yellow, not red: white on red needs 18px+ to reach AA
+        variant="secondary"
+        aria-label={t("addCardNamed", { name: props.card.name })}
         disabled={isSelected}
         onClick={onAdd}
       >
-        {t("addCard")}
+        {t("add")}
       </Button>
     </div>
   )

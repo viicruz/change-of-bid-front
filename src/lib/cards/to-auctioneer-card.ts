@@ -30,6 +30,7 @@ export function toAuctioneerCard(card: Card): AuctioneerCard {
     id: String(card.id),
     name: card.name,
     cardType: toCardType(card),
+    ...(card.attribute ? { attribute: card.attribute } : {}),
     ...(imageUrl ? { imageUrl } : {}),
   }
 }

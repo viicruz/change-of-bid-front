@@ -145,9 +145,7 @@ describe("LotSection", () => {
     vi.mocked(api.get).mockResolvedValue({ lots: [endedLot] })
 
     act(() => {
-      root.render(
-        createElement(SectionHarness, { query: "", status: "ENDED" })
-      )
+      root.render(createElement(SectionHarness, { query: "", status: "ENDED" }))
     })
 
     await act(async () => {
@@ -187,6 +185,238 @@ describe("LotSection", () => {
       },
       schema: expect.anything(),
       errorSchema: expect.anything(),
+    })
+  })
+
+  function numberedLots(count: number) {
+    return Array.from({ length: count }, (_, index) => {
+      const number = index + 1
+
+      return {
+        ...liveLot,
+        id: `11111111-1111-4111-8111-${String(number).padStart(12, "0")}`,
+        title: `Lot ${number}`,
+      }
+    })
+  }
+
+  function titlesInOrder() {
+    return [...container.querySelectorAll("#lot-section-LIVE-list h3 a")].map(
+      (link) => link.textContent
+    )
+  }
+
+  function clickButton(id: string) {
+    act(() => {
+      container
+        .querySelector<HTMLButtonElement>(`#${id}`)
+        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }))
+    })
+  }
+
+  async function renderLots(lots: IndexLot[], query = "") {
+    vi.mocked(api.get).mockResolvedValue({ lots })
+
+    act(() => {
+      root.render(createElement(SectionHarness, { query, status: "LIVE" }))
+    })
+
+    await act(async () => {
+      await vi.waitFor(() => {
+        expect(container.textContent).toContain(
+          lots[0]?.title ?? "No lots found."
+        )
+      })
+    })
+  }
+
+  describe("pagination", () => {
+    it("hides pagination when every lot fits on the first page", async () => {
+      await renderLots(numberedLots(8))
+
+      expect(container.querySelector("#lot-section-LIVE-pagination")).toBeNull()
+      expect(titlesInOrder()).toEqual([
+        "Lot 1",
+        "Lot 2",
+        "Lot 3",
+        "Lot 4",
+        "Lot 5",
+        "Lot 6",
+        "Lot 7",
+        "Lot 8",
+      ])
+    })
+
+    it("shows the first page of eight lots and moves to the next page", async () => {
+      await renderLots(numberedLots(9))
+
+      expect(titlesInOrder()).toEqual([
+        "Lot 1",
+        "Lot 2",
+        "Lot 3",
+        "Lot 4",
+        "Lot 5",
+        "Lot 6",
+        "Lot 7",
+        "Lot 8",
+      ])
+      expect(
+        container
+          .querySelector("#lot-section-LIVE-page-1")
+          ?.getAttribute("aria-current")
+      ).toBe("page")
+      expect(
+        container.querySelector<HTMLButtonElement>("#lot-section-LIVE-previous")
+          ?.disabled
+      ).toBe(true)
+
+      clickButton("lot-section-LIVE-next")
+
+      expect(titlesInOrder()).toEqual(["Lot 9"])
+      expect(
+        container
+          .querySelector("#lot-section-LIVE-page-2")
+          ?.getAttribute("aria-current")
+      ).toBe("page")
+      expect(
+        container.querySelector<HTMLButtonElement>("#lot-section-LIVE-next")
+          ?.disabled
+      ).toBe(true)
+    })
+
+    it("opens the page selected from the page links", async () => {
+      await renderLots(numberedLots(9))
+
+      clickButton("lot-section-LIVE-page-2")
+
+      expect(titlesInOrder()).toEqual(["Lot 9"])
+      expect(
+        container
+          .querySelector("#lot-section-LIVE-page-2")
+          ?.getAttribute("aria-current")
+      ).toBe("page")
+    })
+
+    it("returns to the first page when the search changes", async () => {
+      await renderLots(numberedLots(9))
+
+      clickButton("lot-section-LIVE-next")
+      expect(titlesInOrder()).toEqual(["Lot 9"])
+
+      act(() => {
+        root.render(
+          createElement(SectionHarness, { query: "lot", status: "LIVE" })
+        )
+      })
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(titlesInOrder()).toEqual([
+            "Lot 1",
+            "Lot 2",
+            "Lot 3",
+            "Lot 4",
+            "Lot 5",
+            "Lot 6",
+            "Lot 7",
+            "Lot 8",
+          ])
+        })
+      })
+
+      expect(api.get).toHaveBeenCalledWith({
+        url: "/public/lots",
+        params: {
+          q: "lot",
+          status: "LIVE",
+        },
+        schema: expect.anything(),
+        errorSchema: expect.anything(),
+      })
+      expect(
+        container
+          .querySelector("#lot-section-LIVE-page-1")
+          ?.getAttribute("aria-current")
+      ).toBe("page")
+    })
+
+    it("collapses distant pages and opens the selected page", async () => {
+      await renderLots(numberedLots(41))
+
+      expect(
+        container.querySelector("#lot-section-LIVE-page-1")
+      ).toBeInstanceOf(HTMLButtonElement)
+      expect(
+        container.querySelector("#lot-section-LIVE-page-2")
+      ).toBeInstanceOf(HTMLButtonElement)
+      expect(
+        container.querySelector("#lot-section-LIVE-page-6")
+      ).toBeInstanceOf(HTMLButtonElement)
+      expect(container.querySelector("#lot-section-LIVE-page-3")).toBeNull()
+      expect(
+        container.querySelector("[data-slot='pagination-ellipsis']")
+      ).not.toBeNull()
+
+      clickButton("lot-section-LIVE-page-6")
+
+      expect(titlesInOrder()).toEqual(["Lot 41"])
+      expect(
+        container
+          .querySelector("#lot-section-LIVE-page-6")
+          ?.getAttribute("aria-current")
+      ).toBe("page")
+    })
+
+    it("scrolls the section back to the top when the page changes", async () => {
+      await renderLots(numberedLots(9))
+      const section = container.querySelector("#live")
+
+      expect(section).toBeInstanceOf(HTMLElement)
+
+      const scrollIntoView = vi.spyOn(section as HTMLElement, "scrollIntoView")
+
+      clickButton("lot-section-LIVE-next")
+
+      expect(scrollIntoView).toHaveBeenCalledWith({ block: "start" })
+    })
+
+    it("keeps the scroll position when the search changes", async () => {
+      await renderLots(numberedLots(9))
+      const section = container.querySelector("#live") as HTMLElement
+      const scrollIntoView = vi.spyOn(section, "scrollIntoView")
+
+      clickButton("lot-section-LIVE-next")
+      scrollIntoView.mockClear()
+
+      act(() => {
+        root.render(
+          createElement(SectionHarness, { query: "lot", status: "LIVE" })
+        )
+      })
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(titlesInOrder()[0]).toBe("Lot 1")
+        })
+      })
+
+      expect(scrollIntoView).not.toHaveBeenCalled()
+    })
+
+    it("gives every pagination button an id and a button type", async () => {
+      await renderLots(numberedLots(9))
+
+      for (const id of [
+        "lot-section-LIVE-previous",
+        "lot-section-LIVE-next",
+        "lot-section-LIVE-page-1",
+        "lot-section-LIVE-page-2",
+      ]) {
+        const button = container.querySelector(`#${id}`)
+
+        expect(button).toBeInstanceOf(HTMLButtonElement)
+        expect(button?.getAttribute("type")).toBe("button")
+      }
     })
   })
 

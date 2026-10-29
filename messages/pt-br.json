@@ -2,66 +2,163 @@
   "pages": {
     "/": {
       "title": "Vitrine de lotes",
-      "ctaTitle": "Entre no leilão",
-      "ctaDescription": "Cadastre-se para dar lances em cartas de Yu-Gi-Oh.",
-      "ctaButton": "Começar a dar lances",
-      "searchLabel": "Buscar lotes",
-      "searchPlaceholder": "Buscar pelo nome do lote",
-      "filtersLabel": "Filtrar por tipo",
-      "cardTypes": {
-        "monster": "Monstro",
-        "spell": "Magia",
-        "trap": "Armadilha",
-        "extra": "Extra Deck"
+      "hero": {
+        "tag": "Leilões de cartas Yu-Gi-Oh!",
+        "titleA": "DÊ O",
+        "titleB": "LANCE",
+        "titleC": "VIRE O",
+        "titleD": "JOGO.",
+        "description": "Staples do meta, raridades e aquela carta que falta no seu deck, tudo em leilões rápidos. Ative sua carta-armadilha: um lance no último segundo muda o duelo inteiro.",
+        "ctaLive": "Ver lotes ao vivo",
+        "ctaSignUp": "Criar conta grátis",
+        "stepsLabel": "Como funciona",
+        "steps": {
+          "pick": "Escolha o lote",
+          "bid": "Dê seu lance",
+          "win": "Arremate!"
+        },
+        "cardAlt": "Carta {name}",
+        "logoAlt": "Logo Change of Bid",
+        "stickerLabel": "Novo lance!",
+        "liveBadge": "Ao vivo"
+      },
+      "marquee": {
+        "bid": "Dê seu lance",
+        "win": "Arremate",
+        "duel": "Duele",
+        "collect": "Colecione"
       },
       "sections": {
-        "LIVE": "Lotes ao vivo",
-        "SCHEDULED": "Lotes agendados",
-        "ENDED": "Lotes encerrados"
+        "LIVE": {
+          "tag": "Acontecendo agora",
+          "title": "Lotes ao vivo",
+          "description": "O relógio está correndo. Quem pisca, perde a carta."
+        },
+        "SCHEDULED": {
+          "tag": "Em breve no campo",
+          "title": "Lotes agendados",
+          "description": "Prepare seu deck: ative o lembrete e seja avisado assim que o martelo liberar."
+        },
+        "ENDED": {
+          "tag": "Direto pro cemitério",
+          "title": "Lotes encerrados",
+          "description": "Esses já foram arrematados. Confira os valores finais e calibre seus próximos lances."
+        }
+      },
+      "searchLabel": "Buscar lotes",
+      "searchPlaceholder": "Buscar pelo nome do lote",
+      "filtersLabel": "Filtrar lotes",
+      "filters": {
+        "LIVE": "Ao vivo",
+        "SCHEDULED": "Agendados",
+        "ENDED": "Encerrados"
       },
       "loading": "Carregando lotes.",
       "error": "Não foi possível carregar os lotes.",
       "empty": "Nenhum lote encontrado.",
+      "cardAlt": "Carta {name}",
+      "cardCount": "{count, plural, =0 {# cartas} one {# carta} other {# cartas}}",
+      "liveBadge": "Ao vivo",
+      "scheduledBadge": "Agendado",
       "currentBid": "Lance atual",
-      "finalBid": "Lance final",
-      "endsAt": "Termina em",
-      "startsAt": "Começa em",
-      "endedAt": "Encerrado em",
-      "audit": "Auditar"
+      "bidCount": "{count, plural, =0 {# lances} one {# lance} other {# lances}}",
+      "endsIn": "Termina em",
+      "endingSoon": "Acabando!",
+      "closed": "Encerrado",
+      "placeBid": "Dar lance",
+      "opensAt": "Abre em",
+      "startingBid": "Lance inicial",
+      "sold": "Arrematado!",
+      "unsold": "Sem lances",
+      "finalPrice": "Valor final",
+      "endedOn": "Encerrado em {date}",
+      "details": "Ver detalhes",
+      "audit": "Auditar",
+      "previous": "Anterior",
+      "next": "Próxima",
+      "pagination": "Páginas de {section}",
+      "goToPage": "Ir para a página {page}",
+      "currentPage": "Página {page}",
+      "morePages": "Mais páginas"
     },
     "/sign-up": {
-      "title": "Criar uma conta",
-      "description": "Escolha como participar e cadastre-se com e-mail e senha.",
-      "role": "Como você quer participar?",
+      "title": "Criar conta",
+      "hasAccount": "Já tem conta?",
+      "signInLink": "Entrar",
+      "brand": {
+        "tag": "Novo duelista?",
+        "titleA": "ENTRE NO",
+        "titleB": "DUELO.",
+        "description": "Crie sua conta para leiloar as cartas paradas na pasta ou disputar os lotes ao vivo até o último segundo.",
+        "logoAlt": "Change of Bid"
+      },
+      "role": "Tipo de conta",
       "roles": {
-        "bidder": {
-          "title": "Arrematante",
-          "description": "Dê lances em lotes e acompanhe seus arremates."
-        },
         "auctioneer": {
           "title": "Leiloeiro",
-          "description": "Crie lotes e conduza os leilões."
+          "description": "Quero leiloar minhas cartas e ver os lances subindo."
+        },
+        "bidder": {
+          "title": "Arrematante",
+          "description": "Quero dar lances e arrematar cartas para o meu deck."
         }
       },
       "name": "Nome",
+      "namePlaceholder": "Como os duelistas vão te chamar",
       "email": "E-mail",
+      "emailPlaceholder": "duelista@email.com",
       "password": "Senha",
-      "confirmPassword": "Confirmar senha",
-      "submit": "Criar conta",
-      "submitting": "Criando conta...",
-      "signInLink": "Já tenho uma conta"
+      "passwordPlaceholder": "Mín. 8 caracteres",
+      "confirmPassword": "Repetir senha",
+      "confirmPasswordPlaceholder": "Digite de novo",
+      "showPassword": "Mostrar senha",
+      "hidePassword": "Ocultar senha",
+      "passwordsMatch": "As senhas batem!",
+      "submit": "Criar minha conta",
+      "submitting": "Criando conta..."
     },
     "/wallet": {
       "title": "Carteira",
       "description": "Veja o saldo e as últimas transações.",
-      "depositDescription": "Deposite um valor na sua carteira.",
+      "pageTag": "Seu cofre de duelista",
+      "subtitle": "Acompanhe seu saldo, quanto está preso em lances e tudo o que entrou e saiu da sua conta.",
+      "deposit": "Depositar",
+      "depositTitle": "Depositar na carteira",
+      "depositPresets": "Valores rápidos",
       "depositAmountLabel": "Valor",
-      "depositSubmit": "Depositar",
+      "depositSubmit": "Confirmar depósito",
       "depositSubmitting": "Depositando...",
+      "depositCancel": "Cancelar",
+      "depositSuccess": "Depósito de {amount} confirmado!",
       "depositError": "Não foi possível depositar.",
       "loading": "Carregando saldo.",
       "error": "Não foi possível carregar o saldo.",
+      "retry": "Tentar novamente",
+      "retrying": "Tentando novamente...",
+      "balanceSummary": "Resumo do saldo",
+      "balanceBar": "{available}% disponível, {committed}% comprometido em lances",
+      "balanceShare": "{label} · {percent}%",
+      "availableBalance": "Saldo disponível",
+      "availableHint": "Livre para novos lances.",
+      "committedBalance": "Comprometido em lances",
+      "committedHint": "Volta para você se alguém cobrir seu lance.",
       "totalBalance": "Saldo total",
+      "totalHint": "Disponível + comprometido.",
+      "how": {
+        "title": "Como o saldo funciona",
+        "bid": {
+          "title": "Você dá um lance",
+          "description": "O valor sai do disponível e fica comprometido no lote."
+        },
+        "outbid": {
+          "title": "Alguém cobre seu lance",
+          "description": "O valor volta para o seu saldo disponível na hora."
+        },
+        "win": {
+          "title": "Você arremata",
+          "description": "O valor comprometido sai da sua carteira e vai para a do leiloeiro."
+        }
+      },
       "historyTitle": "Histórico de transações",
       "movements": {
         "loading": "Carregando transações.",
@@ -75,10 +172,25 @@
         "morePages": "Mais páginas",
         "types": {
           "DEPOSIT": "Depósito",
-          "HOLD": "Reserva de lance",
-          "RELEASE": "Reserva liberada",
-          "SETTLEMENT_DEBIT": "Débito de liquidação",
-          "SETTLEMENT_CREDIT": "Crédito de liquidação"
+          "HOLD": "Lance",
+          "RELEASE": "Devolução",
+          "SETTLEMENT_DEBIT": "Arremate",
+          "SETTLEMENT_CREDIT": "Venda"
+        },
+        "viewLot": "Ver lote",
+        "columns": {
+          "date": "Data",
+          "description": "Descrição",
+          "type": "Tipo",
+          "available": "Disponível",
+          "committed": "Comprometido"
+        },
+        "descriptions": {
+          "DEPOSIT": "Depósito na carteira",
+          "HOLD": "Lance em um lote",
+          "RELEASE": "Lance coberto — valor devolvido",
+          "SETTLEMENT_DEBIT": "Arremate pago ao leiloeiro",
+          "SETTLEMENT_CREDIT": "Venda de um lote recebida"
         }
       }
     },
@@ -134,11 +246,16 @@
       "endedAt": "Encerrado em",
       "winner": "Número do vencedor",
       "items": "Cartas do lote",
-      "quantity": "Quantidade",
       "print": "Imprimir comprovante",
       "share": "Compartilhar comprovante",
       "copied": "Link copiado.",
-      "shareError": "Não foi possível copiar o link."
+      "shareError": "Não foi possível copiar o link.",
+      "cardCount": "{count, plural, one {# carta} other {# cartas}}",
+      "summary": "Resumo do arremate",
+      "settled": "Arrematado",
+      "viewLot": "Ver lote",
+      "viewAudit": "Ver auditoria",
+      "browseAuctions": "Ver leilões"
     },
     "/auction/[id]/audit": {
       "title": "Auditoria",
@@ -155,9 +272,6 @@
       "endsAt": "Termina em",
       "endedAt": "Encerrado em",
       "participant": "Participante",
-      "bidAmount": "Valor",
-      "bidTime": "Horário",
-      "quantity": "Quantidade",
       "emptyBids": "Este lote não tem lances aceitos.",
       "tamperedWarning": "Os lances armazenados não conferem com a cadeia. Este registro não é confiável.",
       "verificationFailedWarning": "O servidor não conseguiu verificar a cadeia de lances. Não trate este registro como íntegro nem adulterado.",
@@ -171,7 +285,14 @@
         "INTACT": "Cadeia íntegra",
         "TAMPERED": "Cadeia adulterada",
         "VERIFICATION_FAILED": "Verificação falhou"
-      }
+      },
+      "pageTag": "Auditoria pública",
+      "backToLot": "Voltar ao lote",
+      "cards": "Cartas do lote",
+      "bidCount": "{count, plural, one {# lance} other {# lances}}",
+      "sequence": "Lance {number}",
+      "lastBid": "Último lance",
+      "browseAuctions": "Ver leilões"
     },
     "/auction/[id]": {
       "title": "Sala do lote",
@@ -179,27 +300,20 @@
       "loading": "Carregando lote.",
       "error": "Não foi possível carregar o lote.",
       "notFound": "Lote não encontrado.",
-      "lotInfo": "Informações do lote",
-      "lotDescription": "Descrição",
-      "openingBid": "Lance inicial",
-      "minimumIncrement": "Incremento mínimo",
-      "startsAt": "Início",
-      "endsAt": "Fim",
-      "countdownStarts": "Começa em {time}",
-      "countdownEnds": "Termina em {time}",
+      "minimumIncrement": "Acréscimo mínimo",
       "quantity": "Quantidade",
-      "currentBid": "Valor atual",
+      "currentBid": "Lance atual",
       "noCurrentBid": "Nenhum lance atual.",
-      "leader": "Líder",
-      "youAreWinning": "Você está vencendo",
-      "youWereOutbid": "Você foi superado",
-      "bidder": "Arrematante #{number}",
+      "youAreWinning": "Você está na frente! Fique de olho no relógio.",
+      "youWereOutbid": "Você foi superado! Dê um novo lance para voltar à frente.",
       "winner": "Vencedor",
       "yourNumber": "Seu número",
       "you": "Você",
-      "bidValue": "Valor do lance",
-      "placeBid": "Fazer lance",
-      "placingBid": "Fazendo lance...",
+      "placeBid": "Dar lance",
+      "placingBid": "Dando lance...",
+      "auctioneerCannotBid": "Apenas um arrematante pode fazer um lance.",
+      "guestCannotBid": "Entre para fazer um lance.",
+      "signInToBid": "Entrar",
       "bidError": "Não foi possível fazer o lance.",
       "bidErrors": {
         "NOT_BIDDER": "Apenas um arrematante pode fazer um lance.",
@@ -217,25 +331,79 @@
       "settling": "O resultado ainda está sendo gravado.",
       "reconnecting": "Reconectando...",
       "connectionProblem": "A conexão ao vivo falhou. Tentando de novo.",
-      "participant": "Participante",
+      "participant": "Participante #{number}",
       "statuses": {
         "live": "Ao vivo",
         "scheduled": "Pendente",
         "canceled": "Cancelado",
         "closed": "Finalizado"
-      }
+      },
+      "breadcrumb": {
+        "label": "Você está em",
+        "auctions": "Leilões"
+      },
+      "cardCount": "{count, plural, =0 {nenhuma carta} one {# carta} other {# cartas}}",
+      "cardAlt": "Carta {name}",
+      "viewCard": "Ver {name}",
+      "position": "{current} de {total}",
+      "lotCards": "Cartas do lote",
+      "bidsLabel": "Lances",
+      "whatsIn": "O que vem no lote",
+      "timer": {
+        "startsIn": "Começa em",
+        "endsIn": "Termina em",
+        "endingSoon": "Acabando!",
+        "ended": "Encerrado",
+        "canceled": "Cancelado"
+      },
+      "finalBid": "Lance final",
+      "by": "por",
+      "bidCount": "{count, plural, =0 {nenhum lance} one {# lance} other {# lances}}",
+      "youWithNumber": "Você (#{number})",
+      "minimumBid": "Lance mínimo",
+      "quickBid": "Lance rápido",
+      "quickBidMinimum": "Mínimo",
+      "yourBid": "Seu lance",
+      "finalNote": "Lances são definitivos e não podem ser cancelados.",
+      "topBid": "Maior lance",
+      "fullHistory": "Ver histórico completo",
+      "canceledNote": "Este lote foi cancelado e não aceita mais lances."
     },
     "/auctioneer": {
       "title": "Painel do leiloeiro",
       "description": "Gerencie seus lotes e as cartas que estão neles.",
-      "createLot": "Criar lote",
+      "pageTag": "Painel do leiloeiro",
+      "createHeading": "Criar lote",
+      "createSubtitle": "Monte o lote, defina preço e datas e solte no campo. Seus lotes ficam ao lado para consulta.",
+      "viewHeading": "Ver lote",
+      "viewSubtitle": "Acompanhe os lances do lote e cancele antes do fim, se precisar. Seus lotes ficam ao lado para consulta.",
+      "sectionsLabel": "Seções da página",
+      "tabLots": "Meus lotes",
+      "tabNewLot": "Novo lote",
+      "tabLot": "Lote",
+      "tabCards": "Cartas",
+      "tabDetails": "Detalhes",
+      "myLots": "Meus lotes",
+      "lotDetails": "Detalhes do lote",
+      "addCards": "Adicionar cartas",
+      "closeCardSearch": "Fechar busca",
       "lotSearchLabel": "Buscar lotes",
-      "lotSearchPlaceholder": "Buscar pelo nome do lote",
+      "lotSearchPlaceholder": "Buscar pelo título do lote",
       "lotFiltersLabel": "Filtrar lotes",
       "lotsLabel": "Lotes",
       "lotsLoading": "Carregando lotes.",
       "lotsError": "Não foi possível carregar os lotes.",
       "lotsEmpty": "Nenhum lote encontrado.",
+      "lotsCount": "{count, plural, one {# lote} other {# lotes}}",
+      "lotFilterAll": "Todos",
+      "draftLabel": "Rascunho em edição",
+      "draftUntitled": "Lote sem título",
+      "soldFor": "Arrematado",
+      "noBids": "Sem lances",
+      "lotWhenLive": "Termina {date}",
+      "lotWhenScheduled": "Abre {date}",
+      "lotWhenEnded": "Encerrado {date}",
+      "lotWhenCanceled": "Cancelado",
       "lotLoading": "Carregando lote.",
       "lotError": "Não foi possível carregar o lote.",
       "currentBid": "Lance atual",
@@ -249,20 +417,53 @@
       "extensions": "Extensões",
       "winner": "Vencedor",
       "receivedAmount": "Valor recebido",
-      "cardsInLot": "Cartas já no lote",
-      "addCard": "Adicionar carta",
-      "toggleSidebar": "Abrir ou fechar a sidebar",
+      "cardsInLot": "Cartas do lote",
+      "cardsCount": "{count, plural, =0 {Nenhuma carta ainda} one {# carta} other {# cartas}}",
+      "emptyLotTitle": "Lote vazio por enquanto",
+      "emptyLotText": "Abra a busca, encontre as cartas e adicione ao lote.",
+      "emptyLotSearchText": "Encontre as cartas na busca acima e adicione ao lote.",
+      "removeCardNamed": "Remover {name} do lote",
+      "add": "Adicionar",
+      "addCardNamed": "Adicionar {name} ao lote",
+      "inLot": "No lote",
       "assistanceMenu": "Menu de auxílio",
-      "lotName": "Nome",
+      "lotName": "Título do lote",
       "lotDescription": "Descrição",
       "minimalValue": "Lance inicial",
       "minimumIncrement": "Incremento mínimo",
       "startsAt": "Início do leilão",
       "endsAt": "Fim do leilão",
-      "removeCard": "Remover carta",
+      "lotTitlePlaceholder": "Ex.: Kit Labrynth + Extras",
+      "lotDescriptionPlaceholder": "Conte o que vem no lote, o estado das cartas e como você envia.",
+      "characterCount": "{count}/{max}",
+      "quickIncrements": "Acréscimos rápidos",
+      "schedule": "Quando acontece",
+      "pickDate": "Escolha a data",
+      "scheduleTime": "Hora",
+      "quickDuration": "Duração:",
+      "quickDurationShort": "{days}d",
+      "quickDurationMinutesShort": "{minutes}M",
+      "quickDurationMinutes": "{minutes}M: termina {minutes} minutos depois do início",
+      "quickDurationDays": "{days, plural, one {#d: termina # dia depois do início} other {#d: termina # dias depois do início}}",
+      "summaryLabel": "Resumo do lote",
+      "summaryCards": "Cartas",
+      "summaryDuration": "Duração",
+      "summaryIncrement": "Acréscimo",
+      "durationValueDays": "{days}d {hours}h",
+      "durationValueHours": "{hours}h {minutes}min",
+      "errorSummary": "{count, plural, one {Falta 1 coisa para publicar o lote:} other {Faltam # coisas para publicar o lote:}}",
+      "detailsHaveErrors": "há campos com erro",
+      "createNote": "Depois de publicado, o lote não pode ser editado — só cancelado antes de terminar.",
       "submit": "Publicar lote",
       "submitting": "Publicando...",
-      "created": "Lote criado.",
+      "newLot": "Novo",
+      "createdTag": "Lote criado!",
+      "createdTitle": "“{title}” está no campo",
+      "createdTextScheduled": "O lote abre em {start} e fecha em {end}, com lance inicial de {value}. Ele já aparece em “Agendados” na sua lista.",
+      "createdTextLive": "O lote já está aberto e fecha em {end}, com lance inicial de {value}. Ele já aparece em “Ao vivo” na sua lista.",
+      "createAnother": "Criar outro lote",
+      "viewScheduled": "Ver nos agendados",
+      "viewLive": "Ver nos ao vivo",
       "cancelLot": "Cancelar lote",
       "cancelingLot": "Cancelando...",
       "canceledLot": "Lote cancelado.",
@@ -364,13 +565,30 @@
     },
     "/sign-in": {
       "title": "Entrar",
-      "description": "Entre com seu e-mail e senha.",
+      "noAccount": "Ainda não tem conta?",
+      "signUpLink": "Criar conta",
+      "brand": {
+        "tag": "Já é duelista?",
+        "titleA": "DE VOLTA AO",
+        "titleB": "DUELO.",
+        "description": "Entre para acompanhar seus lances, ficar de olho nos lotes que você segue e arrematar antes que o martelo bata.",
+        "logoAlt": "Change of Bid"
+      },
       "email": "E-mail",
+      "emailPlaceholder": "duelista@email.com",
       "password": "Senha",
+      "passwordPlaceholder": "Sua senha",
+      "showPassword": "Mostrar senha",
+      "hidePassword": "Ocultar senha",
       "submit": "Entrar",
       "submitting": "Entrando...",
       "unknownError": "Não foi possível entrar.",
-      "signUpLink": "Criar uma conta"
+      "or": "ou",
+      "createAccount": "Criar conta grátis"
+    },
+    "/design": {
+      "title": "Design System",
+      "description": "Cores, tipografia, componentes, ícones, animações e voz do Change of Bid."
     }
   },
   "schemas": {
@@ -383,7 +601,9 @@
     "TITLE_REQUIRED": "O título é obrigatório",
     "INVALID_MONEY": "Os valores em dinheiro devem ser maiores que zero e ter no máximo 2 casas decimais.",
     "INVALID_DATETIME": "Informe uma data e hora ISO com fuso horário.",
-    "INVALID_SCHEDULE": "O lote deve durar pelo menos 24 horas, e o término deve estar no futuro.",
+    "INVALID_SCHEDULE": "O lote deve durar pelo menos 4 minutos, e o término deve estar no futuro.",
+    "LOT_STARTS_AT_REQUIRED": "Escolha quando o lote abre.",
+    "LOT_ENDS_AT_REQUIRED": "Escolha quando o lote termina.",
     "CARD_IDS_REQUIRED": "Adicione pelo menos uma carta.",
     "00000_UNKNOWN_ERROR": "Não foi possível criar a conta."
   },
@@ -410,6 +630,15 @@
       "auctioneer": "Leiloeiro",
       "signIn": "Entrar",
       "signUp": "Criar conta"
+    },
+    "sections": {
+      "live": "Ao vivo",
+      "scheduled": "Agendados",
+      "ended": "Encerrados"
+    },
+    "theme": {
+      "toLight": "Ativar tema claro",
+      "toDark": "Ativar tema escuro"
     }
   },
   "localeSelect": {
@@ -417,6 +646,39 @@
     "locales": {
       "en": "English",
       "pt-br": "Português (Brasil)"
+    },
+    "short": {
+      "en": "EN",
+      "pt-br": "PT"
+    }
+  },
+  "components": {
+    "yugiohCard": {
+      "quantity": "Quantidade"
+    },
+    "footer": {
+      "label": "Rodapé",
+      "tagline": "Leilões de cartas Yu-Gi-Oh! feitos por duelistas, para duelistas.",
+      "auctions": "Leilões",
+      "sellCards": "Quero vender minhas cartas",
+      "help": "Ajuda",
+      "howItWorks": "Como funciona",
+      "faq": "Perguntas frequentes",
+      "shipping": "Envio e pagamento",
+      "contact": "Fale conosco",
+      "alerts": "Alerta de lotes",
+      "alertsDescription": "Receba os novos lotes antes de todo mundo.",
+      "email": "Seu e-mail",
+      "emailPlaceholder": "duelista@email.com",
+      "subscribe": "Assinar",
+      "alertsSoon": "O alerta de lotes chega em breve.",
+      "rights": "© {year} Change of Bid. Todos os direitos reservados.",
+      "konami": "Yu-Gi-Oh! é marca registrada da Konami. O Change of Bid não é afiliado à Konami."
+    },
+    "lotItemList": {
+      "quantity": "Quantidade",
+      "total": "Total",
+      "cardCount": "{count, plural, one {# carta} other {# cartas}}"
     }
   }
 }

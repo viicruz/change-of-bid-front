@@ -1,189 +1,227 @@
 "use client"
 
+import { useEffect, useState } from "react"
+
 //* Libraries imports
-import { useTranslations } from "next-intl"
-import { useState, type MouseEvent } from "react"
+import { useFormatter, useTranslations } from "next-intl";
+import { CheckIcon, PlusIcon } from "lucide-react";
+import { parseAsInteger, useQueryState } from "nuqs";
 
 //* Components imports
-import Pagination from "@/src/components/ui/pagination"
 import { Skeleton } from "@/src/components/ui/skeleton"
-import { BalanceCard } from "@/src/components/wallet/balance-card"
+import { Tag } from "@/src/components/ui/brand"
+import { BalanceBar, BalanceCards } from "@/src/components/wallet/balance-card"
 import { DepositForm } from "@/src/components/wallet/deposit-form"
+import { HowBalanceWorks } from "@/src/components/wallet/how-balance-works"
 import { TransactionList } from "@/src/components/wallet/transaction-list"
+import { WalletMovementsPagination } from "@/src/components/wallet/wallet-movements-pagination"
+import { Button } from "@/src/components/ui/button"
 
 //* Hooks imports
 import { useIndexWalletMovements } from "@/src/hooks/wallets/queries/use-index-wallet-movements"
 import { useShowWallet } from "@/src/hooks/wallets/queries/use-show-wallet"
 
-//* Lib imports
-import { getPaginationPageItems } from "@/src/lib/pagination"
+const LIMIT_PER_PAGE = 5; // Limit of movements per page
 
-const movementPageLimit = 5
+//* Error boxes share the hard-edged look of the rest of the page
+const errorBox =
+  "flex w-full flex-col items-start gap-3 border-4 border-border bg-card p-[22px] font-semibold text-red-text shadow-hard-8 shadow-brand-red"
 
 export function WalletSummary() {
-  const t = useTranslations("pages./wallet")
-  const walletQuery = useShowWallet()
-  const [page, setPage] = useState(1)
-  const movementsQuery = useIndexWalletMovements({
-    page,
-    limit: movementPageLimit,
-  })
-  const total = movementsQuery.data?.total
-  const pageCount =
-    total === undefined
-      ? page
-      : Math.max(1, Math.ceil(total / movementPageLimit))
-  const showPagination =
-    page > 1 || (total !== undefined && total > movementPageLimit)
+  const t = useTranslations("pages./wallet");
+  const format = useFormatter();
+  const [, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
+  const walletQuery = useShowWallet();
+  const [isDepositOpen, setIsDepositOpen] = useState(false)
+  const [depositedAmount, setDepositedAmount] = useState<string | null>(null)
 
-  function onDeposited() {
+  function onDepositOpen() {
+    setIsDepositOpen(true)
+    setDepositedAmount(null)
+  }
+
+  function onDepositCancel() {
+    setIsDepositOpen(false)
+  }
+
+  function onDeposited(amount: string) {
+    setIsDepositOpen(false)
+    setDepositedAmount(amount)
     setPage(1)
   }
 
-  function onPageChange(nextPage: number) {
-    if (nextPage === page || nextPage < 1 || nextPage > pageCount) {
-      return
-    }
-
-    setPage(nextPage)
-  }
-
   return (
-    <div className="flex w-full flex-col items-center gap-6">
-      {walletQuery.isError ? (
-        <p id="wallet-balance-error">{t("error")}</p>
-      ) : walletQuery.isPending ? (
-        <>
-          <p className="sr-only">{t("loading")}</p>
-          <Skeleton className="h-24 w-full max-w-lg" />
-        </>
-      ) : (
-        <BalanceCard balance={Number(walletQuery.data.totalBalance)} />
-      )}
-      <div className="w-full max-w-lg">
-        <DepositForm onDeposited={onDeposited} />
-      </div>
-      <section
-        className="flex w-full flex-col items-center gap-3"
-        aria-labelledby="wallet-history-title"
-      >
-        <h2
-          id="wallet-history-title"
-          className="font-heading text-lg font-medium"
+    <div className="flex flex-col gap-12">
+      <div className="flex flex-wrap items-end justify-between gap-5">
+        <div className="flex flex-col gap-3">
+          <Tag tone="yellow">{t("pageTag")}</Tag>
+          <h1 className="font-heading text-[clamp(36px,5vw,64px)] leading-none font-normal">
+            {t("title")}
+          </h1>
+          <p className="max-w-155 text-[17px] text-muted-foreground">
+            {t("subtitle")}
+          </p>
+        </div>
+        <Button
+          id="wallet-deposit-open"
+          type="button"
+          aria-expanded={isDepositOpen}
+          aria-controls={isDepositOpen ? "deposit-form" : undefined}
+          onClick={onDepositOpen}
         >
-          {t("historyTitle")}
-        </h2>
-        {movementsQuery.isError ? (
-          <p id="wallet-movements-error">{t("movements.error")}</p>
-        ) : movementsQuery.isPending ? (
-          <>
-            <p className="sr-only">{t("movements.loading")}</p>
-            <Skeleton className="h-24 w-full max-w-lg" />
-          </>
-        ) : movementsQuery.data.movements.length === 0 ? (
-          <p id="wallet-movements-empty">{t("movements.empty")}</p>
-        ) : (
-          <TransactionList movements={movementsQuery.data.movements} />
-        )}
-        {showPagination ? (
-          <WalletMovementsPagination
-            page={page}
-            pageCount={pageCount}
-            onPageChange={onPageChange}
+          <PlusIcon aria-hidden="true" strokeWidth={3} strokeLinecap="square" />
+          {t("deposit")}
+        </Button>
+      </div>
+
+      {depositedAmount ? (
+        <p
+          id="wallet-deposit-success"
+          role="status"
+          className="-mt-6 flex animate-pop items-center gap-2.5 self-start border-3 border-black bg-brand-yellow px-4 py-3 font-bold text-brand-ink shadow-hard-5 shadow-black motion-reduce:animate-none -rotate-1"
+        >
+          <CheckIcon aria-hidden="true" className="size-5" strokeWidth={3.5} strokeLinecap="square" />
+          {t("depositSuccess", {
+            amount: format.number(Number(depositedAmount), {
+              style: "currency",
+              currency: "BRL",
+            }),
+          })}
+        </p>
+      ) : null}
+
+      {isDepositOpen ? (
+        <div className="-mt-4">
+          <DepositForm
+            availableBalance={walletQuery.data?.availableBalance}
+            onDeposited={onDeposited}
+            onCancel={onDepositCancel}
           />
-        ) : null}
+        </div>
+      ) : null}
+
+      <section
+        className="flex flex-col gap-6"
+        aria-label={t("balanceSummary")}
+      >
+        {walletQuery.isError ? (
+          <div id="wallet-balance-error" className={errorBox} role="alert">
+            <p>{t("error")}</p>
+            <Button type="button" variant="outline" size="sm" onClick={() => walletQuery.refetch()} disabled={walletQuery.isFetching}>
+              {walletQuery.isFetching ? t("retrying") : t("retry")}
+            </Button>
+          </div>
+        ) : walletQuery.isPending ? (
+          <>
+            <p className="sr-only">{t("loading")}</p>
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-7">
+              {Array.from({ length: 3 }).map((_, index) => {
+                const key = `wallet-balance-skeleton-${index}`;
+                return <Skeleton key={key} className="h-38 w-full" />
+              })}
+            </div>
+            <Skeleton className="h-7 w-full" />
+          </>
+        ) : (
+          <>
+            <BalanceCards
+              totalBalance={walletQuery.data.totalBalance}
+              committedBalance={walletQuery.data.committedBalance}
+              availableBalance={walletQuery.data.availableBalance}
+            />
+            <BalanceBar
+              totalBalance={walletQuery.data.totalBalance}
+              committedBalance={walletQuery.data.committedBalance}
+              availableBalance={walletQuery.data.availableBalance}
+            />
+          </>
+        )}
       </section>
+
+      <HowBalanceWorks />
+      <WalletMovementHistory />
     </div>
   )
 }
 
-type WalletMovementsPaginationProps = {
-  page: number
-  pageCount: number
-  onPageChange: (page: number) => void
+function WalletMovementHistory() {
+  const t = useTranslations("pages./wallet");
+  const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
+  const safePage = Math.max(page, 1)
+  const movementsQuery = useIndexWalletMovements({
+    page: safePage,
+    limit: LIMIT_PER_PAGE,
+  });
+  const total = movementsQuery.data?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / LIMIT_PER_PAGE))
+  const showPagination = safePage > 1 || total > LIMIT_PER_PAGE;
+
+  useEffect(() => {
+    if (!movementsQuery.isSuccess) return
+
+    const normalizedPage = Math.min(Math.max(page, 1), totalPages)
+    if (normalizedPage !== page) setPage(normalizedPage)
+  }, [movementsQuery.isSuccess, page, setPage, totalPages])
+
+  return (
+    <section
+      className="flex min-w-0 flex-col gap-[18px]"
+      aria-labelledby="wallet-history-title"
+    >
+      <h2 id="wallet-history-title" className="type-h2">
+        {t("historyTitle")}
+      </h2>
+      <WalletMovementContent query={movementsQuery} t={t} />
+      {showPagination ? (
+        <WalletMovementsPagination total={total} limit={LIMIT_PER_PAGE} />
+      ) : null}
+    </section>
+  )
 }
 
-function WalletMovementsPagination(props: WalletMovementsPaginationProps) {
-  const t = useTranslations("pages./wallet")
-  const items = getPaginationPageItems(props.page, props.pageCount)
-
-  function onPrevious() {
-    props.onPageChange(props.page - 1)
+function WalletMovementContent({
+  query,
+  t,
+}: {
+  query: ReturnType<typeof useIndexWalletMovements>
+  t: ReturnType<typeof useTranslations<"pages./wallet">>
+}) {
+  if (query.isError) {
+    return (
+      <div id="wallet-movements-error" className={errorBox} role="alert">
+        <p>{t("movements.error")}</p>
+        <Button type="button" variant="outline" size="sm" onClick={() => query.refetch()} disabled={query.isFetching}>
+          {query.isFetching ? t("retrying") : t("retry")}
+        </Button>
+      </div>
+    )
   }
 
-  function onNext() {
-    props.onPageChange(props.page + 1)
-  }
-
-  function onPageClick(event: MouseEvent<HTMLButtonElement>) {
-    const nextPage = Number(event.currentTarget.dataset.page)
-
-    if (!Number.isInteger(nextPage)) {
-      return
-    }
-
-    props.onPageChange(nextPage)
+  if (query.isPending) {
+    return (
+      <div className="flex flex-col gap-2">
+        <p className="sr-only">{t("movements.loading")}</p>
+        {
+          Array.from({ length: LIMIT_PER_PAGE }).map((_, index) => {
+            const key = `wallet-movement-skeleton-${index}`;
+            return (
+              <Skeleton key={key} className="h-13 w-full" />
+            );
+          })
+        }
+      </div>
+    )
   }
 
   return (
-    <Pagination.Root
-      id="wallet-movements-pagination"
-      aria-label={t("movements.pagination")}
-    >
-      <Pagination.Content className="flex-wrap justify-center">
-        <Pagination.Item>
-          <Pagination.Previous
-            id="wallet-movements-previous"
-            type="button"
-            size="icon"
-            text={t("movements.previous")}
-            aria-label={t("movements.previous")}
-            disabled={props.page <= 1}
-            className="px-0! **:data-[slot=pagination-label]:sr-only"
-            onClick={onPrevious}
-          />
-        </Pagination.Item>
-        {items.map((item, index) => {
-          if (item === "ellipsis") {
-            return (
-              <Pagination.Item key={`wallet-movements-ellipsis-${index}`}>
-                <Pagination.Ellipsis label={t("movements.morePages")} />
-              </Pagination.Item>
-            )
-          }
-
-          return (
-            <Pagination.Item key={item}>
-              <Pagination.Link
-                id={`wallet-movements-page-${item}`}
-                type="button"
-                isActive={item === props.page}
-                data-page={item}
-                aria-label={
-                  item === props.page
-                    ? t("movements.currentPage", { page: String(item) })
-                    : t("movements.goToPage", { page: String(item) })
-                }
-                onClick={onPageClick}
-              >
-                {item}
-              </Pagination.Link>
-            </Pagination.Item>
-          )
-        })}
-        <Pagination.Item>
-          <Pagination.Next
-            id="wallet-movements-next"
-            type="button"
-            size="icon"
-            text={t("movements.next")}
-            aria-label={t("movements.next")}
-            disabled={props.page >= props.pageCount}
-            className="px-0! **:data-[slot=pagination-label]:sr-only"
-            onClick={onNext}
-          />
-        </Pagination.Item>
-      </Pagination.Content>
-    </Pagination.Root>
+    <div className="overflow-x-auto border-4 border-border bg-card shadow-hard-8">
+      {query.data.movements.length === 0 ? (
+        <p id="wallet-movements-empty" className="p-7 text-center font-semibold text-muted-foreground">
+          {t("movements.empty")}
+        </p>
+      ) : (
+        <TransactionList movements={query.data.movements} />
+      )}
+    </div>
   )
 }
