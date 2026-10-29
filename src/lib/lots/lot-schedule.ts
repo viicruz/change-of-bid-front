@@ -1,7 +1,8 @@
 //* Helpers for the `datetime-local` fields of the create lot form.
 //* Values are local wall-clock strings: "2026-10-29T20:00".
 
-const dayMs = 24 * 60 * 60 * 1000
+const minuteMs = 60 * 1000
+const dayMs = 24 * 60 * minuteMs
 const defaultStartHour = 20
 
 function pad(value: number) {
@@ -35,17 +36,19 @@ export function defaultLotStart(now: Date) {
   )
 }
 
-//* End `days` after the start; without a start, it also returns the default one
+//* End after the start; without a start, it also returns the default one
 export function scheduleForDuration(props: {
   startsAt: string
-  days: number
+  days?: number
+  minutes?: number
   now: Date
 }) {
   const start = parseDateTimeLocal(props.startsAt) ?? defaultLotStart(props.now)
+  const durationMs = (props.days ?? 0) * dayMs + (props.minutes ?? 0) * minuteMs
 
   return {
     startsAt: toDateTimeLocal(start),
-    endsAt: toDateTimeLocal(new Date(start.getTime() + props.days * dayMs)),
+    endsAt: toDateTimeLocal(new Date(start.getTime() + durationMs)),
   }
 }
 
