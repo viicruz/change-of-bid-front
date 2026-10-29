@@ -53,7 +53,7 @@ export function LanguageSelect(props: { id: string }) {
             aria-label={t(`locales.${code}`)}
             onClick={() => onPick(code)}
             className={cn(
-              "h-[38px] min-w-11 rounded-none px-2.5 font-heading text-[13px] focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-ring",
+              "h-9.5 min-w-11 rounded-none px-2.5 font-heading text-[13px] focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-ring",
               pressed ? "bg-brand-red text-white" : "bg-header text-foreground"
             )}
           >

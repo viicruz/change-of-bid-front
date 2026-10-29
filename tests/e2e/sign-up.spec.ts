@@ -30,7 +30,7 @@ async function fillSignUpForm(page: Page, input: SignUpInput) {
   await page.getByLabel("Nome").fill(input.name)
   await page.getByLabel("E-mail").fill(input.email)
   await page.getByLabel("Senha", { exact: true }).fill(input.password)
-  await page.getByLabel("Confirmar senha").fill(input.confirmPassword)
+  await page.getByLabel("Repetir senha").fill(input.confirmPassword)
 }
 
 async function mockSignUp(
@@ -52,16 +52,16 @@ describe("sign-up page", () => {
     await page.goto("/sign-up")
 
     await expect(
-      page.getByRole("heading", { name: "Criar uma conta" })
+      page.getByRole("heading", { name: "Criar conta" })
     ).toBeVisible()
     await expect(page.getByRole("radio", { name: /Arrematante/ })).toBeVisible()
     await expect(page.getByRole("radio", { name: /Leiloeiro/ })).toBeVisible()
     await expect(page.getByLabel("Nome")).toBeVisible()
     await expect(page.getByLabel("E-mail")).toBeVisible()
     await expect(page.getByLabel("Senha", { exact: true })).toBeVisible()
-    await expect(page.getByLabel("Confirmar senha")).toBeVisible()
+    await expect(page.getByLabel("Repetir senha")).toBeVisible()
     await expect(
-      page.getByRole("button", { name: "Criar conta" })
+      page.getByRole("button", { name: "Criar minha conta" })
     ).toBeVisible()
   })
 
@@ -82,7 +82,7 @@ describe("sign-up page", () => {
       password: "short",
       confirmPassword: "short",
     })
-    await page.getByRole("button", { name: "Criar conta" }).click()
+    await page.getByRole("button", { name: "Criar minha conta" }).click()
 
     await expect(
       page.getByText("Digite um endereço de e-mail válido")
@@ -117,7 +117,7 @@ describe("sign-up page", () => {
       confirmPassword: "correct-horse-1",
       role: "Arrematante",
     })
-    await page.getByRole("button", { name: "Criar conta" }).click()
+    await page.getByRole("button", { name: "Criar minha conta" }).click()
 
     await expect(
       page.getByText("O usuário já existe. Use outro e-mail.")
@@ -140,7 +140,7 @@ describe("sign-up page", () => {
       password: "correct-horse-1",
       confirmPassword: "correct-horse-1",
     })
-    await page.getByRole("button", { name: "Criar conta" }).click()
+    await page.getByRole("button", { name: "Criar minha conta" }).click()
 
     await expect(
       page.getByText("Escolha se você quer ser arrematante ou leiloeiro.")
@@ -185,7 +185,7 @@ describe("sign-up page", () => {
       confirmPassword: "correct-horse-1",
       role: "Leiloeiro",
     })
-    await page.getByRole("button", { name: "Criar conta" }).click()
+    await page.getByRole("button", { name: "Criar minha conta" }).click()
 
     await expect(page).toHaveURL("/")
     expect(requestRole).toBe("AUCTIONEER")

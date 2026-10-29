@@ -82,26 +82,40 @@
       "morePages": "Mais páginas"
     },
     "/sign-up": {
-      "title": "Criar uma conta",
-      "description": "Escolha como participar e cadastre-se com e-mail e senha.",
-      "role": "Como você quer participar?",
+      "title": "Criar conta",
+      "hasAccount": "Já tem conta?",
+      "signInLink": "Entrar",
+      "brand": {
+        "tag": "Novo duelista?",
+        "titleA": "ENTRE NO",
+        "titleB": "DUELO.",
+        "description": "Crie sua conta para leiloar as cartas paradas na pasta ou disputar os lotes ao vivo até o último segundo.",
+        "logoAlt": "Change of Bid"
+      },
+      "role": "Tipo de conta",
       "roles": {
-        "bidder": {
-          "title": "Arrematante",
-          "description": "Dê lances em lotes e acompanhe seus arremates."
-        },
         "auctioneer": {
           "title": "Leiloeiro",
-          "description": "Crie lotes e conduza os leilões."
+          "description": "Quero leiloar minhas cartas e ver os lances subindo."
+        },
+        "bidder": {
+          "title": "Arrematante",
+          "description": "Quero dar lances e arrematar cartas para o meu deck."
         }
       },
       "name": "Nome",
+      "namePlaceholder": "Como os duelistas vão te chamar",
       "email": "E-mail",
+      "emailPlaceholder": "duelista@email.com",
       "password": "Senha",
-      "confirmPassword": "Confirmar senha",
-      "submit": "Criar conta",
-      "submitting": "Criando conta...",
-      "signInLink": "Já tenho uma conta"
+      "passwordPlaceholder": "Mín. 8 caracteres",
+      "confirmPassword": "Repetir senha",
+      "confirmPasswordPlaceholder": "Digite de novo",
+      "showPassword": "Mostrar senha",
+      "hidePassword": "Ocultar senha",
+      "passwordsMatch": "As senhas batem!",
+      "submit": "Criar minha conta",
+      "submitting": "Criando conta..."
     },
     "/wallet": {
       "title": "Carteira",
