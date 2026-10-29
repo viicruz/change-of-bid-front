@@ -4,11 +4,7 @@
 import { useMutation } from "@tanstack/react-query"
 
 //* Auth imports
-import {
-  authClient,
-  clearBearerToken,
-  readBearerToken,
-} from "@/src/lib/auth-client"
+import { authClient } from "@/src/lib/auth-client"
 
 //* Local imports
 import { backendBaseUrl } from "@/src/lib/backend-url"
@@ -30,19 +26,10 @@ function signOutUrl() {
 }
 
 async function signOut() {
-  const token = readBearerToken()
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  }
-
-  if (token) {
-    headers.Authorization = `Bearer ${token}`
-  }
-
   const response = await fetch(signOutUrl(), {
     method: "POST",
     credentials: "include",
-    headers,
+    headers: { "Content-Type": "application/json" },
     body: "{}",
   })
 
@@ -56,7 +43,6 @@ export function useSignOut() {
     mutationFn: signOut,
     retry: false,
     onSuccess: () => {
-      clearBearerToken()
       queryClient.clear()
       authClient.$store.notify("$sessionSignal")
     },

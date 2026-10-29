@@ -1,9 +1,6 @@
 //* Libraries imports
 import * as z from "zod"
 
-//* Auth imports
-import { readBearerToken } from "@/src/lib/auth-client"
-
 //* Local imports
 import { backendBaseUrl } from "@/src/lib/backend-url"
 
@@ -118,27 +115,17 @@ function parseSuccess<T>(text: string, schema: z.ZodType<T>) {
   return parsed.data
 }
 
-function withAuthorization(headers: Record<string, string>) {
-  const token = readBearerToken()
-
-  if (token) {
-    headers.Authorization = `Bearer ${token}`
-  }
-
-  return headers
-}
-
 function jsonHeaders() {
-  return withAuthorization({
+  return {
     Accept: "application/json",
     "Content-Type": "application/json",
-  })
+  }
 }
 
 function acceptHeaders() {
-  return withAuthorization({
+  return {
     Accept: "application/json",
-  })
+  }
 }
 
 export const api = {

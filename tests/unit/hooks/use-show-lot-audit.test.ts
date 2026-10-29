@@ -17,7 +17,6 @@ import {
 //* Local imports
 import { QUERY_KEYS, queryClient } from "@/src/lib/query-client"
 
-const tokenKey = "change-of-bid.bearer-token"
 const lotId = "3f1c2a40-7b6e-4d2a-9c11-8e5a1b0d4f22"
 
 const publicAuditResponse = {
@@ -74,8 +73,6 @@ describe("useShowLotAudit", () => {
 
   beforeEach(() => {
     queryClient.clear()
-    sessionStorage.clear()
-    sessionStorage.setItem(tokenKey, "session-token")
     container = document.createElement("div")
     document.body.append(container)
     root = createRoot(container)
@@ -87,7 +84,6 @@ describe("useShowLotAudit", () => {
     })
     container.remove()
     queryClient.clear()
-    sessionStorage.clear()
     vi.unstubAllGlobals()
     vi.clearAllMocks()
   })
@@ -218,23 +214,6 @@ describe("useShowLotAudit", () => {
       const cached = queryClient.getQueryData<ShowLotAudit>(queryKey(lotId))
 
       expect(cached?.audit.status).toBe("VERIFICATION_FAILED")
-    })
-  })
-
-  describe("when there is no session", () => {
-    it("still loads the audit without an authorization header", async () => {
-      sessionStorage.clear()
-      const fetchMock = vi
-        .fn()
-        .mockResolvedValue(jsonResponse(publicAuditResponse))
-      vi.stubGlobal("fetch", fetchMock)
-
-      await renderAndWait({ id: lotId }, "success:INTACT:2:10.00:1:true")
-
-      const request = lastRequest()
-
-      expect(request.headers.get("Authorization")).toBeNull()
-      expect(fetchMock).toHaveBeenCalledTimes(1)
     })
   })
 

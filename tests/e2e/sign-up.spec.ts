@@ -9,9 +9,8 @@ const signUpEndpoint = "**/api/auth/sign-up/email"
 const corsHeaders = {
   "access-control-allow-origin": "http://localhost:3000",
   "access-control-allow-credentials": "true",
-  "access-control-allow-headers": "Content-Type, Authorization",
+  "access-control-allow-headers": "Content-Type",
   "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "access-control-expose-headers": "set-auth-token",
 }
 
 type SignUpInput = {
@@ -157,10 +156,7 @@ describe("sign-up page", () => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
-        headers: {
-          ...corsHeaders,
-          "set-auth-token": "session-token",
-        },
+        headers: corsHeaders,
         body: JSON.stringify({
           token: "session-token",
           user: {

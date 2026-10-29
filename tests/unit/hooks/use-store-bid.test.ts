@@ -23,7 +23,6 @@ import { ApiError, ApiSchemaError } from "@/src/lib/api"
 import { publicLotQueryKey } from "@/src/lib/lots/public-lot-room"
 import { QUERY_KEYS, queryClient } from "@/src/lib/query-client"
 
-const tokenKey = "change-of-bid.bearer-token"
 const lotId = "3f1c2a4e-8b0d-4e6a-9c11-2d5f7a8b9c0d"
 const bidId = "7c9e6679-7425-40de-944b-e07fc1f90ae7"
 
@@ -179,8 +178,6 @@ describe("useStoreBid", () => {
 
   beforeEach(() => {
     queryClient.clear()
-    sessionStorage.clear()
-    sessionStorage.setItem(tokenKey, "session-token")
     container = document.createElement("div")
     document.body.append(container)
     root = createRoot(container)
@@ -192,7 +189,6 @@ describe("useStoreBid", () => {
     })
     container.remove()
     queryClient.clear()
-    sessionStorage.clear()
     vi.unstubAllGlobals()
     vi.clearAllMocks()
   })
@@ -255,7 +251,6 @@ describe("useStoreBid", () => {
     )
     expect(request.init.method).toBe("POST")
     expect(request.init.body).toBe(JSON.stringify({ amount: "11.50" }))
-    expect(request.headers.get("Authorization")).toBe("Bearer session-token")
     expect(request.headers.get("Accept")).toBe("application/json")
     expect(request.headers.get("Content-Type")).toBe("application/json")
     expect(fetchMock).toHaveBeenCalledTimes(1)

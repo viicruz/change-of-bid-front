@@ -14,7 +14,6 @@ import { useSignOut } from "@/src/hooks/auth/use-sign-out"
 //* Auth imports
 import { authClient } from "@/src/lib/auth-client"
 
-const tokenKey = "change-of-bid.bearer-token"
 const signOutUrl = "http://localhost:3000/backend/api/auth/sign-out"
 
 function SignOutHarness() {
@@ -38,7 +37,6 @@ describe("useSignOut", () => {
   let root: Root
 
   beforeEach(() => {
-    sessionStorage.clear()
     container = document.createElement("div")
     document.body.append(container)
     root = createRoot(container)
@@ -49,7 +47,6 @@ describe("useSignOut", () => {
       root.unmount()
     })
     container.remove()
-    sessionStorage.clear()
     vi.unstubAllGlobals()
     vi.restoreAllMocks()
   })
@@ -84,8 +81,7 @@ describe("useSignOut", () => {
     return call
   }
 
-  it("posts an empty json object and sends the bearer token", async () => {
-    sessionStorage.setItem(tokenKey, "session-token")
+  it("posts an empty json object with the session cookie only", async () => {
     const signalBefore = authClient.$store.atoms.$sessionSignal.get()
     stubFetch(204)
 
@@ -103,31 +99,12 @@ describe("useSignOut", () => {
     expect(init.method).toBe("POST")
     expect(init.credentials).toBe("include")
     expect(init.body).toBe("{}")
-    expect(headers.get("Authorization")).toBe("Bearer session-token")
+    expect(headers.get("Authorization")).toBeNull()
     expect(headers.get("Content-Type")).toBe("application/json")
-    expect(sessionStorage.getItem(tokenKey)).toBeNull()
     expect(authClient.$store.atoms.$sessionSignal.get()).toBe(!signalBefore)
   })
 
-  it("omits the authorization header when there is no token", async () => {
-    stubFetch(200)
-
-    renderHarness()
-    await submit()
-
-    await vi.waitFor(() => {
-      expect(container.textContent).toBe("signed-out")
-    })
-
-    const [, init] = requestInit()
-    const headers = new Headers(init.headers)
-
-    expect(headers.get("Authorization")).toBeNull()
-    expect(init.body).toBe("{}")
-  })
-
-  it("keeps the token when sign-out fails", async () => {
-    sessionStorage.setItem(tokenKey, "session-token")
+  it("keeps the session signal when sign-out fails", async () => {
     const signalBefore = authClient.$store.atoms.$sessionSignal.get()
     stubFetch(401)
 
@@ -138,7 +115,6 @@ describe("useSignOut", () => {
       expect(container.textContent).toBe("rejected")
     })
 
-    expect(sessionStorage.getItem(tokenKey)).toBe("session-token")
     expect(authClient.$store.atoms.$sessionSignal.get()).toBe(signalBefore)
   })
 })

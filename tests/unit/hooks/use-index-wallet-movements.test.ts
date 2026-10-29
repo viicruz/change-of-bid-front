@@ -14,8 +14,6 @@ import { useIndexWalletMovements } from "@/src/hooks/wallets/queries/use-index-w
 //* Local imports
 import { queryClient } from "@/src/lib/query-client"
 
-const tokenKey = "change-of-bid.bearer-token"
-
 const lotId = "11111111-1111-4111-8111-111111111111"
 const bidId = "22222222-2222-4222-8222-222222222222"
 
@@ -77,8 +75,6 @@ describe("useIndexWalletMovements", () => {
 
   beforeEach(() => {
     queryClient.clear()
-    sessionStorage.clear()
-    sessionStorage.setItem(tokenKey, "session-token")
     container = document.createElement("div")
     document.body.append(container)
     root = createRoot(container)
@@ -90,7 +86,6 @@ describe("useIndexWalletMovements", () => {
     })
     container.remove()
     queryClient.clear()
-    sessionStorage.clear()
     vi.unstubAllGlobals()
     vi.clearAllMocks()
   })
@@ -149,7 +144,6 @@ describe("useIndexWalletMovements", () => {
     )
     expect(request.init.method).toBe("GET")
     expect(request.init.body).toBeUndefined()
-    expect(request.headers.get("Authorization")).toBe("Bearer session-token")
     expect(request.headers.get("Accept")).toBe("application/json")
     expect(request.headers.get("Content-Type")).toBeNull()
     expect(fetchMock).toHaveBeenCalledTimes(1)
@@ -198,9 +192,6 @@ describe("useIndexWalletMovements", () => {
     await renderAndWait({ page: 1 }, "error")
 
     expect(fetchMock).toHaveBeenCalledTimes(1)
-    expect(lastRequest().headers.get("Authorization")).toBe(
-      "Bearer session-token"
-    )
   })
 
   it("surfaces a missing wallet row and does not retry", async () => {

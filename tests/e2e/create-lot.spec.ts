@@ -7,12 +7,11 @@ const it = test
 const cardSearchEndpoint = /\/public\/yugioh\/cards\/search/
 const storeLotEndpoint = /\/private\/lots$/
 const sessionEndpoint = /\/api\/auth\/get-session/
-const tokenKey = "change-of-bid.bearer-token"
 
 const corsHeaders = {
   "access-control-allow-origin": "http://localhost:3000",
   "access-control-allow-credentials": "true",
-  "access-control-allow-headers": "Content-Type, Authorization, Accept",
+  "access-control-allow-headers": "Content-Type, Accept",
   "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
 }
 
@@ -172,9 +171,6 @@ async function openAuctioneer(page: Page) {
 
     await fulfillJson(route, 200, { totalReceived: "0.00", lots: [] })
   })
-  await page.addInitScript((key) => {
-    sessionStorage.setItem(key, "session-token")
-  }, tokenKey)
   await page.goto("/auctioneer")
 }
 
@@ -244,9 +240,6 @@ describe("create lot page", () => {
 
   it("redirects a bidder to the home page", async ({ page }) => {
     await mockSession(page, "BIDDER")
-    await page.addInitScript((key) => {
-      sessionStorage.setItem(key, "session-token")
-    }, tokenKey)
     await page.goto("/auctioneer")
 
     await expect(page).toHaveURL("/")
@@ -554,7 +547,7 @@ describe("create lot page", () => {
     await expect(page.locator("#card-search")).toBeFocused()
     await expect(page.locator("#lot-title")).toHaveValue("")
     await expect(page.locator("#remove-lot-card-89631139")).toHaveCount(0)
-    expect(authorization).toBe("Bearer session-token")
+    expect(authorization).toBeUndefined()
     expect(requestBody).toEqual({
       title: "Lote do dragão",
       description: null,

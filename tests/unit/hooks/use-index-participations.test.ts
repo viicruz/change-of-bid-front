@@ -14,8 +14,6 @@ import { useIndexParticipations } from "@/src/hooks/participations/queries/use-i
 //* Local imports
 import { QUERY_KEYS, queryClient } from "@/src/lib/query-client"
 
-const tokenKey = "change-of-bid.bearer-token"
-
 const participationsResponse = {
   lots: [
     {
@@ -125,8 +123,6 @@ describe("useIndexParticipations", () => {
 
   beforeEach(() => {
     queryClient.clear()
-    sessionStorage.clear()
-    sessionStorage.setItem(tokenKey, "session-token")
     container = document.createElement("div")
     document.body.append(container)
     root = createRoot(container)
@@ -138,7 +134,6 @@ describe("useIndexParticipations", () => {
     })
     container.remove()
     queryClient.clear()
-    sessionStorage.clear()
     vi.unstubAllGlobals()
     vi.clearAllMocks()
   })
@@ -199,7 +194,6 @@ describe("useIndexParticipations", () => {
     expect(request.url.search).toBe("")
     expect(request.init.method).toBe("GET")
     expect(request.init.body).toBeUndefined()
-    expect(request.headers.get("Authorization")).toBe("Bearer session-token")
     expect(request.headers.get("Accept")).toBe("application/json")
     expect(request.headers.get("Content-Type")).toBeNull()
     expect(fetchMock).toHaveBeenCalledTimes(1)
