@@ -18,6 +18,18 @@ import enMessages from "@/messages/en.json"
 import { ApiError, api } from "@/src/lib/api"
 import { queryClient } from "@/src/lib/query-client"
 
+const authSession = vi.hoisted(() => ({
+  data: { user: { role: "BIDDER" } } as { user: { role: string } } | null,
+  isPending: false,
+  isRefetching: false,
+  error: null,
+  refetch: vi.fn(),
+}))
+
+vi.mock("@/src/hooks/auth/use-auth-session", () => ({
+  useAuthSession: () => authSession,
+}))
+
 vi.mock("@/src/lib/api", async () => {
   const actual =
     await vi.importActual<typeof import("@/src/lib/api")>("@/src/lib/api")
@@ -177,6 +189,8 @@ describe("WalletSummary", () => {
   let root: Root
 
   beforeEach(() => {
+    authSession.data = { user: { role: "BIDDER" } }
+    authSession.isPending = false
     queryClient.clear()
     container = document.createElement("div")
     document.body.append(container)
@@ -673,6 +687,112 @@ describe("WalletSummary", () => {
       },
       schema: expect.anything(),
       errorSchema: expect.anything(),
+    })
+  })
+
+  describe("when the signed-in user is a bidder", () => {
+    it("shows the deposit button and the balance locked in bids", async () => {
+      mockWalletGet()
+
+      act(() => {
+        root.render(createElement(SummaryHarness))
+      })
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(
+            container.querySelector("#wallet-committed-balance")?.textContent
+          ).toBe("R$0.01")
+        })
+      })
+
+      expect(container.querySelector("#wallet-deposit-open")).toBeInstanceOf(
+        HTMLButtonElement
+      )
+      expect(container.querySelector("#wallet-available-balance")?.textContent).toBe(
+        "R$10.09"
+      )
+      expect(container.textContent).toContain("Locked in bids · 0%")
+    })
+  })
+
+  describe("when the session is still loading", () => {
+    it("hides the deposit button and the balance locked in bids", async () => {
+      authSession.data = null
+      authSession.isPending = true
+      mockWalletGet()
+
+      act(() => {
+        root.render(createElement(SummaryHarness))
+      })
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(container.querySelector("#wallet-balance")?.textContent).toBe(
+            "R$10.10"
+          )
+        })
+      })
+
+      expect(container.querySelector("#wallet-deposit-open")).toBeNull()
+      expect(container.querySelector("#wallet-committed-balance")).toBeNull()
+      expect(container.textContent).not.toContain("Locked in bids")
+    })
+  })
+
+  describe("when the signed-in user is an auctioneer", () => {
+    it("hides the deposit button and the balance locked in bids", async () => {
+      authSession.data = { user: { role: "AUCTIONEER" } }
+      mockWalletGet()
+
+      act(() => {
+        root.render(createElement(SummaryHarness))
+      })
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(container.querySelector("#wallet-balance")?.textContent).toBe(
+            "R$10.10"
+          )
+        })
+      })
+
+      expect(container.querySelector("#wallet-deposit-open")).toBeNull()
+      expect(container.querySelector("#deposit-form")).toBeNull()
+      expect(container.querySelector("#wallet-committed-balance")).toBeNull()
+      expect(container.querySelector("#wallet-available-balance")?.textContent).toBe(
+        "R$10.09"
+      )
+      expect(container.textContent).not.toContain("Locked in bids")
+      expect(container.textContent).toContain("Available balance · 100%")
+    })
+
+    it("shows two balance skeletons while the wallet request is pending", async () => {
+      authSession.data = { user: { role: "AUCTIONEER" } }
+      vi.mocked(api.get).mockImplementation(async (input) => {
+        if (input.url === "/private/wallet") {
+          return new Promise(() => {})
+        }
+
+        return movementsResponse
+      })
+
+      act(() => {
+        root.render(createElement(SummaryHarness))
+      })
+
+      await act(async () => {
+        await vi.waitFor(() => {
+          expect(container.textContent).toContain("Loading balance.")
+        })
+      })
+
+      const balanceGrid = container.querySelector(
+        "[aria-label='Balance summary'] .grid"
+      )
+
+      expect(balanceGrid?.children).toHaveLength(2)
+      expect(container.querySelector("#wallet-deposit-open")).toBeNull()
     })
   })
 })
