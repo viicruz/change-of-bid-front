@@ -6,6 +6,12 @@ A interface está em inglês e português do Brasil (padrão: português). Cadas
 
 A API fica em outro repositório: [change-of-bid-back](https://github.com/viicruz/change-of-bid-back).
 
+![Vitrine de lotes do Change of Bid](./docs/images/home.png)
+
+## Nome e paleta
+
+O nome foi inspirado na carta **Change of Heart**. A paleta foi pensada nas cores dessa carta e em cores que funcionam bem nos temas claro e escuro. O fundo é branco no tema claro e preto no tema escuro, porque prefiro telas com background nessas cores.
+
 ## Requisitos
 
 - Node.js 20 ou mais recente
@@ -38,11 +44,13 @@ Além das contas, o mesmo seed cadastra lotes, lances, recebimentos e a validaç
 
 Esse seed já está em execução na [produção](https://change-of-bid-front.vercel.app/).
 
-| E-mail | Papel |
-| --- | --- |
-| `bidder@bidder.bidder` | Licitante (`BIDDER`) |
-| `bidder2@bidder.bidder` | Licitante (`BIDDER`) |
+
+| E-mail                             | Papel                    |
+| ---------------------------------- | ------------------------ |
+| `bidder@bidder.bidder`             | Licitante (`BIDDER`)     |
+| `bidder2@bidder.bidder`            | Licitante (`BIDDER`)     |
 | `auctioneer@auctioneer.auctioneer` | Leiloeiro (`AUCTIONEER`) |
+
 
 Build de produção:
 
@@ -51,15 +59,31 @@ npm run build
 npm start
 ```
 
+## Pesquisa de cartas
+
+No painel do leiloeiro, a busca consulta o catálogo em inglês. Digite o nome da carta em inglês, mesmo com a interface em português.
+
+Alguns nomes para testar:
+
+- `Change of Heart`
+- `Blue-Eyes White Dragon`
+- `Dark Magician`
+- `Red-Eyes Black Dragon`
+- `Pot of Greed`
+- `Mirror Force`
+
 ## Rotas
 
-| Rota | O que faz |
-| --- | --- |
-| `/` | Vitrine de lotes. Busca e filtra lotes por tipo de carta (monstro, magia, armadilha, extra deck) e status (ao vivo, agendado, cancelado, encerrado). |
-| `/sign-up` | Cria uma conta com nome, e-mail e senha. |
-| `/sign-in` | Entra com e-mail e senha. |
-| `/auction/[id]` | Sala do lote. Mostra as cartas do lote, o lance atual e o histórico de lances. Um lote ao vivo também mostra o formulário de lance. Ids desconhecidos retornam 404. Exemplo: `/auction/lot-blue-eyes-white-dragon`. |
-| `/auction/[id]/audit` | Auditoria pública de um lote: cartas e lances, com os nomes dos licitantes censurados. Ids desconhecidos retornam 404. Exemplo: `/auction/lot-blue-eyes-white-dragon/audit`. |
-| `/wallet` | Saldo e histórico de transações. |
-| `/my-bids` | Lances do usuário autenticado. |
-| `/auctioneer` | Painel do leiloeiro para gerenciar lotes e as cartas dentro deles. |
+
+| Rota                  | O que faz                                                                                                                                                                                                           |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`                   | Vitrine de lotes. Busca e filtra lotes por tipo de carta (monstro, magia, armadilha, extra deck) e status (ao vivo, agendado, cancelado, encerrado).                                                                |
+| `/sign-up`            | Cria uma conta com nome, e-mail e senha.                                                                                                                                                                            |
+| `/sign-in`            | Entra com e-mail e senha.                                                                                                                                                                                           |
+| `/auction/[id]`       | Sala do lote. Mostra as cartas do lote, o lance atual e o histórico de lances. Um lote ao vivo também mostra o formulário de lance. Ids desconhecidos retornam 404. Exemplo: `/auction/lot-blue-eyes-white-dragon`. |
+| `/auction/[id]/audit` | Auditoria pública de um lote: cartas e lances, com os nomes dos licitantes censurados. Ids desconhecidos retornam 404. Exemplo: `/auction/lot-blue-eyes-white-dragon/audit`.                                        |
+| `/wallet`             | Saldo e histórico de transações.                                                                                                                                                                                    |
+| `/my-bids`            | Lances do usuário autenticado.                                                                                                                                                                                      |
+| `/auctioneer`         | Painel do leiloeiro para gerenciar lotes e as cartas dentro deles.                                                                                                                                                  |
+
+
