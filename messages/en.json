@@ -608,6 +608,18 @@
     "/design": {
       "title": "Design System",
       "description": "Change of Bid colors, typography, components, icons, motion and voice."
+    },
+    "/not-found": {
+      "title": "Page not found",
+      "description": "The page you are looking for doesn’t exist or has moved.",
+      "tag": "Error 404",
+      "titleA": "CARD",
+      "titleB": "OUT",
+      "titleC": "OF THE DECK.",
+      "subtitle": "This page doesn’t exist, has moved or went straight to the graveyard. Check the address or head back to the table and find your next lot.",
+      "ctaLive": "See live lots",
+      "ctaHome": "Back to home",
+      "graveyardBadge": "Sent to the graveyard"
     }
   },
   "schemas": {
