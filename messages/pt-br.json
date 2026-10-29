@@ -563,13 +563,26 @@
     },
     "/sign-in": {
       "title": "Entrar",
-      "description": "Entre com seu e-mail e senha.",
+      "noAccount": "Ainda não tem conta?",
+      "signUpLink": "Criar conta",
+      "brand": {
+        "tag": "Já é duelista?",
+        "titleA": "DE VOLTA AO",
+        "titleB": "DUELO.",
+        "description": "Entre para acompanhar seus lances, ficar de olho nos lotes que você segue e arrematar antes que o martelo bata.",
+        "logoAlt": "Change of Bid"
+      },
       "email": "E-mail",
+      "emailPlaceholder": "duelista@email.com",
       "password": "Senha",
+      "passwordPlaceholder": "Sua senha",
+      "showPassword": "Mostrar senha",
+      "hidePassword": "Ocultar senha",
       "submit": "Entrar",
       "submitting": "Entrando...",
       "unknownError": "Não foi possível entrar.",
-      "signUpLink": "Criar uma conta"
+      "or": "ou",
+      "createAccount": "Criar conta grátis"
     },
     "/design": {
       "title": "Design System",

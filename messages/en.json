@@ -563,13 +563,26 @@
     },
     "/sign-in": {
       "title": "Sign in",
-      "description": "Sign in with your email and password.",
+      "noAccount": "Don’t have an account?",
+      "signUpLink": "Sign up",
+      "brand": {
+        "tag": "Already a duelist?",
+        "titleA": "BACK TO THE",
+        "titleB": "DUEL.",
+        "description": "Sign in to track your bids, keep an eye on the lots you follow and win before the gavel drops.",
+        "logoAlt": "Change of Bid"
+      },
       "email": "Email",
+      "emailPlaceholder": "duelist@email.com",
       "password": "Password",
+      "passwordPlaceholder": "Your password",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
       "submit": "Sign in",
       "submitting": "Signing in...",
       "unknownError": "Unable to sign in.",
-      "signUpLink": "Create an account"
+      "or": "or",
+      "createAccount": "Sign up free"
     },
     "/design": {
       "title": "Design System",

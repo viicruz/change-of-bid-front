@@ -61,10 +61,10 @@ const buttonStates = [
 
 function Buttons() {
   return (
-    <div className="flex flex-col gap-[18px]">
+    <div className="flex flex-col gap-4.5">
       <SubTitle>Botões</SubTitle>
-      <Panel className="flex flex-col gap-[26px] p-6">
-        <div className="flex flex-wrap items-center gap-[22px]">
+      <Panel className="flex flex-col gap-6.5 p-6">
+        <div className="flex flex-wrap items-center gap-5.5">
           <Button>Primário</Button>
           <Button variant="secondary">Secundário</Button>
           <Button variant="dark">Escuro</Button>
@@ -73,7 +73,7 @@ function Buttons() {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="ds-table min-w-[640px]">
+          <table className="ds-table min-w-160">
             <thead>
               <tr>
                 <th scope="col">Variante</th>
@@ -123,7 +123,7 @@ function Buttons() {
 
         <div className="flex flex-col gap-3">
           <Eyebrow>Tamanhos</Eyebrow>
-          <div className="flex flex-wrap items-end gap-[22px]">
+          <div className="flex flex-wrap items-end gap-5.5">
             <Button size="lg">GG · lg · 22px</Button>
             <Button>M · default · 18px</Button>
             <Button variant="secondary" size="sm">
@@ -144,7 +144,7 @@ function Buttons() {
 
 function Badges() {
   return (
-    <div className="flex flex-col gap-[18px]">
+    <div className="flex flex-col gap-4.5">
       <SubTitle>Tags, selos e badges</SubTitle>
       <Panel className="flex flex-wrap items-center gap-x-8 gap-y-7 px-6 py-7">
         <Labeled label="Status ao vivo · pulsa">
@@ -169,7 +169,7 @@ function Badges() {
           <Badge>Maior lance</Badge>
         </Labeled>
         <Labeled label="Quantidade">
-          <span className="border-3 border-black bg-brand-yellow px-[7px] py-0.5 font-heading text-[13px] text-brand-ink">
+          <span className="border-3 border-black bg-brand-yellow px-1.75 py-0.5 font-heading text-[13px] text-brand-ink">
             ×3
           </span>
         </Labeled>
@@ -196,7 +196,7 @@ function Badges() {
 
 function FormFields() {
   return (
-    <div className="flex flex-col gap-[18px]">
+    <div className="flex flex-col gap-4.5">
       <SubTitle>Campos de formulário</SubTitle>
       <Panel className="grid grid-cols-[repeat(auto-fit,minmax(min(260px,100%),1fr))] gap-7 p-6">
         <div className="flex flex-col gap-2">
@@ -252,7 +252,7 @@ function FormFields() {
             <span className={cn(fieldBox, "flex-1 border-r-0 border-input")}>
               ••••••••
             </span>
-            <span className="flex w-[52px] flex-none items-center justify-center border-3 border-input bg-brand-ink text-brand-yellow">
+            <span className="flex w-13 flex-none items-center justify-center border-3 border-input bg-brand-ink text-brand-yellow">
               <DesignIcon name="olho" size={20} />
             </span>
           </div>
@@ -294,7 +294,7 @@ const cardStage = "relative border-b-4 px-10 py-[18px]"
 
 function LotCards() {
   return (
-    <div className="flex flex-col gap-[18px]">
+    <div className="flex flex-col gap-4.5">
       <SubTitle>Cards de lote</SubTitle>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-8">
         <div className="flex flex-col gap-2.5">

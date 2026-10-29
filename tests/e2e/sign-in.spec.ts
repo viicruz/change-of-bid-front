@@ -22,7 +22,7 @@ type SignInInput = {
 
 async function fillSignInForm(page: Page, input: SignInInput) {
   await page.getByLabel("E-mail").fill(input.email)
-  await page.getByLabel("Senha").fill(input.password)
+  await page.getByLabel("Senha", { exact: true }).fill(input.password)
 }
 
 async function mockSignIn(
@@ -45,11 +45,14 @@ describe("sign-in page", () => {
 
     await expect(page.getByRole("heading", { name: "Entrar" })).toBeVisible()
     await expect(page.getByLabel("E-mail")).toBeVisible()
-    await expect(page.getByLabel("Senha")).toBeVisible()
+    await expect(page.getByLabel("Senha", { exact: true })).toBeVisible()
     await expect(page.getByRole("button", { name: "Entrar" })).toBeVisible()
+    await expect(page.locator("#sign-in-sign-up-link")).toHaveText(
+      "Criar conta"
+    )
     await expect(
-      page.getByRole("link", { name: "Criar uma conta" })
-    ).toBeVisible()
+      page.getByRole("link", { name: "Criar conta grátis" })
+    ).toHaveAttribute("href", "/sign-up")
   })
 
   it("blocks an invalid email and a short password without calling the API", async ({
