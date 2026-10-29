@@ -1,6 +1,5 @@
-export const cardTypes = ["monster", "spell", "trap", "extra"] as const
-
-export type CardType = (typeof cardTypes)[number]
+//* Lib imports
+import type { CardType } from "@/src/lib/cards/card-types"
 
 export const lotStatuses = ["live", "scheduled", "canceled", "closed"] as const
 

@@ -12,7 +12,7 @@ import {
 import { cardAttributeSchema } from "@/src/schemas/card"
 
 //* Lib imports
-import { cardTypes } from "@/src/lib/lots/mock-lots"
+import { cardTypes } from "@/src/lib/cards/card-types"
 
 const lotCardFieldSchema = z.object({
   cardId: z.number().int().positive(),

@@ -8,7 +8,7 @@ import { useTranslations } from "next-intl"
 import type { CardAttribute } from "@/src/schemas/card"
 
 //* Lib imports
-import type { CardType } from "@/src/lib/lots/mock-lots"
+import type { CardType } from "@/src/lib/cards/card-types"
 import { cn } from "@/src/lib/utils"
 
 const imageWidth = 421
