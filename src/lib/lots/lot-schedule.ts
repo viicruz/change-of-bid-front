@@ -1,4 +1,4 @@
-//* Helpers for the `datetime-local` fields of the create lot form.
+//* Helpers for the create lot schedule.
 //* Values are local wall-clock strings: "2026-10-29T20:00".
 
 const minuteMs = 60 * 1000
@@ -25,30 +25,75 @@ export function parseDateTimeLocal(value: string) {
   return new Date(year, month - 1, day, hours, minutes)
 }
 
-//* Tomorrow at 20:00, when the evening auctions happen
-export function defaultLotStart(now: Date) {
-  return new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate() + 1,
-    defaultStartHour,
-    0
+//* Keep the clock time, or 20:00 when the field is still empty
+export function applyCalendarDate(value: string, date: Date) {
+  const current = parseDateTimeLocal(value)
+
+  return toDateTimeLocal(
+    new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      current?.getHours() ?? defaultStartHour,
+      current?.getMinutes() ?? 0
+    )
   )
 }
 
-//* End after the start; without a start, it also returns the default one
+//* Change only the hours and minutes of a value that already has a date
+export function applyClockTime(value: string, time: string) {
+  const current = parseDateTimeLocal(value)
+  const match = /^(\d{2}):(\d{2})(?::\d{2})?$/.exec(time)
+
+  if (!current || !match) {
+    return value
+  }
+
+  const hours = Number(match[1])
+  const minutes = Number(match[2])
+
+  if (hours > 23 || minutes > 59) {
+    return value
+  }
+
+  return toDateTimeLocal(
+    new Date(
+      current.getFullYear(),
+      current.getMonth(),
+      current.getDate(),
+      hours,
+      minutes
+    )
+  )
+}
+
+//* The end of a lot cannot be earlier than its start
+export function dateTimeNotBefore(value: string, minimum: string | undefined) {
+  if (!minimum) {
+    return value
+  }
+
+  const next = parseDateTimeLocal(value)
+  const earliest = parseDateTimeLocal(minimum)
+
+  if (!next || !earliest || next >= earliest) {
+    return value
+  }
+
+  return minimum
+}
+
+//* A duration preset starts at the moment it is chosen
 export function scheduleForDuration(props: {
-  startsAt: string
   days?: number
   minutes?: number
   now: Date
 }) {
-  const start = parseDateTimeLocal(props.startsAt) ?? defaultLotStart(props.now)
   const durationMs = (props.days ?? 0) * dayMs + (props.minutes ?? 0) * minuteMs
 
   return {
-    startsAt: toDateTimeLocal(start),
-    endsAt: toDateTimeLocal(new Date(start.getTime() + durationMs)),
+    startsAt: toDateTimeLocal(props.now),
+    endsAt: toDateTimeLocal(new Date(props.now.getTime() + durationMs)),
   }
 }
 
