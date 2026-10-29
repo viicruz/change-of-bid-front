@@ -18,6 +18,8 @@ O nome foi inspirado na carta **Change of Heart**. A paleta foi pensada nas core
 - npm
 - O [backend](https://github.com/viicruz/change-of-bid-back) em execução para criar uma conta ou entrar
 
+
+
 ## Instalação e execução
 
 ```bash
@@ -38,24 +40,22 @@ Altere esse valor se o backend não estiver na porta `3001`.
 
 ## Docker
 
-O `docker-compose.yml` sobe só este frontend. PostgreSQL e a API ficam de fora: o [backend](https://github.com/viicruz/change-of-bid-back) precisa estar em execução antes.
+O Compose deste repositório sobe só o frontend. Postgres e a API ficam no [change-of-bid-back](https://github.com/viicruz/change-of-bid-back): suba aquele projeto primeiro (no README dele tem as explicações de como rodar) e deixe a API em `http://localhost:3001`. Sem isso a vitrine abre, mas lotes, login e lances não funcionam.
 
-Requisitos: Docker e Docker Compose. O compose usa a rede do host (`network_mode: host`), então `localhost:3001` aponta para a API tanto no navegador quanto dentro do container. Isso funciona no Linux.
+Requisito: Docker Compose v2 no **Linux**. O serviço usa `network_mode: host` para que `localhost:3001` seja a API no navegador e no container (o Next faz rewrite de `/backend` para a API). Em macOS e Windows esse modo não se comporta igual.
 
 ```bash
 cp example.env .env
-docker compose up --build
+docker compose up -d --build
 ```
 
-Abra [http://localhost:3000](http://localhost:3000).
-
-`NEXT_PUBLIC_BACKEND_URL` é lida do `.env` e fica fixada na imagem. O padrão é `http://localhost:3001`. Se mudar esse valor, suba de novo com `docker compose up --build`.
-
-Para parar:
+A vitrine fica em [http://localhost:3000](http://localhost:3000). `NEXT_PUBLIC_BACKEND_URL` entra na imagem no build (padrão `http://localhost:3001`). Se alterar o `.env`, rode de novo o `up --build`.
 
 ```bash
 docker compose down
 ```
+
+
 
 ## Contas
 
@@ -80,6 +80,8 @@ npm run build
 npm start
 ```
 
+
+
 ## Pesquisa de cartas
 
 No painel do leiloeiro, a busca consulta o catálogo em inglês. Digite o nome da carta em inglês, mesmo com a interface em português.
@@ -92,6 +94,8 @@ Alguns nomes para testar:
 - `Red-Eyes Black Dragon`
 - `Pot of Greed`
 - `Mirror Force`
+
+
 
 ## Rotas
 
