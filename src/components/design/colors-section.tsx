@@ -41,7 +41,7 @@ export function ColorsSection() {
             className="border-4 border-black bg-card shadow-hard-8"
           >
             <div
-              className="flex h-[150px] items-end border-b-4 border-black p-3 font-heading text-[28px]"
+              className="flex h-37.5 items-end border-b-4 border-black p-3 font-heading text-[28px]"
               style={{ background: color.hex, color: color.on }}
             >
               {color.short}
@@ -79,7 +79,7 @@ export function ColorsSection() {
 
       <div className="flex flex-col gap-3">
         <SubHeading>Tokens de tema</SubHeading>
-        <p className="m-0 max-w-[720px] text-[15px] text-muted-foreground">
+        <p className="m-0 max-w-180 text-[15px] text-muted-foreground">
           As telas nunca usam hex direto para superfícies e textos: usam
           variáveis CSS que mudam com o tema. Cores de marca (vermelho, amarelo,
           contorno preto) ficam fixas nos dois temas.
@@ -116,7 +116,7 @@ export function ColorsSection() {
 
       <div className="flex flex-col gap-3">
         <SubHeading>Contraste (calculado)</SubHeading>
-        <p className="m-0 max-w-[720px] text-[15px] text-muted-foreground">
+        <p className="m-0 max-w-180 text-[15px] text-muted-foreground">
           Combinações usadas nas telas e a razão de contraste WCAG. &quot;AA
           grande&quot; só vale para texto a partir de 18px bold (ou 24px
           regular) — é por isso que todo botão vermelho usa Bungee 18px+.
