@@ -22,6 +22,7 @@ import { cn } from "@/src/lib/utils"
 const titleMaxLength = 80
 const descriptionMaxLength = 500
 const quickIncrements = [1, 5, 10] as const
+const quickDurationMinutes = 4
 const quickDurationDays = [1, 3, 5, 7] as const
 
 const textareaClassName =
@@ -102,8 +103,13 @@ export function LotDetailsFields() {
     form.setValue("minIncrement", amount.toFixed(2), setOptions)
   }
 
-  function onQuickDuration(days: number) {
-    const schedule = scheduleForDuration({ startsAt, days, now: new Date() })
+  function onQuickDuration(duration: { days?: number; minutes?: number }) {
+    const schedule = scheduleForDuration({
+      startsAt,
+      days: duration.days,
+      minutes: duration.minutes,
+      now: new Date(),
+    })
 
     form.setValue("startsAt", schedule.startsAt, setOptions)
     form.setValue("endsAt", schedule.endsAt, setOptions)
@@ -254,6 +260,20 @@ export function LotDetailsFields() {
           >
             {t("quickDuration")}
           </span>
+          <Button
+            id="lot-quick-duration-4m"
+            type="button"
+            size="xs"
+            variant="outline"
+            aria-label={t("quickDurationMinutes", {
+              minutes: String(quickDurationMinutes),
+            })}
+            onClick={() => onQuickDuration({ minutes: quickDurationMinutes })}
+          >
+            {t("quickDurationMinutesShort", {
+              minutes: String(quickDurationMinutes),
+            })}
+          </Button>
           {quickDurationDays.map((days) => (
             <Button
               key={days}
@@ -262,7 +282,7 @@ export function LotDetailsFields() {
               size="xs"
               variant="outline"
               aria-label={t("quickDurationDays", { days })}
-              onClick={() => onQuickDuration(days)}
+              onClick={() => onQuickDuration({ days })}
             >
               {t("quickDurationShort", { days: String(days) })}
             </Button>

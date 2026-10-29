@@ -12,7 +12,7 @@ import { lotSchema } from "@/src/schemas/lot"
 import { api } from "@/src/lib/api"
 import { QUERY_KEYS, queryInvalidator } from "@/src/lib/query-client"
 
-const oneDayMs = 24 * 60 * 60 * 1000
+const minimumLotDurationMs = 4 * 60 * 1000
 
 const moneyInputSchema = z
   .string()
@@ -39,9 +39,9 @@ export const storeLotSchema = z
     }
 
     const endsInTheFuture = endsAt > Date.now()
-    const lastsAtLeastOneDay = endsAt - startsAt >= oneDayMs
+    const lastsLongEnough = endsAt - startsAt >= minimumLotDurationMs
 
-    if (endsInTheFuture && lastsAtLeastOneDay) {
+    if (endsInTheFuture && lastsLongEnough) {
       return
     }
 

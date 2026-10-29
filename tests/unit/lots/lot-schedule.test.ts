@@ -30,6 +30,15 @@ describe("lot schedule", () => {
     expect(toDateTimeLocal(defaultLotStart(now))).toBe("2026-10-29T20:00")
   })
 
+  it("ends four minutes after the chosen start", () => {
+    expect(
+      scheduleForDuration({ startsAt: "2026-11-02T18:30", minutes: 4, now })
+    ).toEqual({
+      startsAt: "2026-11-02T18:30",
+      endsAt: "2026-11-02T18:34",
+    })
+  })
+
   it("ends a duration after the chosen start", () => {
     expect(
       scheduleForDuration({ startsAt: "2026-11-02T18:30", days: 3, now })

@@ -58,9 +58,9 @@ describe("createLotFormSchema", () => {
     expect(issueMessages(result.error, "cards")).toContain("CARD_IDS_REQUIRED")
   })
 
-  it("rejects a schedule shorter than 24 hours", () => {
+  it("rejects a schedule shorter than 4 minutes", () => {
     const result = createLotFormSchema.safeParse(
-      validForm({ endsAt: "2099-10-26T20:00" })
+      validForm({ endsAt: "2099-10-26T18:03" })
     )
 
     expect(result.success).toBe(false)
