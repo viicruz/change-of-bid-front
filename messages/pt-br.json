@@ -608,6 +608,18 @@
     "/design": {
       "title": "Design System",
       "description": "Cores, tipografia, componentes, ícones, animações e voz do Change of Bid."
+    },
+    "/not-found": {
+      "title": "Página não encontrada",
+      "description": "A página que você procura não existe ou mudou de lugar.",
+      "tag": "Erro 404",
+      "titleA": "CARTA",
+      "titleB": "FORA",
+      "titleC": "DO DECK.",
+      "subtitle": "Esta página não existe, mudou de lugar ou foi direto pro cemitério. Confira o endereço ou volte para a mesa e encontre seu próximo lote.",
+      "ctaLive": "Ver lotes ao vivo",
+      "ctaHome": "Voltar ao início",
+      "graveyardBadge": "Direto pro cemitério"
     }
   },
   "schemas": {
