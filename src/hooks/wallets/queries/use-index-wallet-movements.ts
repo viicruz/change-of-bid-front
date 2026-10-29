@@ -12,6 +12,7 @@ import { walletMovementsSchema } from "@/src/schemas/wallet"
 import { ApiError, ApiSchemaError, api } from "@/src/lib/api"
 import { QUERY_KEYS } from "@/src/lib/query-client"
 
+/** @expected-unused */
 export type IndexWalletMovements = z.infer<typeof walletMovementsSchema>
 
 export interface IndexWalletMovementsInput {

@@ -55,6 +55,7 @@ const apiResponseSchema = z.object({
   lots: z.array(indexParticipationSchema),
 })
 
+/** @expected-unused */
 export type IndexParticipations = z.infer<typeof apiResponseSchema>
 
 export interface IndexParticipationsInput {

@@ -16,6 +16,7 @@ import { env } from "@/src/env/client"
 //* Local imports
 import { queryClient } from "@/src/lib/query-client"
 
+/** @expected-unused */
 export class SignOutError extends Error {
   readonly status: number
 

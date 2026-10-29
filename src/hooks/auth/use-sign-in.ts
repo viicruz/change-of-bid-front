@@ -12,6 +12,7 @@ import { authUserSchema } from "@/src/schemas/user"
 //* Local imports
 import { queryClient } from "@/src/lib/query-client"
 
+/** @expected-unused */
 export type SignInInput = {
   email: string
   password: string

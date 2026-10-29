@@ -104,7 +104,7 @@ function toStoreLotInput(values: CreateLotFormValues) {
   }
 }
 
-export function toOffsetDateTime(value: string) {
+function toOffsetDateTime(value: string) {
   const trimmed = value.trim()
 
   if (trimmed.length === 0) {
