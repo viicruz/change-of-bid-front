@@ -111,4 +111,22 @@ Alguns nomes para testar:
 | `/my-bids`            | Lances do usuário autenticado.                                                                                                                                                                                      |
 | `/auctioneer`         | Painel do leiloeiro para gerenciar lotes e as cartas dentro deles.                                                                                                                                                  |
 
+---
 
+## Comportamentos inesperados em produção
+
+### Horário dos lotes agendados exibido no fuso do servidor em vez do fuso do usuário
+
+O projeto foi entregue na **quinta-feira (29/10)**. Na **segunda-feira (02/11)**, identifiquei um bug no front-end em produção relacionado à exibição de data e hora.
+
+Os cards da seção **"Lotes agendados"**, na landing page (vitrine), mostram a data e a hora no fuso horário do servidor (**Londres, UTC+0**), e não no fuso horário do usuário. Por isso, para quem está no horário de Brasília (**UTC-3**), os horários aparecem **3 horas adiantados**.
+
+> O horário armazenado está correto. O problema está apenas na renderização, que deveria converter o horário para o fuso horário local do usuário.
+
+#### Exemplo
+
+| Situação                                    | Horário   |
+| ------------------------------------------- | --------- |
+| Horário no servidor                         | 10:00     |
+| Exibido hoje para um usuário em Brasília    | 10:00 ❌  |
+| Deveria ser exibido                         | 07:00 ✅  |
